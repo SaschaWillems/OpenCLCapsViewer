@@ -30,6 +30,9 @@
 #include <vector>
 #include <QVariantMap>
 #include <QDebug>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 
 struct DeviceExtension
 {
@@ -68,19 +71,23 @@ enum class clValueType {
 class DeviceInfo
 {
 private:
-    std::string getDeviceInfoString(cl_device_info info);
+    QString getDeviceInfoString(cl_device_info info);
     bool extensionSupported(const char* name);
     void readDeviceInfoValue(cl_device_info info, clValueType valueType, QString extension = "");
     void readDeviceInfo();
+    void readOpenCLVersion();
     void readDeviceExtensions();
     void readDeviceInfoExtensions();
 public:
     DeviceInfo();
     cl_device_id deviceId;
-    std::string name;
+    QString name;
+    uint32_t clVersionMajor;
+    uint32_t clVersionMinor;
     std::vector<DeviceInfoValue> deviceInfo;
     std::vector<DeviceExtension> extensions;
     void read();
+    QJsonObject toJson(QString submitter, QString comment);
 };
 
 #endif // DEVICEINFO_H

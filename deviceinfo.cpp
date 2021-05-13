@@ -20,14 +20,14 @@
 
 #include "deviceinfo.h"
 
-std::string DeviceInfo::getDeviceInfoString(cl_device_info info)
+QString DeviceInfo::getDeviceInfoString(cl_device_info info)
 {
 	size_t valueSize;
 	clGetDeviceInfo(this->deviceId, info, 0, nullptr, &valueSize);
 	std::string value;
 	value.resize(valueSize);
 	clGetDeviceInfo(this->deviceId, info, valueSize, &value[0], nullptr);
-	return value;
+	return QString::fromStdString(value);
 }
 
 bool DeviceInfo::extensionSupported(const char* name)
@@ -270,6 +270,24 @@ void DeviceInfo::readDeviceInfo()
 	}
 }
 
+void DeviceInfo::readOpenCLVersion()
+{
+	size_t valueSize;
+	clGetDeviceInfo(this->deviceId, CL_DEVICE_VERSION, 0, nullptr, &valueSize);
+	std::string value;
+	value.resize(valueSize);
+	clGetDeviceInfo(this->deviceId, CL_DEVICE_VERSION, valueSize, &value[0], nullptr);
+	// OpenCL<space><major_version.minor_version><space>
+	size_t versStart = value.find(' ', 0);
+	size_t versSplit = value.find('.', versStart+1);
+	size_t versEnd = value.find(' ', versStart+1);
+	std::string major, minor;
+	major = value.substr(versStart, versSplit - versStart);
+	minor = value.substr(versSplit + 1, versEnd - versSplit - 1);
+	clVersionMajor = std::stoi(major);
+	clVersionMinor = std::stoi(minor);
+}
+
 void DeviceInfo::readDeviceInfoExtensions()
 {
 	// @todo: tag device info with extension
@@ -323,9 +341,17 @@ DeviceInfo::DeviceInfo()
 void DeviceInfo::read()
 {
 	name = getDeviceInfoString(CL_DEVICE_NAME);
+	readOpenCLVersion();
 	readDeviceInfo();
 	readDeviceExtensions();
 	readDeviceInfoExtensions();
+}
+
+QJsonObject DeviceInfo::toJson(QString submitter, QString comment)
+{
+	QJsonObject jsonRoot;
+
+	return jsonRoot;
 }
 
 void DeviceInfo::readDeviceExtensions()

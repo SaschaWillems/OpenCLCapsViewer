@@ -196,7 +196,7 @@ QTreeView {
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="label_header_top">
+           <widget class="QLabel" name="labelTitle">
             <property name="styleSheet">
              <string notr="true">color:#FFFFFF;</string>
             </property>
@@ -429,7 +429,7 @@ QTreeView {
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QComboBox" name="comboBoxGPU">
+           <widget class="QComboBox" name="comboBoxDevice">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>

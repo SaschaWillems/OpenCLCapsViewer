@@ -28,6 +28,7 @@
 #include <QMessageBox>
 #include <QKeyEvent>
 #include <QWindow>
+#include <QFileDialog>
 #include <treeproxyfilter.h>
 
 #include <vector>
@@ -46,12 +47,25 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    static const QString version;
+    static const QString reportVersion;
+
+    struct OperatingSystem
+    {
+        QString name;
+        QString version;
+        QString architecture;
+    } operatingSystem;
+
     std::vector<DeviceInfo> devices;
+    
     void getDevices();
     void displayDevice(uint32_t index);
+    void getOperatingSystem();
 
 private:
     Ui::MainWindow *ui;
+    int selectedDeviceIndex = 0;
 
     struct FilterProxies {
         TreeProxyFilter deviceinfo;
@@ -65,8 +79,13 @@ private:
     void displayDeviceInfo(DeviceInfo &device);
     void displayDeviceExtensions(DeviceInfo &device);
 
+    void saveReport(QString fileName, QString submitter, QString comment);
+
 private Q_SLOTS:
+    void slotComboBoxDeviceChanged(int index);
     void slotClose();
+    void slotAbout();
+    void slotSaveReport();
     void slotFilterDeviceInfo(QString text);
     void slotFilterExtensions(QString text);
 };
