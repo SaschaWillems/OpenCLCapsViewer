@@ -38,9 +38,14 @@ MainWindow::MainWindow(QWidget *parent)
     ui->treeViewDeviceInfo->setModel(&filterProxies.deviceinfo);
     filterProxies.deviceinfo.setSourceModel(&models.deviceinfo);
     connect(ui->filterLineEditDeviceInfo, SIGNAL(textChanged(QString)), this, SLOT(slotFilterDeviceInfo(QString)));
-    ui->treeViewDeviceExtensions->setModel(&filterProxies.extensions);
-    filterProxies.extensions.setSourceModel(&models.extensions);
-    connect(ui->filterLineEditExtensions, SIGNAL(textChanged(QString)), this, SLOT(slotFilterExtensions(QString)));
+    
+    ui->treeViewDeviceExtensions->setModel(&filterProxies.deviceExtensions);
+    filterProxies.deviceExtensions.setSourceModel(&models.deviceExtensions);
+    connect(ui->filterLineEditExtensions, SIGNAL(textChanged(QString)), this, SLOT(slotFilterDeviceExtensions(QString)));
+    
+    ui->treeViewPlatformExtensions->setModel(&filterProxies.platformExtensions);
+    filterProxies.platformExtensions.setSourceModel(&models.platformExtensions);
+    connect(ui->filterLineEditPlatformExtensions, SIGNAL(textChanged(QString)), this, SLOT(slotFilterPlatformExtensions(QString)));
 
     // Slots
     connect(ui->comboBoxDevice, SIGNAL(currentIndexChanged(int)), this, SLOT(slotComboBoxDeviceChanged(int)));
@@ -67,27 +72,33 @@ void MainWindow::getDevices()
         return;
     }
 
-    std::vector<cl_platform_id> platforms(numPlatforms);
-    status = clGetPlatformIDs(numPlatforms, platforms.data(), nullptr);
+    std::vector<cl_platform_id> platformIds(numPlatforms);
+    status = clGetPlatformIDs(numPlatforms, platformIds.data(), nullptr);
     if (status != CL_SUCCESS)
     {
         QMessageBox::warning(this, tr("Error"), "Could not read platforms!");
         return;
     }
-    for (cl_platform_id platform : platforms)
+    for (cl_platform_id platformId : platformIds)
     {
         // @todo: store platform information
         
         // @todo: Error checking
         cl_uint numDevices;
-        status = clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, 0, nullptr, &numDevices);
+        status = clGetDeviceIDs(platformId, CL_DEVICE_TYPE_ALL, 0, nullptr, &numDevices);
         std::vector<cl_device_id> deviceIds(numDevices);
-        status = clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, numDevices, deviceIds.data(), nullptr);
+        status = clGetDeviceIDs(platformId, CL_DEVICE_TYPE_ALL, numDevices, deviceIds.data(), nullptr);
+
+        PlatformInfo platformInfo{};
+        platformInfo.platformId = platformId;
+        platformInfo.read();
+        platforms.push_back(platformInfo);
 
         for (auto deviceId : deviceIds) 
         {
             DeviceInfo deviceInfo{};
             deviceInfo.deviceId = deviceId;
+            deviceInfo.platform = &platforms.back();
             deviceInfo.read();
             devices.push_back(deviceInfo);
         }
@@ -118,6 +129,8 @@ void MainWindow::displayDevice(uint32_t index)
     DeviceInfo& device = devices[index];
     displayDeviceExtensions(device);
     displayDeviceInfo(device);
+    displayPlatformExtensions(*device.platform);
+    displayOperatingSystem();
 }
 
 void MainWindow::getOperatingSystem()
@@ -145,8 +158,8 @@ void MainWindow::displayDeviceInfo(DeviceInfo& device)
 
 void MainWindow::displayDeviceExtensions(DeviceInfo& device)
 {
-    models.extensions.clear();
-    QStandardItem* rootItem = models.extensions.invisibleRootItem();
+    models.deviceExtensions.clear();
+    QStandardItem* rootItem = models.deviceExtensions.invisibleRootItem();
     for (auto& extension : device.extensions) {
         QList<QStandardItem*> extItem;
         extItem << new QStandardItem(extension.name);
@@ -164,6 +177,46 @@ void MainWindow::displayDeviceExtensions(DeviceInfo& device)
     }
     ui->treeViewDeviceExtensions->expandAll();
     ui->treeViewDeviceExtensions->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+}
+
+void MainWindow::displayPlatformExtensions(PlatformInfo& platform)
+{
+    models.platformExtensions.clear();
+    QStandardItem* rootItem = models.platformExtensions.invisibleRootItem();
+    for (auto& extension : platform.extensions) {
+        QList<QStandardItem*> extItem;
+        extItem << new QStandardItem(extension.name);
+        extItem << new QStandardItem(utils::clVersionString(extension.version));
+        // Append extension related device info
+        for (auto info : platform.platformInfo) {
+            if (extension.name == info.extension) {
+                QList<QStandardItem*> extInfoItem;
+                extInfoItem << new QStandardItem(info.name);
+                extInfoItem << new QStandardItem(info.value.toString());
+                extItem.first()->appendRow(extInfoItem);
+            }
+        }
+        rootItem->appendRow(extItem);
+    }
+    ui->treeViewPlatformExtensions->expandAll();
+    ui->treeViewPlatformExtensions->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+}
+
+void MainWindow::displayOperatingSystem()
+{
+    ui->treeWidgetOS->clear();
+    std::unordered_map<std::string, std::string> osInfo;
+    osInfo["Name"] = operatingSystem.name.toStdString();
+    osInfo["Version"] = operatingSystem.version.toStdString();
+    osInfo["Architecture"] = operatingSystem.architecture.toStdString();
+    for (auto& info : osInfo) {
+        QTreeWidgetItem* treeItem = new QTreeWidgetItem(ui->treeWidgetOS);
+        treeItem->setText(0, QString::fromStdString(info.first));
+        treeItem->setText(1, QString::fromStdString(info.second));
+    }
+    for (int i = 0; i < ui->treeWidgetOS->columnCount(); i++) {
+        ui->treeWidgetOS->header()->setSectionResizeMode(i, QHeaderView::ResizeToContents);
+    }
 }
 
 void MainWindow::saveReport(QString fileName, QString submitter, QString comment)
@@ -241,10 +294,16 @@ void MainWindow::slotFilterDeviceInfo(QString text)
     filterProxies.deviceinfo.setFilterRegExp(regExp);
 }
 
-void MainWindow::slotFilterExtensions(QString text)
+void MainWindow::slotFilterDeviceExtensions(QString text)
 {
     QRegExp regExp(text, Qt::CaseInsensitive, QRegExp::RegExp);
-    filterProxies.extensions.setFilterRegExp(regExp);
+    filterProxies.deviceExtensions.setFilterRegExp(regExp);
+}
+
+void MainWindow::slotFilterPlatformExtensions(QString text)
+{
+    QRegExp regExp(text, Qt::CaseInsensitive, QRegExp::RegExp);
+    filterProxies.platformExtensions.setFilterRegExp(regExp);
 }
 
 void MainWindow::slotComboBoxDeviceChanged(int index)

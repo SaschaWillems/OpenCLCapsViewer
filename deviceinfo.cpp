@@ -174,6 +174,8 @@ void DeviceInfo::readDeviceInfoValue(cl_device_info info, clValueType valueType,
 
 void DeviceInfo::readDeviceInfo()
 {
+	deviceInfo.clear();
+
 	std::unordered_map<cl_device_info, clValueType> infoList = {
 		{ CL_DEVICE_TYPE, clValueType::cl_device_type },
 		{ CL_DEVICE_VENDOR_ID, clValueType::cl_uint },
@@ -226,8 +228,6 @@ void DeviceInfo::readDeviceInfo()
 		//{ CL_DEVICE_EXTENSIONS, clValueType:: },
 		//{ CL_DEVICE_PLATFOR, clValueType:: },
 	};
-
-	deviceInfo.clear();
 	for (auto info : infoList)
 	{
 		readDeviceInfoValue(info.first, info.second);
@@ -390,10 +390,10 @@ void DeviceInfo::readDeviceExtensions()
 	cl_name_version* extensions = new cl_name_version[4096];
 	clGetDeviceInfo(this->deviceId, CL_DEVICE_EXTENSIONS_WITH_VERSION, extSize, extensions, nullptr);
 	for (size_t i = 0; i < extSize / sizeof(cl_name_version); i++) {
-		DeviceExtension deviceExtension{};
-		deviceExtension.name = extensions[i].name;
-		deviceExtension.version = extensions[i].version;
-		this->extensions.push_back(deviceExtension);
+		DeviceExtension extension{};
+		extension.name = extensions[i].name;
+		extension.version = extensions[i].version;
+		this->extensions.push_back(extension);
 	}
 	delete[] extensions;
 }

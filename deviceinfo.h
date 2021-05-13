@@ -24,6 +24,7 @@
 #include "CL/cl.h"
 #include "CL/cl_ext.h"
 #include "openclutils.h"
+#include "platforminfo.h"
 #include <unordered_map>
 #include <string>
 #include <sstream>
@@ -49,25 +50,6 @@ struct DeviceInfoValue
     DeviceInfoValue(cl_device_info info, QVariant value, QString extension = "");
 };
 
-enum class clValueType {
-    cl_bool,
-    cl_char,
-    cl_command_queue_properties,
-    cl_device_atomic_capabilities,
-    cl_device_device_enqueue_capabilities,
-    cl_device_exec_capabilities,
-    cl_device_fp_config,
-    cl_device_local_mem_type,
-    cl_device_mem_cache_type,
-    cl_device_type,
-    cl_size_t,
-    cl_uchar,
-    cl_uint,
-    cl_ulong,
-    cl_version,
-    special
-};
-
 class DeviceInfo
 {
 private:
@@ -81,6 +63,7 @@ private:
 public:
     DeviceInfo();
     cl_device_id deviceId;
+    PlatformInfo* platform;
     QString name;
     uint32_t clVersionMajor;
     uint32_t clVersionMinor;

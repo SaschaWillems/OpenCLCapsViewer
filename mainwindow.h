@@ -33,6 +33,7 @@
 
 #include <vector>
 #include "deviceinfo.h"
+#include "platforminfo.h"
 #include "CL/cl.h"
 
 QT_BEGIN_NAMESPACE
@@ -57,6 +58,7 @@ public:
         QString architecture;
     } operatingSystem;
 
+    std::vector<PlatformInfo> platforms;
     std::vector<DeviceInfo> devices;
     
     void getDevices();
@@ -69,15 +71,19 @@ private:
 
     struct FilterProxies {
         TreeProxyFilter deviceinfo;
-        TreeProxyFilter extensions;
+        TreeProxyFilter deviceExtensions;
+        TreeProxyFilter platformExtensions;
     } filterProxies;
     struct Models {
         QStandardItemModel deviceinfo;
-        QStandardItemModel extensions;
+        QStandardItemModel deviceExtensions;
+        QStandardItemModel platformExtensions;
     } models;
 
     void displayDeviceInfo(DeviceInfo &device);
     void displayDeviceExtensions(DeviceInfo &device);
+    void displayPlatformExtensions(PlatformInfo& platform);
+    void displayOperatingSystem();
 
     void saveReport(QString fileName, QString submitter, QString comment);
 
@@ -87,6 +93,7 @@ private Q_SLOTS:
     void slotAbout();
     void slotSaveReport();
     void slotFilterDeviceInfo(QString text);
-    void slotFilterExtensions(QString text);
+    void slotFilterDeviceExtensions(QString text);
+    void slotFilterPlatformExtensions(QString text);
 };
 #endif // MAINWINDOW_H

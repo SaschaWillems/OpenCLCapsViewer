@@ -25,7 +25,26 @@
 #include <sstream>
 #include <QString>
 
-namespace utils 
+enum class clValueType {
+	cl_bool,
+	cl_char,
+	cl_command_queue_properties,
+	cl_device_atomic_capabilities,
+	cl_device_device_enqueue_capabilities,
+	cl_device_exec_capabilities,
+	cl_device_fp_config,
+	cl_device_local_mem_type,
+	cl_device_mem_cache_type,
+	cl_device_type,
+	cl_size_t,
+	cl_uchar,
+	cl_uint,
+	cl_ulong,
+	cl_version,
+	special
+};
+
+namespace utils
 {
 	inline QString clVersionString(cl_version version)
 	{
@@ -178,6 +197,24 @@ namespace utils
 			STR(DEVICE_LUID_VALID_KHR);
 			STR(DEVICE_LUID_KHR);
 			STR(DEVICE_NODE_MASK_KHR);
+#undef STR
+		default: return "?";
+		}
+	}
+
+	inline QString platformInfoString(const cl_platform_info info)
+	{
+		switch (info)
+		{
+#define STR(r) case CL_##r: return #r
+			STR(PLATFORM_PROFILE);
+			STR(PLATFORM_VERSION);
+			STR(PLATFORM_NAME);
+			STR(PLATFORM_VENDOR);
+			STR(PLATFORM_EXTENSIONS);
+			STR(PLATFORM_HOST_TIMER_RESOLUTION);
+			STR(PLATFORM_NUMERIC_VERSION);
+			STR(PLATFORM_EXTENSIONS_WITH_VERSION);
 #undef STR
 		default: return "?";
 		}
