@@ -1,7 +1,5 @@
 <RCC>
     <qresource prefix="/openclcapsviewer">
-        <file>Resources/vulkan32.png</file>
-        <file>Resources/vulkan48.png</file>
         <file>Resources/device48.png</file>
         <file>Resources/refresh16.png</file>
         <file>Resources/compare24.png</file>

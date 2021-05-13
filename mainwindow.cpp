@@ -103,29 +103,22 @@ void MainWindow::getDevices()
 
 void MainWindow::displayDevice(uint32_t index)
 {
-    // @todo
     DeviceInfo& device = devices[index];
     displayDeviceExtensions(device);
     displayDeviceInfo(device);
-}
-
-// @todo: move to utility file
-std::string clVersionString(cl_version version)
-{
-    std::stringstream ss;
-    ss << CL_VERSION_MAJOR(version) << "." << CL_VERSION_MINOR(version) << "." << CL_VERSION_PATCH(version);
-    return ss.str();
 }
 
 void MainWindow::displayDeviceInfo(DeviceInfo& device)
 {
     models.deviceinfo.clear();
     QStandardItem* rootItem = models.deviceinfo.invisibleRootItem();
-    for (QVariantMap::const_iterator iter = device.deviceInfo.begin(); iter != device.deviceInfo.end(); ++iter) {
-        QList<QStandardItem*> extItem;
-        extItem << new QStandardItem(iter.key());
-        extItem << new QStandardItem(iter.value().toString());
-        rootItem->appendRow(extItem);
+    for (auto info : device.deviceInfo) {
+        if (info.extension.isEmpty()) {
+            QList<QStandardItem*> extItem;
+            extItem << new QStandardItem(info.name);
+            extItem << new QStandardItem(info.value.toString());
+            rootItem->appendRow(extItem);
+        }
     }
     ui->treeViewDeviceInfo->expandAll();
     ui->treeViewDeviceInfo->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
@@ -137,8 +130,17 @@ void MainWindow::displayDeviceExtensions(DeviceInfo& device)
     QStandardItem* rootItem = models.extensions.invisibleRootItem();
     for (auto& extension : device.extensions) {
         QList<QStandardItem*> extItem;
-        extItem << new QStandardItem(QString::fromStdString(extension.name));
-        extItem << new QStandardItem(QString::fromStdString(clVersionString(extension.version)));
+        extItem << new QStandardItem(extension.name);
+        extItem << new QStandardItem(utils::clVersionString(extension.version));
+        // Append extension related device info
+        for (auto info : device.deviceInfo) {
+            if (extension.name == info.extension) {
+                QList<QStandardItem*> extInfoItem;
+                extInfoItem << new QStandardItem(info.name);
+                extInfoItem << new QStandardItem(info.value.toString());
+                extItem.first()->appendRow(extInfoItem);
+            }
+        }
         rootItem->appendRow(extItem);
     }
     ui->treeViewDeviceExtensions->expandAll();

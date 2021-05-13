@@ -33,23 +33,23 @@ std::string DeviceInfo::getDeviceInfoString(cl_device_info info)
 bool DeviceInfo::extensionSupported(const char* name)
 {
 	for (auto& ext : extensions) {
-		if (strcmp(ext.name.c_str(), name) == 0) {
+		if (ext.name == QLatin1String(name)) {
 			return true;
 		}
 	}
 	return false;
 }
 
-void DeviceInfo::readDeviceInfoValue(cl_device_info info, clValueType valueType)
+void DeviceInfo::readDeviceInfoValue(cl_device_info info, clValueType valueType, QString extension)
 {
-	// @todo: return instead of add to map
+	// @todo: return instead of add to map?
 	switch(valueType) 
 	{
 	case clValueType::cl_bool:
 	{
 		cl_bool value;
 		clGetDeviceInfo(this->deviceId, info, sizeof(cl_bool), &value, nullptr);
-		deviceInfo[utils::deviceInfoString(info)] = value;
+		deviceInfo.push_back(DeviceInfoValue(info, value, extension));
 		break;
 	}
 	case clValueType::cl_char:
@@ -59,35 +59,35 @@ void DeviceInfo::readDeviceInfoValue(cl_device_info info, clValueType valueType)
 		std::string value;
 		value.resize(valueSize);
 		clGetDeviceInfo(this->deviceId, info, valueSize, &value[0], nullptr);
-		deviceInfo[utils::deviceInfoString(info)] = QString::fromStdString(value);
+		deviceInfo.push_back(DeviceInfoValue(info, QString::fromStdString(value), extension));
 		break;
 	}
 	case clValueType::cl_size_t:
 	{
 		size_t value;
 		clGetDeviceInfo(this->deviceId, info, sizeof(size_t), &value, nullptr);
-		deviceInfo[utils::deviceInfoString(info)] = value;
+		deviceInfo.push_back(DeviceInfoValue(info, value, extension));
 		break;
 	}
 	case clValueType::cl_uint:
 	{
 		cl_uint value;
 		clGetDeviceInfo(this->deviceId, info, sizeof(cl_uint), &value, nullptr);
-		deviceInfo[utils::deviceInfoString(info)] = value;
+		deviceInfo.push_back(DeviceInfoValue(info, value, extension));
 		break;
 	}
 	case clValueType::cl_ulong:
 	{
 		cl_ulong value;
 		clGetDeviceInfo(this->deviceId, info, sizeof(cl_ulong), &value, nullptr);
-		deviceInfo[utils::deviceInfoString(info)] = value;
+		deviceInfo.push_back(DeviceInfoValue(info, value, extension));
 		break;
 	}
 	case clValueType::cl_version:
 	{
 		cl_version value;
 		clGetDeviceInfo(this->deviceId, info, sizeof(cl_version), &value, nullptr);
-		deviceInfo[utils::deviceInfoString(info)] = value;
+		deviceInfo.push_back(DeviceInfoValue(info, value, extension));
 		break;
 	}
 	//
@@ -95,62 +95,65 @@ void DeviceInfo::readDeviceInfoValue(cl_device_info info, clValueType valueType)
 	{
 		cl_device_atomic_capabilities value;
 		clGetDeviceInfo(this->deviceId, info, sizeof(cl_device_atomic_capabilities), &value, nullptr);
-		deviceInfo[utils::deviceInfoString(info)] = value;
+		deviceInfo.push_back(DeviceInfoValue(info, value, extension));
 		break;
 	}
 	case clValueType::cl_device_device_enqueue_capabilities:
 	{
 		cl_device_device_enqueue_capabilities value;
 		clGetDeviceInfo(this->deviceId, info, sizeof(cl_device_device_enqueue_capabilities), &value, nullptr);
-		deviceInfo[utils::deviceInfoString(info)] = value;
+		deviceInfo.push_back(DeviceInfoValue(info, value, extension));
 		break;
 	}
 	case clValueType::cl_device_local_mem_type:
 	{
 		cl_device_local_mem_type value;
 		clGetDeviceInfo(this->deviceId, info, sizeof(cl_device_local_mem_type), &value, nullptr);
-		deviceInfo[utils::deviceInfoString(info)] = value;
+		deviceInfo.push_back(DeviceInfoValue(info, value, extension));
 		break;
 	}
 	case clValueType::cl_device_exec_capabilities:
 	{
 		cl_device_exec_capabilities value;
 		clGetDeviceInfo(this->deviceId, info, sizeof(cl_device_exec_capabilities), &value, nullptr);
-		deviceInfo[utils::deviceInfoString(info)] = value;
+		deviceInfo.push_back(DeviceInfoValue(info, value, extension));
 		break;
 	}
 	case clValueType::cl_device_mem_cache_type:
 	{
 		cl_device_mem_cache_type value;
 		clGetDeviceInfo(this->deviceId, info, sizeof(cl_device_mem_cache_type), &value, nullptr);
-		deviceInfo[utils::deviceInfoString(info)] = value;
+		deviceInfo.push_back(DeviceInfoValue(info, value, extension));
 		break;
 	}
 	case clValueType::cl_command_queue_properties:
 	{
 		cl_command_queue_properties value;
 		clGetDeviceInfo(this->deviceId, info, sizeof(cl_command_queue_properties), &value, nullptr);
-		deviceInfo[utils::deviceInfoString(info)] = value;
+		deviceInfo.push_back(DeviceInfoValue(info, value, extension));
 		break;
 	}
 	case clValueType::cl_device_fp_config:
 	{
 		cl_device_fp_config value;
 		clGetDeviceInfo(this->deviceId, info, sizeof(cl_device_fp_config), &value, nullptr);
-		deviceInfo[utils::deviceInfoString(info)] = value;
+		deviceInfo.push_back(DeviceInfoValue(info, value, extension));
 		break;
 	}
 	case clValueType::cl_device_type:
 	{
 		cl_device_type value;
 		clGetDeviceInfo(this->deviceId, info, sizeof(cl_device_type), &value, nullptr);
-		deviceInfo[utils::deviceInfoString(info)] = value;
+		deviceInfo.push_back(DeviceInfoValue(info, value, extension));
 		break;
 	}
 	/* Special cases */
 	case clValueType::special:
 	{
-		if (info == CL_DEVICE_MAX_WORK_ITEM_SIZES) {
+		switch (info)
+		{
+		case CL_DEVICE_MAX_WORK_ITEM_SIZES:
+		{
 			cl_uint dim;
 			clGetDeviceInfo(this->deviceId, CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS, sizeof(cl_uint), &dim, nullptr);
 			std::vector<size_t> dimensions(dim);
@@ -159,9 +162,10 @@ void DeviceInfo::readDeviceInfoValue(cl_device_info info, clValueType valueType)
 			for (auto dimension : dimensions) {
 				variantList << dimension;
 			}
-			deviceInfo[utils::deviceInfoString(info)] = variantList;
+			deviceInfo.push_back(DeviceInfoValue(info, variantList, extension));
+			break;
 		}
-		break;
+		}
 	}
 	default:
 		qDebug("Unknwon device info type");
@@ -268,6 +272,34 @@ void DeviceInfo::readDeviceInfo()
 
 void DeviceInfo::readDeviceInfoExtensions()
 {
+	// @todo: tag device info with extension
+
+	// KHR
+	if (extensionSupported("cl_khr_fp64")) {
+		std::unordered_map<cl_device_info, clValueType> infoList = {
+			{ CL_DEVICE_DOUBLE_FP_CONFIG, clValueType::cl_device_fp_config },
+		};
+		for (auto info : infoList) {
+			readDeviceInfoValue(info.first, info.second, "cl_khr_fp64");
+		}
+	}
+	if (extensionSupported("cl_khr_fp16")) {
+		std::unordered_map<cl_device_info, clValueType> infoList = {
+			{ CL_DEVICE_HALF_FP_CONFIG, clValueType::cl_device_fp_config },
+		};
+		for (auto info : infoList) {
+			readDeviceInfoValue(info.first, info.second, "cl_khr_fp16");
+		}
+	}
+	if (extensionSupported("cl_khr_il_program")) {
+		std::unordered_map<cl_device_info, clValueType> infoList = {
+			{ CL_DEVICE_IL_VERSION_KHR, clValueType::cl_char },
+		};
+		for (auto info : infoList) {
+			readDeviceInfoValue(info.first, info.second, "cl_khr_il_program");
+		}
+	}
+	// NV
 	if (extensionSupported("cl_nv_device_attribute_query")) {
 		std::unordered_map<cl_device_info, clValueType> infoList = {
 			{ CL_DEVICE_COMPUTE_CAPABILITY_MAJOR_NV, clValueType::cl_uint },
@@ -279,7 +311,7 @@ void DeviceInfo::readDeviceInfoExtensions()
 			{ CL_DEVICE_INTEGRATED_MEMORY_NV, clValueType::cl_bool },
 		};
 		for (auto info : infoList) {
-			readDeviceInfoValue(info.first, info.second);
+			readDeviceInfoValue(info.first, info.second, "cl_nv_device_attribute_query");
 		}
 	}
 }
@@ -311,4 +343,11 @@ void DeviceInfo::readDeviceExtensions()
 		this->extensions.push_back(deviceExtension);
 	}
 	delete[] extensions;
+}
+
+DeviceInfoValue::DeviceInfoValue(cl_device_info info, QVariant value, QString extension)
+{
+	this->name = utils::deviceInfoString(info);
+	this->value = value;
+	this->extension = extension;
 }

@@ -22,11 +22,20 @@
 
 #include "CL/cl.h"
 #include "CL/cl_ext.h"
-#include <string>
+#include <sstream>
 #include <QString>
 
 namespace utils 
 {
+	inline QString clVersionString(cl_version version)
+	{
+		std::stringstream ss;
+		ss << CL_VERSION_MAJOR(version) << "." << CL_VERSION_MINOR(version) << "." << CL_VERSION_PATCH(version);
+		QString res = QString::fromStdString(ss.str());
+		return res;
+	}
+
+
 	inline QString deviceTypeString(const cl_device_type type)
 	{
 		switch (type)
@@ -163,6 +172,12 @@ namespace utils
 			STR(DEVICE_GPU_OVERLAP_NV);
 			STR(DEVICE_KERNEL_EXEC_TIMEOUT_NV);
 			STR(DEVICE_INTEGRATED_MEMORY_NV);
+			// cl_khr_device_uuid
+			STR(DEVICE_UUID_KHR);
+			STR(DRIVER_UUID_KHR);
+			STR(DEVICE_LUID_VALID_KHR);
+			STR(DEVICE_LUID_KHR);
+			STR(DEVICE_NODE_MASK_KHR);
 #undef STR
 		default: return "?";
 		}

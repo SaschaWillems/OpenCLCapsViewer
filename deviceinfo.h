@@ -33,8 +33,17 @@
 
 struct DeviceExtension
 {
-    std::string name;
+    QString name;
     cl_version version;
+};
+
+struct DeviceInfoValue
+{
+    QString name;
+    QVariant value;
+    QString extension;
+    // @todo: add display "translation" rule?
+    DeviceInfoValue(cl_device_info info, QVariant value, QString extension = "");
 };
 
 enum class clValueType {
@@ -49,6 +58,7 @@ enum class clValueType {
     cl_device_mem_cache_type,
     cl_device_type,
     cl_size_t,
+    cl_uchar,
     cl_uint,
     cl_ulong,
     cl_version,
@@ -60,8 +70,7 @@ class DeviceInfo
 private:
     std::string getDeviceInfoString(cl_device_info info);
     bool extensionSupported(const char* name);
-    void readDeviceInfoValue(cl_device_info info);
-    void readDeviceInfoValue(cl_device_info info, clValueType valueType);
+    void readDeviceInfoValue(cl_device_info info, clValueType valueType, QString extension = "");
     void readDeviceInfo();
     void readDeviceExtensions();
     void readDeviceInfoExtensions();
@@ -69,7 +78,7 @@ public:
     DeviceInfo();
     cl_device_id deviceId;
     std::string name;
-    QVariantMap deviceInfo;
+    std::vector<DeviceInfoValue> deviceInfo;
     std::vector<DeviceExtension> extensions;
     void read();
 };
