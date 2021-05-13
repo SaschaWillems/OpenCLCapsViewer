@@ -169,8 +169,8 @@ void MainWindow::displayDeviceExtensions(DeviceInfo& device)
 void MainWindow::saveReport(QString fileName, QString submitter, QString comment)
 {
     DeviceInfo device = devices[selectedDeviceIndex];
-    QJsonObject report = device.toJson(submitter, comment);
-
+    QJsonObject jsonReport;
+    
     // Environment
     QJsonObject jsonEnv;
     jsonEnv["name"] = operatingSystem.name;
@@ -180,9 +180,15 @@ void MainWindow::saveReport(QString fileName, QString submitter, QString comment
     jsonEnv["comment"] = comment;
     jsonEnv["reportversion"] = reportVersion;
     jsonEnv["appversion"] = version;
-    report["environment"] = jsonEnv;
+    jsonReport["environment"] = jsonEnv;
 
-    QJsonDocument doc(report);
+    // Platform
+    // @todo
+
+    // Device
+    jsonReport["device"] = device.toJson(submitter, comment);
+
+    QJsonDocument doc(jsonReport);
     QFile jsonFile(fileName);
     jsonFile.open(QFile::WriteOnly);
     jsonFile.write(doc.toJson(QJsonDocument::Indented));

@@ -351,6 +351,33 @@ QJsonObject DeviceInfo::toJson(QString submitter, QString comment)
 {
 	QJsonObject jsonRoot;
 
+	// Extensions
+	QJsonArray jsonExtensions;
+	for (auto& ext : extensions)
+	{
+		QJsonObject jsonNode;
+		jsonNode["name"] = ext.name;
+		jsonNode["version"] = int(ext.version);
+		jsonExtensions.append(jsonNode);
+	}
+	jsonRoot["extensions"] = jsonExtensions;
+
+	// Device info
+	QJsonArray jsonDeviceInfos;
+	for (auto& info : deviceInfo)
+	{
+		QJsonObject jsonNode;
+		jsonNode["name"] = info.name;
+		jsonNode["extension"] = info.extension;
+		if (info.value.canConvert(QMetaType::QVariantList)) {
+			jsonNode["value"] = QJsonArray::fromVariantList(info.value.toList());
+		} else {
+			jsonNode["value"] = info.value.toString();
+		}
+		jsonDeviceInfos.append(jsonNode);
+	}
+	jsonRoot["deviceinfo"] = jsonDeviceInfos;
+
 	return jsonRoot;
 }
 
