@@ -215,6 +215,8 @@ namespace utils
 			STR(PLATFORM_HOST_TIMER_RESOLUTION);
 			STR(PLATFORM_NUMERIC_VERSION);
 			STR(PLATFORM_EXTENSIONS_WITH_VERSION);
+			// cl_khr_icd
+			STR(PLATFORM_ICD_SUFFIX_KHR);
 #undef STR
 		default: return "?";
 		}

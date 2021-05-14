@@ -54,7 +54,7 @@ void PlatformInfo::readPlatformInfoValue(cl_platform_info info, clValueType valu
 	}
 }
 
-void PlatformInfo::readPlatformExtensions()
+void PlatformInfo::readExtensions()
 {
 	// @todo: 3.0 vs. older way of reading (no version)
 	extensions.clear();
@@ -71,6 +71,16 @@ void PlatformInfo::readPlatformExtensions()
 		this->extensions.push_back(extension);
 	}
 	delete[] extensions;
+}
+
+bool PlatformInfo::extensionSupported(const char* name)
+{
+	for (auto& ext : extensions) {
+		if (ext.name == QLatin1String(name)) {
+			return true;
+		}
+	}
+	return false;
 }
 
 void PlatformInfo::read()
@@ -94,9 +104,29 @@ void PlatformInfo::read()
 	// CL_PLATFORM_HOST_TIMER_RESOLUTION
 
 	// @todo: 3.0
+	// CL_PLATFORM_NUMERIC_VERSION
 	// CL_PLATFORM_EXTENSIONS_WITH_VERSION
 
-	readPlatformExtensions();
+	readExtensions();
+	readExtensionInfo();
+}
+
+void PlatformInfo::readExtensionInfo()
+{
+	// KHR
+	if (extensionSupported("cl_khr_icd")) {
+		std::unordered_map<cl_device_info, clValueType> infoList = {
+			{ CL_PLATFORM_ICD_SUFFIX_KHR, clValueType::cl_char },
+		};
+		for (auto info : infoList) {
+			readPlatformInfoValue(info.first, info.second, "cl_khr_icd");
+		}
+	}
+	// @todo
+	// cl_khr_extended_versioning
+	// CL_PLATFORM_NUMERIC_VERSION_KHR
+	// CL_PLATFORM_EXTENSIONS_WITH_VERSION_KHR
+
 }
 
 QJsonObject PlatformInfo::toJson()

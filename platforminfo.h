@@ -47,12 +47,14 @@ class PlatformInfo
 {
 private:
 	void readPlatformInfoValue(cl_platform_info info, clValueType valueType, QString extension = "");
-    void readPlatformExtensions();
+    void readExtensions();
+    bool extensionSupported(const char* name);
 public:
 	cl_platform_id platformId;
     std::vector<PlatformInfoValue> platformInfo;
     std::vector<PlatformExtension> extensions;
 	void read();
+    void readExtensionInfo();
     QJsonObject toJson();
 };
 
