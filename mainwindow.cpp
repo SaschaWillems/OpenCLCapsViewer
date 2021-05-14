@@ -47,6 +47,11 @@ MainWindow::MainWindow(QWidget *parent)
     filterProxies.platformExtensions.setSourceModel(&models.platformExtensions);
     connect(ui->filterLineEditPlatformExtensions, SIGNAL(textChanged(QString)), this, SLOT(slotFilterPlatformExtensions(QString)));
 
+    ui->treeViewPlatformInfo->setModel(&filterProxies.platformInfo);
+    filterProxies.platformInfo.setSourceModel(&models.platformInfo);
+    connect(ui->filterLineEditPlatformInfo, SIGNAL(textChanged(QString)), this, SLOT(slotFilterPlatformInfo(QString)));
+
+
     // Slots
     connect(ui->comboBoxDevice, SIGNAL(currentIndexChanged(int)), this, SLOT(slotComboBoxDeviceChanged(int)));
     connect(ui->toolButtonSave, SIGNAL(pressed()), this, SLOT(slotSaveReport()));
@@ -130,6 +135,7 @@ void MainWindow::displayDevice(uint32_t index)
     displayDeviceExtensions(device);
     displayDeviceInfo(device);
     displayPlatformExtensions(*device.platform);
+    displayPlatformInfo(*device.platform);
     displayOperatingSystem();
 }
 
@@ -177,6 +183,22 @@ void MainWindow::displayDeviceExtensions(DeviceInfo& device)
     }
     ui->treeViewDeviceExtensions->expandAll();
     ui->treeViewDeviceExtensions->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+}
+
+void MainWindow::displayPlatformInfo(PlatformInfo& platform)
+{
+    models.platformInfo.clear();
+    QStandardItem* rootItem = models.platformInfo.invisibleRootItem();
+    for (auto info : platform.platformInfo) {
+        if (info.extension.isEmpty()) {
+            QList<QStandardItem*> extItem;
+            extItem << new QStandardItem(info.name);
+            extItem << new QStandardItem(info.value.toString());
+            rootItem->appendRow(extItem);
+        }
+    }
+    ui->treeViewPlatformInfo->expandAll();
+    ui->treeViewPlatformInfo->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
 }
 
 void MainWindow::displayPlatformExtensions(PlatformInfo& platform)
@@ -298,6 +320,12 @@ void MainWindow::slotFilterDeviceExtensions(QString text)
 {
     QRegExp regExp(text, Qt::CaseInsensitive, QRegExp::RegExp);
     filterProxies.deviceExtensions.setFilterRegExp(regExp);
+}
+
+void MainWindow::slotFilterPlatformInfo(QString text)
+{
+    QRegExp regExp(text, Qt::CaseInsensitive, QRegExp::RegExp);
+    filterProxies.platformInfo.setFilterRegExp(regExp);
 }
 
 void MainWindow::slotFilterPlatformExtensions(QString text)

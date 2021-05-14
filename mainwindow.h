@@ -72,16 +72,19 @@ private:
     struct FilterProxies {
         TreeProxyFilter deviceinfo;
         TreeProxyFilter deviceExtensions;
+        TreeProxyFilter platformInfo;
         TreeProxyFilter platformExtensions;
     } filterProxies;
     struct Models {
         QStandardItemModel deviceinfo;
         QStandardItemModel deviceExtensions;
+        QStandardItemModel platformInfo;
         QStandardItemModel platformExtensions;
     } models;
 
     void displayDeviceInfo(DeviceInfo &device);
     void displayDeviceExtensions(DeviceInfo &device);
+    void displayPlatformInfo(PlatformInfo& platform);
     void displayPlatformExtensions(PlatformInfo& platform);
     void displayOperatingSystem();
 
@@ -94,6 +97,7 @@ private Q_SLOTS:
     void slotSaveReport();
     void slotFilterDeviceInfo(QString text);
     void slotFilterDeviceExtensions(QString text);
+    void slotFilterPlatformInfo(QString text);
     void slotFilterPlatformExtensions(QString text);
 };
 #endif // MAINWINDOW_H
