@@ -121,6 +121,7 @@ QJsonObject PlatformInfo::toJson()
 		QJsonObject jsonNode;
 		jsonNode["name"] = info.name;
 		jsonNode["extension"] = info.extension;
+		jsonNode["enumvalue"] = info.enumValue;
 		if (info.value.canConvert(QMetaType::QVariantList)) {
 			jsonNode["value"] = QJsonArray::fromVariantList(info.value.toList());
 		}
@@ -139,4 +140,5 @@ PlatformInfoValue::PlatformInfoValue(cl_platform_info info, QVariant value, QStr
 	this->name = utils::platformInfoString(info);
 	this->value = value;
 	this->extension = extension;
+	this->enumValue = info;
 }

@@ -46,6 +46,7 @@ struct DeviceInfoValue
     QString name;
     QVariant value;
     QString extension;
+    qint32 enumValue;
     // @todo: add display "translation" rule?
     DeviceInfoValue(cl_device_info info, QVariant value, QString extension = "");
 };
@@ -58,8 +59,8 @@ private:
     void readDeviceInfoValue(cl_device_info info, clValueType valueType, QString extension = "");
     void readDeviceInfo();
     void readOpenCLVersion();
-    void readDeviceExtensions();
-    void readDeviceInfoExtensions();
+    void readExtensions();
+    void readExtensionInfo();
 public:
     DeviceInfo();
     cl_device_id deviceId;

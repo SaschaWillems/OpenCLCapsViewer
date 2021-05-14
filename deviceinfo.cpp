@@ -288,10 +288,8 @@ void DeviceInfo::readOpenCLVersion()
 	clVersionMinor = std::stoi(minor);
 }
 
-void DeviceInfo::readDeviceInfoExtensions()
+void DeviceInfo::readExtensionInfo()
 {
-	// @todo: tag device info with extension
-
 	// KHR
 	if (extensionSupported("cl_khr_fp64")) {
 		std::unordered_map<cl_device_info, clValueType> infoList = {
@@ -343,8 +341,8 @@ void DeviceInfo::read()
 	name = getDeviceInfoString(CL_DEVICE_NAME);
 	readOpenCLVersion();
 	readDeviceInfo();
-	readDeviceExtensions();
-	readDeviceInfoExtensions();
+	readExtensions();
+	readExtensionInfo();
 }
 
 QJsonObject DeviceInfo::toJson()
@@ -369,6 +367,7 @@ QJsonObject DeviceInfo::toJson()
 		QJsonObject jsonNode;
 		jsonNode["name"] = info.name;
 		jsonNode["extension"] = info.extension;
+		jsonNode["enumvalue"] = info.enumValue;
 		if (info.value.canConvert(QMetaType::QVariantList)) {
 			jsonNode["value"] = QJsonArray::fromVariantList(info.value.toList());
 		} else {
@@ -381,7 +380,7 @@ QJsonObject DeviceInfo::toJson()
 	return jsonRoot;
 }
 
-void DeviceInfo::readDeviceExtensions()
+void DeviceInfo::readExtensions()
 {
 	// @todo: 3.0 vs. older way of reading (no version)
 	extensions.clear();
@@ -403,4 +402,5 @@ DeviceInfoValue::DeviceInfoValue(cl_device_info info, QVariant value, QString ex
 	this->name = utils::deviceInfoString(info);
 	this->value = value;
 	this->extension = extension;
+	this->enumValue = info;
 }
