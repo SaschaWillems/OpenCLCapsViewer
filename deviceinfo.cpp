@@ -84,6 +84,7 @@ void DeviceInfo::readDeviceInfoValue(cl_device_info info, clValueType valueType,
 		break;
 	}
 	case clValueType::cl_version:
+	case clValueType::cl_version_khr:
 	{
 		cl_version value;
 		clGetDeviceInfo(this->deviceId, info, sizeof(cl_version), &value, nullptr);
@@ -165,6 +166,30 @@ void DeviceInfo::readDeviceInfoValue(cl_device_info info, clValueType valueType,
 			deviceInfo.push_back(DeviceInfoValue(info, variantList, extension));
 			break;
 		}
+		case CL_DEVICE_UUID_KHR:
+		case CL_DRIVER_UUID_KHR:
+		{
+			cl_uchar uuid[CL_UUID_SIZE_KHR];
+			clGetDeviceInfo(this->deviceId, info, sizeof(uuid), &uuid, nullptr);
+			std::ostringstream os;
+			os << std::hex << std::noshowbase << std::uppercase;
+			for (uint32_t i = 0; i < CL_UUID_SIZE_KHR; i++) {
+				os << std::right << std::setw(2) << std::setfill('0') << static_cast<unsigned short>(uuid[i]);
+				if (i == 3 || i == 5 || i == 7 || i == 9) os << '-';
+			}
+			deviceInfo.push_back(DeviceInfoValue(info, QString::fromStdString(os.str()), extension));
+			break;
+		}
+		case CL_DEVICE_LUID_KHR:
+			cl_uchar uuid[CL_LUID_SIZE_KHR];
+			clGetDeviceInfo(this->deviceId, info, sizeof(uuid), &uuid, nullptr);
+			std::ostringstream os;
+			os << std::hex << std::noshowbase << std::uppercase;
+			for (uint32_t i = 0; i < CL_LUID_SIZE_KHR; i++) {
+				os << std::right << std::setw(2) << std::setfill('0') << static_cast<unsigned short>(uuid[i]);
+			}
+			deviceInfo.push_back(DeviceInfoValue(info, QString::fromStdString(os.str()), extension));
+			break;
 		}
 	}
 	default:
@@ -234,8 +259,7 @@ void DeviceInfo::readDeviceInfo()
 	}
 
 	// OpenCL 3.0
-	// @todo: check version support
-	if (false) 
+	if (clVersionMajor == 3) 
 	{
 		std::unordered_map<cl_device_info, clValueType> infoListCL30 = {
 			{ CL_DEVICE_NUMERIC_VERSION, clValueType::cl_version },
@@ -315,6 +339,248 @@ void DeviceInfo::readExtensionInfo()
 			readDeviceInfoValue(info.first, info.second, "cl_khr_il_program");
 		}
 	}
+	if (extensionSupported("cl_khr_image2D_from_buffer")) {
+		std::unordered_map<cl_device_info, clValueType> infoList = {
+			{ CL_DEVICE_IMAGE_PITCH_ALIGNMENT_KHR, clValueType::cl_uint },
+			{ CL_DEVICE_IMAGE_BASE_ADDRESS_ALIGNMENT_KHR, clValueType::cl_uint },
+		};
+		for (auto info : infoList) {
+			readDeviceInfoValue(info.first, info.second, "cl_khr_image2D_from_buffer");
+		}
+	}	
+	if (extensionSupported("cl_khr_terminate_context")) {
+		std::unordered_map<cl_device_info, clValueType> infoList = {
+			// @todo: bitfield
+			//{ CL_DEVICE_TERMINATE_CAPABILITY_KHR, clValueType::cl_device_terminate_capability_khr },
+		};
+		for (auto info : infoList) {
+			readDeviceInfoValue(info.first, info.second, "cl_khr_terminate_context");
+		}
+	}
+	if (extensionSupported("cl_khr_spir")) {
+		std::unordered_map<cl_device_info, clValueType> infoList = {
+			{ CL_DEVICE_SPIR_VERSIONS, clValueType::cl_char },
+		};
+		for (auto info : infoList) {
+			readDeviceInfoValue(info.first, info.second, "cl_khr_spir");
+		}
+	}
+	if (extensionSupported("cl_khr_subgroup_named_barrier")) {
+		std::unordered_map<cl_device_info, clValueType> infoList = {
+			{ CL_DEVICE_MAX_NAMED_BARRIER_COUNT_KHR, clValueType::cl_uint },
+		};
+		for (auto info : infoList) {
+			readDeviceInfoValue(info.first, info.second, "cl_khr_spir");
+		}
+	}
+	if (extensionSupported("cl_khr_device_uuid")) {
+		std::unordered_map<cl_device_info, clValueType> infoList = {
+			{ CL_DEVICE_UUID_KHR, clValueType::special },
+			{ CL_DRIVER_UUID_KHR, clValueType::special },
+			{ CL_DEVICE_LUID_VALID_KHR, clValueType::cl_bool },
+			{ CL_DEVICE_LUID_KHR, clValueType::special },
+			{ CL_DEVICE_NODE_MASK_KHR, clValueType::cl_uint },
+		};
+		for (auto info : infoList) {
+			readDeviceInfoValue(info.first, info.second, "cl_khr_device_uuid");
+		}
+	}
+	if (extensionSupported("cl_khr_extended_versioning")) {
+		std::unordered_map<cl_device_info, clValueType> infoList = {
+			{ CL_DEVICE_NUMERIC_VERSION_KHR, clValueType::cl_version_khr },
+			{ CL_DEVICE_OPENCL_C_NUMERIC_VERSION_KHR, clValueType::cl_version_khr },
+			// @todo
+			//{ CL_DEVICE_EXTENSIONS_WITH_VERSION_KHR, clValueType::cl_name_version_khr[] },
+			//{ CL_DEVICE_ILS_WITH_VERSION_KHR, clValueType::cl_name_version_khr[] },
+			//{ CL_DEVICE_BUILT_IN_KERNELS_WITH_VERSION_KHR, clValueType::cl_name_version_khr[] },
+		};
+		for (auto info : infoList) {
+			readDeviceInfoValue(info.first, info.second, "cl_khr_extended_versioning");
+		}
+	}
+	if (extensionSupported("cl_khr_pci_bus_info")) {
+		std::unordered_map<cl_device_info, clValueType> infoList = {
+			// @todo
+			//{ CL_DEVICE_PCI_BUS_INFO_KHR, clValueType::cl_device_pci_bus_info_khr },
+		};
+		for (auto info : infoList) {
+			readDeviceInfoValue(info.first, info.second, "cl_khr_pci_bus_info");
+		}
+	}
+	
+	// EXT
+	// @todo: types
+	if (extensionSupported("cl_ext_device_fission")) {
+		std::unordered_map<cl_device_info, clValueType> infoList = {
+			{ CL_DEVICE_PARENT_DEVICE_EXT, clValueType::cl_char },
+			{ CL_DEVICE_PARTITION_TYPES_EXT, clValueType::cl_char },
+			{ CL_DEVICE_AFFINITY_DOMAINS_EXT, clValueType::cl_char },
+			{ CL_DEVICE_REFERENCE_COUNT_EXT, clValueType::cl_char },
+			{ CL_DEVICE_PARTITION_STYLE_EXT, clValueType::cl_char },
+		};
+		for (auto info : infoList) {
+			readDeviceInfoValue(info.first, info.second, "cl_ext_device_fission");
+		}
+	}
+	if (extensionSupported("cl_ext_cxx_for_opencl")) {
+		std::unordered_map<cl_device_info, clValueType> infoList = {
+			{ CL_DEVICE_CXX_FOR_OPENCL_NUMERIC_VERSION_EXT, clValueType::cl_char },
+		};
+		for (auto info : infoList) {
+			readDeviceInfoValue(info.first, info.second, "cl_ext_cxx_for_opencl");
+		}
+	}
+
+	// ARM
+	if (extensionSupported("cl_arm_shared_virtual_memory")) {
+		std::unordered_map<cl_device_info, clValueType> infoList = {
+			{ CL_DEVICE_SVM_CAPABILITIES_ARM, clValueType::cl_char },
+		};
+		for (auto info : infoList) {
+			readDeviceInfoValue(info.first, info.second, "cl_arm_shared_virtual_memory");
+		}
+	}
+	if (extensionSupported("cl_arm_get_core_id")) {
+		std::unordered_map<cl_device_info, clValueType> infoList = {
+			{ CL_DEVICE_COMPUTE_UNITS_BITFIELD_ARM, clValueType::cl_char },
+		};
+		for (auto info : infoList) {
+			readDeviceInfoValue(info.first, info.second, "cl_arm_get_core_id");
+		}
+	}
+	if (extensionSupported("cl_arm_controlled_kernel_termination")) {
+		std::unordered_map<cl_device_info, clValueType> infoList = {
+			{ CL_DEVICE_CONTROLLED_TERMINATION_CAPABILITIES_ARM, clValueType::cl_char },
+		};
+		for (auto info : infoList) {
+			readDeviceInfoValue(info.first, info.second, "cl_arm_controlled_kernel_termination");
+		}
+	}
+	if (extensionSupported("cl_arm_scheduling_controls")) {
+		std::unordered_map<cl_device_info, clValueType> infoList = {
+			//@todo: bitfield
+			//{ CL_DEVICE_SCHEDULING_CONTROLS_CAPABILITIES_ARM, clValueType::cl_device_scheduling_controls_capabilities_arm },
+			//@todo: int[]
+			//{ CL_DEVICE_SUPPORTED_REGISTER_ALLOCATIONS_ARM, clValueType::cl_int[] },
+		};
+		for (auto info : infoList) {
+			readDeviceInfoValue(info.first, info.second, "cl_arm_scheduling_controls");
+		}
+	}
+
+	// INTEL
+	if (extensionSupported("cl_intel_advanced_motion_estimation")) {
+		std::unordered_map<cl_device_info, clValueType> infoList = {
+			{ CL_DEVICE_ME_VERSION_INTEL, clValueType::cl_uint },
+		};
+		for (auto info : infoList) {
+			readDeviceInfoValue(info.first, info.second, "cl_intel_advanced_motion_estimation");
+		}
+	}
+	if (extensionSupported("cl_intel_simultaneous_sharing")) {
+		std::unordered_map<cl_device_info, clValueType> infoList = {
+			// @todo
+			// { CL_DEVICE_SIMULTANEOUS_INTEROPS_INTEL, clValueType::cl_uint[] }, 
+			{ CL_DEVICE_NUM_SIMULTANEOUS_INTEROPS_INTEL, clValueType::cl_uint },
+		};
+		for (auto info : infoList) {
+			readDeviceInfoValue(info.first, info.second, "cl_intel_simultaneous_sharing");
+		}
+	}
+	if (extensionSupported("cl_intel_required_subgroup_size")) {
+		std::unordered_map<cl_device_info, clValueType> infoList = {
+			// @todo
+			// { CL_DEVICE_SUB_GROUP_SIZES_INTEL, clValueType::size_t[] },
+		};
+		for (auto info : infoList) {
+			readDeviceInfoValue(info.first, info.second, "cl_intel_required_subgroup_size");
+		}
+	}
+	if (extensionSupported("cl_intel_planar_yuv")) {
+		std::unordered_map<cl_device_info, clValueType> infoList = {
+			{ CL_DEVICE_PLANAR_YUV_MAX_WIDTH_INTEL, clValueType::cl_size_t },
+			{ CL_DEVICE_PLANAR_YUV_MAX_HEIGHT_INTEL, clValueType::cl_size_t },
+		};
+		for (auto info : infoList) {
+			readDeviceInfoValue(info.first, info.second, "cl_intel_planar_yuv");
+		}
+	}
+	if (extensionSupported("cl_intel_device_side_avc_motion_estimation")) {
+		std::unordered_map<cl_device_info, clValueType> infoList = {
+			{ CL_DEVICE_AVC_ME_VERSION_INTEL, clValueType::cl_uint },
+			{ CL_DEVICE_AVC_ME_SUPPORTS_TEXTURE_SAMPLER_USE_INTEL, clValueType::cl_bool },
+			{ CL_DEVICE_AVC_ME_SUPPORTS_PREEMPTION_INTEL, clValueType::cl_bool },
+		};
+		for (auto info : infoList) {
+			readDeviceInfoValue(info.first, info.second, "cl_intel_device_side_avc_motion_estimation");
+		}
+	}
+	/* @todo: undocumented?
+	if (extensionSupported("cl_intel_unified_shared_memory")) {
+		std::unordered_map<cl_device_info, clValueType> infoList = {
+			{ CL_DEVICE_HOST_MEM_CAPABILITIES_INTEL, clValueType::cl_char },
+			{ CL_DEVICE_DEVICE_MEM_CAPABILITIES_INTEL, clValueType::cl_char },
+			{ CL_DEVICE_SINGLE_DEVICE_SHARED_MEM_CAPABILITIES_INTEL, clValueType::cl_char },
+			{ CL_DEVICE_CROSS_DEVICE_SHARED_MEM_CAPABILITIES_INTEL, clValueType::cl_char },
+			{ CL_DEVICE_SHARED_SYSTEM_MEM_CAPABILITIES_INTEL, clValueType::cl_char },
+		};
+		for (auto info : infoList) {
+			readDeviceInfoValue(info.first, info.second, "cl_intel_unified_shared_memory");
+		}
+	}
+	*/
+	if (extensionSupported("cl_intel_command_queue_families")) {
+		std::unordered_map<cl_device_info, clValueType> infoList = {
+			// @todo
+			//{ CL_DEVICE_QUEUE_FAMILY_PROPERTIES_INTEL, clValueType::cl_queue_family_properties_intel },
+		};
+		for (auto info : infoList) {
+			readDeviceInfoValue(info.first, info.second, "cl_intel_command_queue_families");
+		}
+	}
+
+	// QCOM
+	if (extensionSupported("cl_qcom_ext_host_ptr")) {
+		std::unordered_map<cl_device_info, clValueType> infoList = {
+			{ CL_DEVICE_EXT_MEM_PADDING_IN_BYTES_QCOM, clValueType::cl_char },
+			{ CL_DEVICE_PAGE_SIZE_QCOM, clValueType::cl_char },
+		};
+		for (auto info : infoList) {
+			readDeviceInfoValue(info.first, info.second, "cl_qcom_ext_host_ptr");
+		}
+	}
+
+	// AMD
+	// @todo: types
+	if (extensionSupported("cl_amd_device_attribute_query")) {
+		std::unordered_map<cl_device_info, clValueType> infoList = {
+			{ CL_DEVICE_PROFILING_TIMER_OFFSET_AMD, clValueType::cl_char },
+			{ CL_DEVICE_TOPOLOGY_AMD, clValueType::cl_char },
+			{ CL_DEVICE_BOARD_NAME_AMD, clValueType::cl_char },
+			{ CL_DEVICE_GLOBAL_FREE_MEMORY_AMD, clValueType::cl_char },
+			{ CL_DEVICE_SIMD_PER_COMPUTE_UNIT_AMD, clValueType::cl_char },
+			{ CL_DEVICE_SIMD_WIDTH_AMD, clValueType::cl_char },
+			{ CL_DEVICE_SIMD_INSTRUCTION_WIDTH_AMD, clValueType::cl_char },
+			{ CL_DEVICE_WAVEFRONT_WIDTH_AMD, clValueType::cl_char },
+			{ CL_DEVICE_GLOBAL_MEM_CHANNELS_AMD, clValueType::cl_char },
+			{ CL_DEVICE_GLOBAL_MEM_CHANNEL_BANKS_AMD, clValueType::cl_char },
+			{ CL_DEVICE_GLOBAL_MEM_CHANNEL_BANK_WIDTH_AMD, clValueType::cl_char },
+			{ CL_DEVICE_LOCAL_MEM_SIZE_PER_COMPUTE_UNIT_AMD, clValueType::cl_char },
+			{ CL_DEVICE_LOCAL_MEM_BANKS_AMD, clValueType::cl_char },
+			{ CL_DEVICE_THREAD_TRACE_SUPPORTED_AMD, clValueType::cl_char },
+			{ CL_DEVICE_GFXIP_MAJOR_AMD, clValueType::cl_char },
+			{ CL_DEVICE_GFXIP_MINOR_AMD, clValueType::cl_char },
+			{ CL_DEVICE_AVAILABLE_ASYNC_QUEUES_AMD, clValueType::cl_char },
+			{ CL_DEVICE_PREFERRED_WORK_GROUP_SIZE_AMD, clValueType::cl_char },
+			{ CL_DEVICE_MAX_WORK_GROUP_SIZE_AMD, clValueType::cl_char },
+			{ CL_DEVICE_PREFERRED_CONSTANT_BUFFER_SIZE_AMD, clValueType::cl_char },
+			{ CL_DEVICE_PCIE_ID_AMD, clValueType::cl_char },
+		};
+		for (auto info : infoList) {
+			readDeviceInfoValue(info.first, info.second, "cl_amd_device_attribute_query");
+		}
+	}
+
 	// NV
 	if (extensionSupported("cl_nv_device_attribute_query")) {
 		std::unordered_map<cl_device_info, clValueType> infoList = {
