@@ -236,10 +236,10 @@ void MainWindow::saveReport(QString fileName, QString submitter, QString comment
     jsonReport["environment"] = jsonEnv;
 
     // Platform
-    // @todo
+    jsonReport["platform"] = device.platform->toJson();
 
     // Device
-    jsonReport["device"] = device.toJson(submitter, comment);
+    jsonReport["device"] = device.toJson();
 
     QJsonDocument doc(jsonReport);
     QFile jsonFile(fileName);

@@ -99,6 +99,41 @@ void PlatformInfo::read()
 	readPlatformExtensions();
 }
 
+QJsonObject PlatformInfo::toJson()
+{
+	QJsonObject jsonRoot;
+
+	// Extensions
+	QJsonArray jsonExtensions;
+	for (auto& ext : extensions)
+	{
+		QJsonObject jsonNode;
+		jsonNode["name"] = ext.name;
+		jsonNode["version"] = int(ext.version);
+		jsonExtensions.append(jsonNode);
+	}
+	jsonRoot["extensions"] = jsonExtensions;
+
+	// Platform info
+	QJsonArray jsonDeviceInfos;
+	for (auto& info : platformInfo)
+	{
+		QJsonObject jsonNode;
+		jsonNode["name"] = info.name;
+		jsonNode["extension"] = info.extension;
+		if (info.value.canConvert(QMetaType::QVariantList)) {
+			jsonNode["value"] = QJsonArray::fromVariantList(info.value.toList());
+		}
+		else {
+			jsonNode["value"] = info.value.toString();
+		}
+		jsonDeviceInfos.append(jsonNode);
+	}
+	jsonRoot["info"] = jsonDeviceInfos;
+
+	return jsonRoot;
+}
+
 PlatformInfoValue::PlatformInfoValue(cl_platform_info info, QVariant value, QString extension)
 {
 	this->name = utils::platformInfoString(info);

@@ -70,7 +70,7 @@ public:
     std::vector<DeviceInfoValue> deviceInfo;
     std::vector<DeviceExtension> extensions;
     void read();
-    QJsonObject toJson(QString submitter, QString comment);
+    QJsonObject toJson();
 };
 
 #endif // DEVICEINFO_H

@@ -347,7 +347,7 @@ void DeviceInfo::read()
 	readDeviceInfoExtensions();
 }
 
-QJsonObject DeviceInfo::toJson(QString submitter, QString comment)
+QJsonObject DeviceInfo::toJson()
 {
 	QJsonObject jsonRoot;
 
@@ -376,7 +376,7 @@ QJsonObject DeviceInfo::toJson(QString submitter, QString comment)
 		}
 		jsonDeviceInfos.append(jsonNode);
 	}
-	jsonRoot["deviceinfo"] = jsonDeviceInfos;
+	jsonRoot["info"] = jsonDeviceInfos;
 
 	return jsonRoot;
 }

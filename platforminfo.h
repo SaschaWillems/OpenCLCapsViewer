@@ -20,6 +20,9 @@
 
 #include "CL/cl.h"
 #include <QVariant>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 #include "openclutils.h"
 
 #pragma once
@@ -49,5 +52,6 @@ public:
     std::vector<PlatformInfoValue> platformInfo;
     std::vector<PlatformExtension> extensions;
 	void read();
+    QJsonObject toJson();
 };
 
