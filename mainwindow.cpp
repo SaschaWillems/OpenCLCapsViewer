@@ -54,6 +54,7 @@ MainWindow::MainWindow(QWidget *parent)
     // Slots
     connect(ui->comboBoxDevice, SIGNAL(currentIndexChanged(int)), this, SLOT(slotComboBoxDeviceChanged(int)));
     connect(ui->toolButtonSave, SIGNAL(pressed()), this, SLOT(slotSaveReport()));
+    connect(ui->toolButtonOnlineDataBase, SIGNAL(pressed()), this, SLOT(slotBrowseDatabase()));
     connect(ui->toolButtonUpload, SIGNAL(pressed()), this, SLOT(slotUploadReport()));
     connect(ui->toolButtonAbout, SIGNAL(pressed()), this, SLOT(slotAbout()));
     connect(ui->toolButtonExit, SIGNAL(pressed()), this, SLOT(slotClose()));
@@ -334,6 +335,11 @@ void MainWindow::slotAbout()
     QMessageBox::about(this, tr("About the OpenCL Hardware Capability Viewer"), QString::fromStdString(aboutText.str()));
 }
 
+void MainWindow::slotBrowseDatabase()
+{
+    QDesktopServices::openUrl(QUrl("https://opencl.gpuinfo.org"));
+}
+
 void MainWindow::slotSaveReport()
 {
     DeviceInfo& device = devices[selectedDeviceIndex];
@@ -371,15 +377,24 @@ void MainWindow::slotUploadReport()
         QMessageBox::warning(this, "Error", "Could not connect to database:<br>" + error);
         return;
     }
-    // @todo: testing
-    int reportId;
-    QJsonObject reportJson;
-    reportToJson(devices[selectedDeviceIndex], "", "", reportJson);
-    if (database.getReportId(reportJson, reportId))
-    {
-        QMessageBox::information(this, "Info", "ReportID: " + QString::number(reportId));
-    } else {
-        QMessageBox::warning(this, "Error", "Could not get report information");
+    // Upload new report
+    if (reportState == ReportState::not_present) {
+        SubmitDialog dialog("", /*appSettings.submitterName,*/ "Submit new report");
+
+        if (dialog.exec() == QDialog::Accepted) {
+            QString message;
+            QJsonObject reportJson;
+            reportToJson(devices[selectedDeviceIndex], "", "", reportJson);
+            if (database.uploadReport(reportJson, message))
+            {
+                QMessageBox::information(this, "Report submitted", "Your report has been uploaded to the database!\n\nThank you for your contribution!");
+                checkReportDatabaseState();
+            }
+            else
+            {
+                QMessageBox::warning(this, "Error", "The report could not be uploaded : \n" + message);
+            }
+        }
         return;
     }
 }

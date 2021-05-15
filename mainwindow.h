@@ -29,12 +29,14 @@
 #include <QKeyEvent>
 #include <QWindow>
 #include <QFileDialog>
+#include <QDesktopServices>
 #include <treeproxyfilter.h>
 
 #include <vector>
 #include "deviceinfo.h"
 #include "platforminfo.h"
 #include "database.h"
+#include "submitdialog.h"
 #include "CL/cl.h"
 
 QT_BEGIN_NAMESPACE
@@ -103,6 +105,7 @@ private Q_SLOTS:
     void slotComboBoxDeviceChanged(int index);
     void slotClose();
     void slotAbout();
+    void slotBrowseDatabase();
     void slotSaveReport();
     void slotUploadReport();
     void slotFilterDeviceInfo(QString text);

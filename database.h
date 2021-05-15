@@ -48,6 +48,7 @@ public:
 	static QString databaseUrl;
 	bool getReportId(QJsonObject json, int& id);
 	bool getReportState(QJsonObject json, ReportState& state);
+	bool uploadReport(QJsonObject json, QString& message);
 	bool checkServerConnection(QString& message);
 };
 

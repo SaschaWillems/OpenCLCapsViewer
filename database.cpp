@@ -139,6 +139,34 @@ bool Database::getReportState(QJsonObject json, ReportState& state)
 	return result;
 }
 
+bool Database::uploadReport(QJsonObject json, QString &message)
+{
+	manager = new QNetworkAccessManager(nullptr);
+	QHttpMultiPart* multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
+	QHttpPart httpPart;
+	httpPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"data\"; filename=\"update_check_report.json\""));
+	QJsonDocument doc(json);
+	httpPart.setBody(doc.toJson());
+	multiPart->append(httpPart);
+	QUrl qurl(databaseUrl + "api/v1/uploadreport.php");
+	QNetworkRequest request(qurl);
+	QNetworkReply* reply = manager->post(request, multiPart);
+	multiPart->setParent(reply);
+	QEventLoop loop;
+	connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+	loop.exec(QEventLoop::ExcludeUserInputEvents);
+	bool result = false;
+	if (reply->error() == QNetworkReply::NoError)
+	{
+		result = true;
+	} else {
+		message = reply->errorString();
+		result = false;
+	}
+	delete(manager);
+	return result;
+}
+
 bool Database::checkServerConnection(QString& message)
 {
 	manager = new QNetworkAccessManager(nullptr);
