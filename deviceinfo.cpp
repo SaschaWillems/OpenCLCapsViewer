@@ -643,6 +643,12 @@ QJsonObject DeviceInfo::toJson()
 	}
 	jsonRoot["info"] = jsonDeviceInfos;
 
+	// Additional OpenCL info
+	QJsonObject jsonDeviceInfosOpenCL;
+	jsonDeviceInfosOpenCL["versionmajor"] = clVersionMajor;
+	jsonDeviceInfosOpenCL["versionminor"] = clVersionMinor;
+	jsonRoot["opencl"] = jsonDeviceInfosOpenCL;
+
 	return jsonRoot;
 }
 

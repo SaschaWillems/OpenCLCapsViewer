@@ -67,8 +67,8 @@ public:
     cl_device_id deviceId;
     PlatformInfo* platform;
     QString name;
-    uint32_t clVersionMajor;
-    uint32_t clVersionMinor;
+    qint32 clVersionMajor;
+    qint32 clVersionMinor;
     std::vector<DeviceInfoValue> deviceInfo;
     std::vector<DeviceExtension> extensions;
     void read();
