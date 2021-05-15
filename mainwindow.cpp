@@ -51,10 +51,10 @@ MainWindow::MainWindow(QWidget *parent)
     filterProxies.platformInfo.setSourceModel(&models.platformInfo);
     connect(ui->filterLineEditPlatformInfo, SIGNAL(textChanged(QString)), this, SLOT(slotFilterPlatformInfo(QString)));
 
-
     // Slots
     connect(ui->comboBoxDevice, SIGNAL(currentIndexChanged(int)), this, SLOT(slotComboBoxDeviceChanged(int)));
     connect(ui->toolButtonSave, SIGNAL(pressed()), this, SLOT(slotSaveReport()));
+    connect(ui->toolButtonUpload, SIGNAL(pressed()), this, SLOT(slotUploadReport()));
     connect(ui->toolButtonAbout, SIGNAL(pressed()), this, SLOT(slotAbout()));
     connect(ui->toolButtonExit, SIGNAL(pressed()), this, SLOT(slotClose()));
 
@@ -137,6 +137,7 @@ void MainWindow::displayDevice(uint32_t index)
     displayPlatformExtensions(*device.platform);
     displayPlatformInfo(*device.platform);
     displayOperatingSystem();
+    checkReportDatabaseState();
 }
 
 void MainWindow::getOperatingSystem()
@@ -241,11 +242,61 @@ void MainWindow::displayOperatingSystem()
     }
 }
 
-void MainWindow::saveReport(QString fileName, QString submitter, QString comment)
+void MainWindow::setReportState(ReportState state)
 {
-    DeviceInfo device = devices[selectedDeviceIndex];
+    reportState = state;
+    switch (reportState) 
+    {
+    case ReportState::is_present:
+        ui->toolButtonUpload->setEnabled(false);
+        ui->toolButtonOnlineDevice->setEnabled(true);
+        ui->toolButtonUpload->setText("Upload");
+        ui->labelReportDatabaseState->setText("<font color='#00cc63'>Device is already present in the database</font>");
+        break;
+    case ReportState::not_present:
+        ui->toolButtonUpload->setEnabled(true);
+        ui->toolButtonOnlineDevice->setEnabled(false);
+        ui->toolButtonUpload->setText("Upload");
+        ui->labelReportDatabaseState->setText("<font color='#80b3ff'>Device can be uploaded to the database</font>");
+        break;
+    case ReportState::is_updatable:
+        ui->toolButtonUpload->setEnabled(true);
+        ui->toolButtonOnlineDevice->setEnabled(true);
+        ui->toolButtonUpload->setText("Update");
+        ui->labelReportDatabaseState->setText("<font color='#ffcc00'>Device is already present in the database, but can be updated</font>");
+        break;
+    default:
+        ui->toolButtonUpload->setEnabled(false);
+        ui->toolButtonOnlineDevice->setEnabled(false);
+        ui->toolButtonUpload->setText("n.a.");
+        ui->labelReportDatabaseState->setText("<font color='#ff0000'>Could not get report state from database</font>");
+    }
+}
+
+void MainWindow::checkReportDatabaseState()
+{
+    ui->labelReportDatabaseState->setText("<font color='#000000'>Connecting to database...</font>");
+    ui->toolButtonOnlineDevice->setEnabled(false);
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    QString message;
+    if (!database.checkServerConnection(message))
+    {
+        ui->labelReportDatabaseState->setText("<font color='#FF0000'>Could not connect to the database!\n\nPlease check your internet connection and proxy settings!</font>");
+        QApplication::restoreOverrideCursor();
+        return;
+    }
     QJsonObject jsonReport;
-    
+    reportToJson(devices[selectedDeviceIndex], "", "", jsonReport);
+    ReportState state;
+    if (database.getReportState(jsonReport, state))
+    {
+        setReportState(state);
+    }
+    QApplication::restoreOverrideCursor();
+}
+
+void MainWindow::reportToJson(DeviceInfo& device, QString submitter, QString comment, QJsonObject& jsonObject)
+{
     // Environment
     QJsonObject jsonEnv;
     jsonEnv["name"] = operatingSystem.name;
@@ -255,14 +306,17 @@ void MainWindow::saveReport(QString fileName, QString submitter, QString comment
     jsonEnv["comment"] = comment;
     jsonEnv["reportversion"] = reportVersion;
     jsonEnv["appversion"] = version;
-    jsonReport["environment"] = jsonEnv;
-
+    jsonObject["environment"] = jsonEnv;
     // Platform
-    jsonReport["platform"] = device.platform->toJson();
-
+    jsonObject["platform"] = device.platform->toJson();
     // Device
-    jsonReport["device"] = device.toJson();
+    jsonObject["device"] = device.toJson();
+}
 
+void MainWindow::saveReport(QString fileName, QString submitter, QString comment)
+{
+    QJsonObject jsonReport;
+    reportToJson(devices[selectedDeviceIndex], submitter, comment, jsonReport);
     QJsonDocument doc(jsonReport);
     QFile jsonFile(fileName);
     jsonFile.open(QFile::WriteOnly);
@@ -282,8 +336,7 @@ void MainWindow::slotAbout()
 
 void MainWindow::slotSaveReport()
 {
-    DeviceInfo device = devices[selectedDeviceIndex];
-
+    DeviceInfo& device = devices[selectedDeviceIndex];
 #ifndef VK_USE_PLATFORM_IOS_MVK
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save Report to disk"), device.name + ".json", tr("json (*.json)"));
 
@@ -308,6 +361,27 @@ void MainWindow::slotSaveReport()
     msgBox.exec();
 
 #endif
+}
+
+void MainWindow::slotUploadReport()
+{
+    QString error;
+    if (!database.checkServerConnection(error))
+    {
+        QMessageBox::warning(this, "Error", "Could not connect to database:<br>" + error);
+        return;
+    }
+    // @todo: testing
+    int reportId;
+    QJsonObject reportJson;
+    reportToJson(devices[selectedDeviceIndex], "", "", reportJson);
+    if (database.getReportId(reportJson, reportId))
+    {
+        QMessageBox::information(this, "Info", "ReportID: " + QString::number(reportId));
+    } else {
+        QMessageBox::warning(this, "Error", "Could not get report information");
+        return;
+    }
 }
 
 void MainWindow::slotFilterDeviceInfo(QString text)

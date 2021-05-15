@@ -34,6 +34,7 @@
 #include <vector>
 #include "deviceinfo.h"
 #include "platforminfo.h"
+#include "database.h"
 #include "CL/cl.h"
 
 QT_BEGIN_NAMESPACE
@@ -50,7 +51,7 @@ public:
 
     static const QString version;
     static const QString reportVersion;
-
+    
     struct OperatingSystem
     {
         QString name;
@@ -60,6 +61,8 @@ public:
 
     std::vector<PlatformInfo> platforms;
     std::vector<DeviceInfo> devices;
+
+    ReportState reportState = ReportState::unknown;
     
     void getDevices();
     void displayDevice(uint32_t index);
@@ -82,12 +85,18 @@ private:
         QStandardItemModel platformExtensions;
     } models;
 
+    Database database;
+
     void displayDeviceInfo(DeviceInfo &device);
     void displayDeviceExtensions(DeviceInfo &device);
     void displayPlatformInfo(PlatformInfo& platform);
     void displayPlatformExtensions(PlatformInfo& platform);
     void displayOperatingSystem();
 
+    void setReportState(ReportState state);
+    void checkReportDatabaseState();
+
+    void reportToJson(DeviceInfo& device, QString submitter, QString comment, QJsonObject& jsonObject);
     void saveReport(QString fileName, QString submitter, QString comment);
 
 private Q_SLOTS:
@@ -95,6 +104,7 @@ private Q_SLOTS:
     void slotClose();
     void slotAbout();
     void slotSaveReport();
+    void slotUploadReport();
     void slotFilterDeviceInfo(QString text);
     void slotFilterDeviceExtensions(QString text);
     void slotFilterPlatformInfo(QString text);

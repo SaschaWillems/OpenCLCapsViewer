@@ -451,7 +451,7 @@ QTreeView {
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="labelDevicePresent">
+        <widget class="QLabel" name="labelReportDatabaseState">
          <property name="styleSheet">
           <string notr="true">color: rgb(255, 255, 255);
 background-color: rgb(68, 68, 68);
