@@ -105,6 +105,7 @@ private Q_SLOTS:
     void slotComboBoxDeviceChanged(int index);
     void slotClose();
     void slotAbout();
+    void slotDisplayOnlineReport();
     void slotBrowseDatabase();
     void slotSaveReport();
     void slotUploadReport();

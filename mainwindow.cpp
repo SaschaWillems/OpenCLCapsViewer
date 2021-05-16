@@ -54,6 +54,7 @@ MainWindow::MainWindow(QWidget *parent)
     // Slots
     connect(ui->comboBoxDevice, SIGNAL(currentIndexChanged(int)), this, SLOT(slotComboBoxDeviceChanged(int)));
     connect(ui->toolButtonSave, SIGNAL(pressed()), this, SLOT(slotSaveReport()));
+    connect(ui->toolButtonOnlineDevice, SIGNAL(pressed()), this, SLOT(slotDisplayOnlineReport()));
     connect(ui->toolButtonOnlineDataBase, SIGNAL(pressed()), this, SLOT(slotBrowseDatabase()));
     connect(ui->toolButtonUpload, SIGNAL(pressed()), this, SLOT(slotUploadReport()));
     connect(ui->toolButtonAbout, SIGNAL(pressed()), this, SLOT(slotAbout()));
@@ -333,6 +334,19 @@ void MainWindow::slotAbout()
         "For usage and distribution details refer to the readme<br/><br/>"
         "<a href='https://www.gpuinfo.org'>https://www.gpuinfo.org</a></p>";
     QMessageBox::about(this, tr("About the OpenCL Hardware Capability Viewer"), QString::fromStdString(aboutText.str()));
+}
+
+void MainWindow::slotDisplayOnlineReport()
+{
+    QJsonObject jsonReport;
+    reportToJson(devices[selectedDeviceIndex], "", "", jsonReport);
+    int reportId;
+    if (database.getReportId(jsonReport, reportId)) {
+        QUrl url(database.databaseUrl + "displayreport.php?id=" + QString::number(reportId));
+        QDesktopServices::openUrl(url);
+    } else {
+        QMessageBox::warning(this, "Error", "Could not get the report id from the database");
+    }
 }
 
 void MainWindow::slotBrowseDatabase()
