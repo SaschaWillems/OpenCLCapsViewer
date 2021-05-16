@@ -152,12 +152,7 @@ QJsonObject PlatformInfo::toJson()
 		jsonNode["name"] = info.name;
 		jsonNode["extension"] = info.extension;
 		jsonNode["enumvalue"] = info.enumValue;
-		if (info.value.canConvert(QMetaType::QVariantList)) {
-			jsonNode["value"] = QJsonArray::fromVariantList(info.value.toList());
-		}
-		else {
-			jsonNode["value"] = info.value.toString();
-		}
+		jsonNode["value"] = info.value.toJsonValue();
 		jsonDeviceInfos.append(jsonNode);
 	}
 	jsonRoot["info"] = jsonDeviceInfos;
