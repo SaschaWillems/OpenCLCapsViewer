@@ -123,14 +123,14 @@ bool Database::getReportState(QJsonObject json, ReportState& state)
 	state = ReportState::unknown;
 	if (reply->error() == QNetworkReply::NoError)
 	{
-		QString reason = reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toString();
-		if (reason == "report_present") {
+		QString message = reply->readAll();
+		if (message == "report_present") {
 			state = ReportState::is_present;
 		}
-		if (reason == "report_not_present") {
+		if (message == "report_not_present") {
 			state = ReportState::not_present;
 		}
-		if (reason == "report_updatable") {
+		if (message == "report_updatable") {
 			state = ReportState::is_updatable;
 		}
 		result = true;
