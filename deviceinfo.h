@@ -24,6 +24,7 @@
 #include "CL/cl.h"
 #include "CL/cl_ext.h"
 #include "openclutils.h"
+#include "displayutils.h"
 #include "platforminfo.h"
 #include <unordered_map>
 #include <string>
@@ -42,6 +43,17 @@ struct DeviceExtension
     cl_version version;
 };
 
+typedef std::function<QString(QVariant)> DisplayFn;
+
+struct DeviceInfoValueDescriptor
+{
+    cl_device_info name;
+    clValueType valueType;
+    DisplayFn displayFunction = nullptr;
+    DeviceInfoValueDescriptor();
+    DeviceInfoValueDescriptor(cl_device_info name, clValueType valueType, DisplayFn displayFunction = nullptr);
+};
+
 struct DeviceInfoValueDetailValue
 {
     QString name;
@@ -54,6 +66,7 @@ struct DeviceInfoValue
     QVariant value;
     QString extension;
     qint32 enumValue;
+    DisplayFn displayFunction = nullptr;
     std::vector<DeviceInfoValueDetailValue> detailValues;
     // @todo: add display "translation" rule?
     DeviceInfoValue(cl_device_info info, QVariant value, QString extension, DisplayFn displayFunction = nullptr);
@@ -65,7 +78,7 @@ class DeviceInfo
 private:
     QString getDeviceInfoString(cl_device_info info);
     bool extensionSupported(const char* name);
-    void readDeviceInfoValue(cl_device_info info, clValueType valueType, QString extension = "");
+    void readDeviceInfoValue(DeviceInfoValueDescriptor descriptor, QString extension = "");
     void readDeviceInfo();
     void readOpenCLVersion();
     void readExtensions();

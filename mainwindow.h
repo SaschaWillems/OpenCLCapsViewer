@@ -37,6 +37,7 @@
 #include "platforminfo.h"
 #include "database.h"
 #include "submitdialog.h"
+#include "displayutils.h"
 #include "CL/cl.h"
 
 QT_BEGIN_NAMESPACE
@@ -88,6 +89,8 @@ private:
     } models;
 
     Database database;
+
+    QString getDisplayInfoDisplayValue(DeviceInfoValue& value);
 
     void displayDeviceInfo(DeviceInfo &device);
     void displayDeviceExtensions(DeviceInfo &device);

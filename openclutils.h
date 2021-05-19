@@ -57,22 +57,6 @@ namespace utils
 		return res;
 	}
 
-
-	inline QString deviceTypeString(const cl_device_type type)
-	{
-		switch (type)
-		{
-#define STR(r) case CL_DEVICE_TYPE_##r: return #r
-			STR(DEFAULT);
-			STR(CPU);
-			STR(GPU);
-			STR(ACCELERATOR);
-			STR(CUSTOM);
-#undef STR
-		default: return "?";
-		}
-	}
-
 	inline QString deviceInfoString(const cl_device_info info)
 	{
 		switch (info)

@@ -149,6 +149,15 @@ void MainWindow::getOperatingSystem()
     operatingSystem.version = QSysInfo::productVersion();
 }
 
+QString MainWindow::getDisplayInfoDisplayValue(DeviceInfoValue& value)
+{
+    if (value.displayFunction) {
+        QString displayValue = value.displayFunction(value.value);
+        return displayValue;
+    }
+    return value.value.toString();
+}
+
 void MainWindow::displayDeviceInfo(DeviceInfo& device)
 {
     models.deviceinfo.clear();
@@ -156,8 +165,15 @@ void MainWindow::displayDeviceInfo(DeviceInfo& device)
     for (auto info : device.deviceInfo) {
         if (info.extension.isEmpty()) {
             QList<QStandardItem*> extItem;
+            QString displayValue = getDisplayInfoDisplayValue(info);
             extItem << new QStandardItem(info.name);
-            extItem << new QStandardItem(info.value.toString());
+            extItem << new QStandardItem(displayValue);
+            if (displayValue == "true") {
+                extItem[1]->setForeground(QColor::fromRgb(0, 128, 0));
+            }
+            if (displayValue == "false") {
+                extItem[1]->setForeground(QColor::fromRgb(255, 0, 0));
+            }
             rootItem->appendRow(extItem);
         }
     }
@@ -177,8 +193,15 @@ void MainWindow::displayDeviceExtensions(DeviceInfo& device)
         for (auto info : device.deviceInfo) {
             if (extension.name == info.extension) {
                 QList<QStandardItem*> extInfoItem;
+                QString displayValue = getDisplayInfoDisplayValue(info);
                 extInfoItem << new QStandardItem(info.name);
-                extInfoItem << new QStandardItem(info.value.toString());
+                extInfoItem << new QStandardItem(displayValue);
+                if (displayValue == "true") {
+                    extInfoItem[1]->setForeground(QColor::fromRgb(0, 128, 0));
+                }
+                if (displayValue == "false") {
+                    extInfoItem[1]->setForeground(QColor::fromRgb(255, 0, 0));
+                }
                 extItem.first()->appendRow(extInfoItem);
             }
         }

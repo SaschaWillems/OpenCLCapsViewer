@@ -40,112 +40,128 @@ bool DeviceInfo::extensionSupported(const char* name)
 	return false;
 }
 
-void DeviceInfo::readDeviceInfoValue(cl_device_info info, clValueType valueType, QString extension)
+void DeviceInfo::readDeviceInfoValue(DeviceInfoValueDescriptor descriptor, QString extension)
 {
 	// @todo: return instead of add to map?
-	switch(valueType) 
+	switch(descriptor.valueType)
 	{
 	case clValueType::cl_bool:
 	{
 		cl_bool value;
-		clGetDeviceInfo(this->deviceId, info, sizeof(cl_bool), &value, nullptr);
-		deviceInfo.push_back(DeviceInfoValue(info, value, extension));
+		clGetDeviceInfo(this->deviceId, descriptor.name, sizeof(cl_bool), &value, nullptr);
+		deviceInfo.push_back(DeviceInfoValue(descriptor.name, value, extension, descriptor.displayFunction));
 		break;
 	}
 	case clValueType::cl_char:
 	{
 		size_t valueSize;
-		clGetDeviceInfo(this->deviceId, info, 0, nullptr, &valueSize);
+		clGetDeviceInfo(this->deviceId, descriptor.name, 0, nullptr, &valueSize);
 		std::string value;
 		value.resize(valueSize);
-		clGetDeviceInfo(this->deviceId, info, valueSize, &value[0], nullptr);
-		deviceInfo.push_back(DeviceInfoValue(info, QString::fromStdString(value), extension));
+		clGetDeviceInfo(this->deviceId, descriptor.name, valueSize, &value[0], nullptr);
+		deviceInfo.push_back(DeviceInfoValue(descriptor.name, QString::fromStdString(value), extension, descriptor.displayFunction));
 		break;
 	}
 	case clValueType::cl_size_t:
 	{
 		size_t value;
-		clGetDeviceInfo(this->deviceId, info, sizeof(size_t), &value, nullptr);
-		deviceInfo.push_back(DeviceInfoValue(info, value, extension));
+		clGetDeviceInfo(this->deviceId, descriptor.name, sizeof(size_t), &value, nullptr);
+		deviceInfo.push_back(DeviceInfoValue(descriptor.name, value, extension, descriptor.displayFunction));
+		break;
+	}
+	case clValueType::cl_size_t_array:
+	{
+		size_t valueSize;
+		clGetDeviceInfo(this->deviceId, descriptor.name, 0, nullptr, &valueSize);
+		std::vector<size_t> values;
+		values.resize(valueSize/sizeof(size_t));
+		clGetDeviceInfo(this->deviceId, descriptor.name, valueSize, &values[0], nullptr);
+		QVariantList variantList;
+		for (auto value : values) {
+			variantList << value;
+		}
+		deviceInfo.push_back(DeviceInfoValue(descriptor.name, variantList, extension, descriptor.displayFunction));
 		break;
 	}
 	case clValueType::cl_uint:
 	{
 		cl_uint value;
-		clGetDeviceInfo(this->deviceId, info, sizeof(cl_uint), &value, nullptr);
-		deviceInfo.push_back(DeviceInfoValue(info, value, extension));
+		clGetDeviceInfo(this->deviceId, descriptor.name, sizeof(cl_uint), &value, nullptr);
+		deviceInfo.push_back(DeviceInfoValue(descriptor.name, value, extension, descriptor.displayFunction));
 		break;
 	}
 	case clValueType::cl_ulong:
 	{
 		cl_ulong value;
-		clGetDeviceInfo(this->deviceId, info, sizeof(cl_ulong), &value, nullptr);
-		deviceInfo.push_back(DeviceInfoValue(info, value, extension));
+		clGetDeviceInfo(this->deviceId, descriptor.name, sizeof(cl_ulong), &value, nullptr);
+		deviceInfo.push_back(DeviceInfoValue(descriptor.name, value, extension, descriptor.displayFunction));
 		break;
 	}
 	case clValueType::cl_version:
 	case clValueType::cl_version_khr:
 	{
 		cl_version value;
-		clGetDeviceInfo(this->deviceId, info, sizeof(cl_version), &value, nullptr);
-		deviceInfo.push_back(DeviceInfoValue(info, value, extension));
+		clGetDeviceInfo(this->deviceId, descriptor.name, sizeof(cl_version), &value, nullptr);
+		deviceInfo.push_back(DeviceInfoValue(descriptor.name, value, extension, descriptor.displayFunction));
 		break;
 	}
 	//
 	case clValueType::cl_device_atomic_capabilities:
 	{
 		cl_device_atomic_capabilities value;
-		clGetDeviceInfo(this->deviceId, info, sizeof(cl_device_atomic_capabilities), &value, nullptr);
-		deviceInfo.push_back(DeviceInfoValue(info, value, extension));
+		clGetDeviceInfo(this->deviceId, descriptor.name, sizeof(cl_device_atomic_capabilities), &value, nullptr);
+		deviceInfo.push_back(DeviceInfoValue(descriptor.name, value, extension, descriptor.displayFunction));
 		break;
 	}
 	case clValueType::cl_device_device_enqueue_capabilities:
 	{
 		cl_device_device_enqueue_capabilities value;
-		clGetDeviceInfo(this->deviceId, info, sizeof(cl_device_device_enqueue_capabilities), &value, nullptr);
-		deviceInfo.push_back(DeviceInfoValue(info, value, extension));
+		clGetDeviceInfo(this->deviceId, descriptor.name, sizeof(cl_device_device_enqueue_capabilities), &value, nullptr);
+		deviceInfo.push_back(DeviceInfoValue(descriptor.name, value, extension, descriptor.displayFunction));
 		break;
 	}
 	case clValueType::cl_device_local_mem_type:
 	{
 		cl_device_local_mem_type value;
-		clGetDeviceInfo(this->deviceId, info, sizeof(cl_device_local_mem_type), &value, nullptr);
-		deviceInfo.push_back(DeviceInfoValue(info, value, extension));
+		clGetDeviceInfo(this->deviceId, descriptor.name, sizeof(cl_device_local_mem_type), &value, nullptr);
+		deviceInfo.push_back(DeviceInfoValue(descriptor.name, value, extension, descriptor.displayFunction));
 		break;
 	}
 	case clValueType::cl_device_exec_capabilities:
 	{
 		cl_device_exec_capabilities value;
-		clGetDeviceInfo(this->deviceId, info, sizeof(cl_device_exec_capabilities), &value, nullptr);
-		deviceInfo.push_back(DeviceInfoValue(info, value, extension));
+		clGetDeviceInfo(this->deviceId, descriptor.name, sizeof(cl_device_exec_capabilities), &value, nullptr);
+		deviceInfo.push_back(DeviceInfoValue(descriptor.name, value, extension, descriptor.displayFunction));
 		break;
 	}
 	case clValueType::cl_device_mem_cache_type:
 	{
 		cl_device_mem_cache_type value;
-		clGetDeviceInfo(this->deviceId, info, sizeof(cl_device_mem_cache_type), &value, nullptr);
-		deviceInfo.push_back(DeviceInfoValue(info, value, extension));
+		clGetDeviceInfo(this->deviceId, descriptor.name, sizeof(cl_device_mem_cache_type), &value, nullptr);
+		deviceInfo.push_back(DeviceInfoValue(descriptor.name, value, extension, descriptor.displayFunction));
 		break;
 	}
 	case clValueType::cl_command_queue_properties:
 	{
 		cl_command_queue_properties value;
-		clGetDeviceInfo(this->deviceId, info, sizeof(cl_command_queue_properties), &value, nullptr);
-		deviceInfo.push_back(DeviceInfoValue(info, value, extension));
+		clGetDeviceInfo(this->deviceId, descriptor.name, sizeof(cl_command_queue_properties), &value, nullptr);
+		deviceInfo.push_back(DeviceInfoValue(descriptor.name, value, extension, descriptor.displayFunction));
 		break;
 	}
 	case clValueType::cl_device_fp_config:
 	{
 		cl_device_fp_config value;
-		clGetDeviceInfo(this->deviceId, info, sizeof(cl_device_fp_config), &value, nullptr);
-		deviceInfo.push_back(DeviceInfoValue(info, value, extension));
+		clGetDeviceInfo(this->deviceId, descriptor.name, sizeof(cl_device_fp_config), &value, nullptr);
+		deviceInfo.push_back(DeviceInfoValue(descriptor.name, value, extension, descriptor.displayFunction));
 		break;
 	}
 	case clValueType::cl_device_type:
 	{
 		cl_device_type value;
-		clGetDeviceInfo(this->deviceId, info, sizeof(cl_device_type), &value, nullptr);
-		deviceInfo.push_back(DeviceInfoValue(info, value, extension));
+		clGetDeviceInfo(this->deviceId, descriptor.name, sizeof(cl_device_type), &value, nullptr);
+		deviceInfo.push_back(DeviceInfoValue(descriptor.name, value, extension, descriptor.displayFunction));
+		break;
+	}
 	case clValueType::cl_device_pci_bus_info_khr:
 	{
 		cl_device_pci_bus_info_khr value;
@@ -161,7 +177,7 @@ void DeviceInfo::readDeviceInfoValue(cl_device_info info, clValueType valueType,
 	/* Special cases */
 	case clValueType::special:
 	{
-		switch (info)
+		switch (descriptor.name)
 		{
 		case CL_DEVICE_MAX_WORK_ITEM_SIZES:
 		{
@@ -173,32 +189,32 @@ void DeviceInfo::readDeviceInfoValue(cl_device_info info, clValueType valueType,
 			for (auto dimension : dimensions) {
 				variantList << dimension;
 			}
-			deviceInfo.push_back(DeviceInfoValue(info, variantList, extension));
+			deviceInfo.push_back(DeviceInfoValue(descriptor.name, variantList, extension, utils::displayNumberArray));
 			break;
 		}
 		case CL_DEVICE_UUID_KHR:
 		case CL_DRIVER_UUID_KHR:
 		{
 			cl_uchar uuid[CL_UUID_SIZE_KHR];
-			clGetDeviceInfo(this->deviceId, info, sizeof(uuid), &uuid, nullptr);
+			clGetDeviceInfo(this->deviceId, descriptor.name, sizeof(uuid), &uuid, nullptr);
 			std::ostringstream os;
 			os << std::hex << std::noshowbase << std::uppercase;
 			for (uint32_t i = 0; i < CL_UUID_SIZE_KHR; i++) {
 				os << std::right << std::setw(2) << std::setfill('0') << static_cast<unsigned short>(uuid[i]);
 				if (i == 3 || i == 5 || i == 7 || i == 9) os << '-';
 			}
-			deviceInfo.push_back(DeviceInfoValue(info, QString::fromStdString(os.str()), extension));
+			deviceInfo.push_back(DeviceInfoValue(descriptor.name, QString::fromStdString(os.str()), extension, descriptor.displayFunction));
 			break;
 		}
 		case CL_DEVICE_LUID_KHR:
 			cl_uchar uuid[CL_LUID_SIZE_KHR];
-			clGetDeviceInfo(this->deviceId, info, sizeof(uuid), &uuid, nullptr);
+			clGetDeviceInfo(this->deviceId, descriptor.name, sizeof(uuid), &uuid, nullptr);
 			std::ostringstream os;
 			os << std::hex << std::noshowbase << std::uppercase;
 			for (uint32_t i = 0; i < CL_LUID_SIZE_KHR; i++) {
 				os << std::right << std::setw(2) << std::setfill('0') << static_cast<unsigned short>(uuid[i]);
 			}
-			deviceInfo.push_back(DeviceInfoValue(info, QString::fromStdString(os.str()), extension));
+			deviceInfo.push_back(DeviceInfoValue(descriptor.name, QString::fromStdString(os.str()), extension, descriptor.displayFunction));
 			break;
 		}
 	}
@@ -211,8 +227,8 @@ void DeviceInfo::readDeviceInfo()
 {
 	deviceInfo.clear();
 
-	std::unordered_map<cl_device_info, clValueType> infoList = {
-		{ CL_DEVICE_TYPE, clValueType::cl_device_type },
+	std::vector<DeviceInfoValueDescriptor> infoList = {
+		{ CL_DEVICE_TYPE, clValueType::cl_device_type, utils::displayDeviceType },
 		{ CL_DEVICE_VENDOR_ID, clValueType::cl_uint },
 		{ CL_DEVICE_MAX_COMPUTE_UNITS, clValueType::cl_uint },
 		{ CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS, clValueType::cl_uint },
@@ -234,7 +250,7 @@ void DeviceInfo::readDeviceInfo()
 		{ CL_DEVICE_IMAGE3D_MAX_WIDTH, clValueType::cl_size_t },
 		{ CL_DEVICE_IMAGE3D_MAX_HEIGHT, clValueType::cl_size_t },
 		{ CL_DEVICE_IMAGE3D_MAX_DEPTH, clValueType::cl_size_t },
-		{ CL_DEVICE_IMAGE_SUPPORT, clValueType::cl_bool },
+		{ CL_DEVICE_IMAGE_SUPPORT, clValueType::cl_bool, utils::displayBool },
 		{ CL_DEVICE_MAX_PARAMETER_SIZE, clValueType::cl_size_t },
 		{ CL_DEVICE_MAX_SAMPLERS, clValueType::cl_uint },
 		{ CL_DEVICE_MEM_BASE_ADDR_ALIGN, clValueType::cl_uint },
@@ -248,11 +264,11 @@ void DeviceInfo::readDeviceInfo()
 		{ CL_DEVICE_MAX_CONSTANT_ARGS, clValueType::cl_uint },
 		{ CL_DEVICE_LOCAL_MEM_TYPE, clValueType::cl_device_local_mem_type },
 		{ CL_DEVICE_LOCAL_MEM_SIZE, clValueType::cl_ulong },
-		{ CL_DEVICE_ERROR_CORRECTION_SUPPORT, clValueType::cl_bool },
+		{ CL_DEVICE_ERROR_CORRECTION_SUPPORT, clValueType::cl_bool, utils::displayBool },
 		{ CL_DEVICE_PROFILING_TIMER_RESOLUTION, clValueType::cl_size_t },
-		{ CL_DEVICE_ENDIAN_LITTLE, clValueType::cl_bool },
+		{ CL_DEVICE_ENDIAN_LITTLE, clValueType::cl_bool, utils::displayBool },
 		//{ CL_DEVICE_AVAILABLE, clValueType:: },
-		{ CL_DEVICE_COMPILER_AVAILABLE, clValueType::cl_bool },
+		{ CL_DEVICE_COMPILER_AVAILABLE, clValueType::cl_bool, utils::displayBool },
 		{ CL_DEVICE_EXECUTION_CAPABILITIES, clValueType::cl_device_exec_capabilities },
 		// { CL_DEVICE_QUEUE_PROPERTIES, clValueType:: }, @todo
 		{ CL_DEVICE_NAME, clValueType::cl_char },
@@ -265,31 +281,31 @@ void DeviceInfo::readDeviceInfo()
 	};
 	for (auto info : infoList)
 	{
-		readDeviceInfoValue(info.first, info.second);
+		readDeviceInfoValue(info);
 	}
 
 	// OpenCL 3.0
 	if (clVersionMajor == 3) 
 	{
-		std::unordered_map<cl_device_info, clValueType> infoListCL30 = {
+		std::vector<DeviceInfoValueDescriptor> infoListCL30 = {
 			{ CL_DEVICE_NUMERIC_VERSION, clValueType::cl_version },
 			// { CL_DEVICE_ILS_WITH_VERSION, clValueType::cl_device_type }, array of descriptors
 			// { CL_DEVICE_BUILT_IN_KERNELS_WITH_VERSION, clValueType::cl_device_type }, array of descriptors
-			{ CL_DEVICE_ATOMIC_MEMORY_CAPABILITIES, clValueType::cl_device_atomic_capabilities },
-			{ CL_DEVICE_ATOMIC_FENCE_CAPABILITIES, clValueType::cl_device_atomic_capabilities },
-			{ CL_DEVICE_NON_UNIFORM_WORK_GROUP_SUPPORT, clValueType::cl_bool },
+			{ CL_DEVICE_ATOMIC_MEMORY_CAPABILITIES, clValueType::cl_device_atomic_capabilities, utils::displayAtomicCapabilities },
+			{ CL_DEVICE_ATOMIC_FENCE_CAPABILITIES, clValueType::cl_device_atomic_capabilities, utils::displayAtomicCapabilities },
+			{ CL_DEVICE_NON_UNIFORM_WORK_GROUP_SUPPORT, clValueType::cl_bool, utils::displayBool },
 			// { CL_DEVICE_OPENCL_C_ALL_VERSIONS, clValueType::cl_device_type },  array of descriptors
 			{ CL_DEVICE_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, clValueType::cl_size_t },
-			{ CL_DEVICE_WORK_GROUP_COLLECTIVE_FUNCTIONS_SUPPORT, clValueType::cl_bool },
-			{ CL_DEVICE_GENERIC_ADDRESS_SPACE_SUPPORT, clValueType::cl_bool },
+			{ CL_DEVICE_WORK_GROUP_COLLECTIVE_FUNCTIONS_SUPPORT, clValueType::cl_bool, utils::displayBool },
+			{ CL_DEVICE_GENERIC_ADDRESS_SPACE_SUPPORT, clValueType::cl_bool, utils::displayBool },
 			//{ CL_DEVICE_OPENCL_C_FEATURES, clValueType:: }, array of descriptors
 			{ CL_DEVICE_DEVICE_ENQUEUE_CAPABILITIES, clValueType::cl_device_device_enqueue_capabilities },
-			{ CL_DEVICE_PIPE_SUPPORT, clValueType::cl_bool },
+			{ CL_DEVICE_PIPE_SUPPORT, clValueType::cl_bool, utils::displayBool },
 			{ CL_DEVICE_LATEST_CONFORMANCE_VERSION_PASSED, clValueType::cl_char },
 		};
 		for (auto info : infoListCL30)
 		{
-			readDeviceInfoValue(info.first, info.second);
+			readDeviceInfoValue(info);
 		}
 
 		// @todo: OpenCL CL_DEVICE_OPENCL_C_FEATURES
@@ -326,77 +342,77 @@ void DeviceInfo::readExtensionInfo()
 {
 	// KHR
 	if (extensionSupported("cl_khr_fp64")) {
-		std::unordered_map<cl_device_info, clValueType> infoList = {
+		std::vector<DeviceInfoValueDescriptor> infoList = {
 			{ CL_DEVICE_DOUBLE_FP_CONFIG, clValueType::cl_device_fp_config },
 		};
 		for (auto info : infoList) {
-			readDeviceInfoValue(info.first, info.second, "cl_khr_fp64");
+			readDeviceInfoValue(info, "cl_khr_fp64");
 		}
 	}
 	if (extensionSupported("cl_khr_fp16")) {
-		std::unordered_map<cl_device_info, clValueType> infoList = {
+		std::vector<DeviceInfoValueDescriptor> infoList = {
 			{ CL_DEVICE_HALF_FP_CONFIG, clValueType::cl_device_fp_config },
 		};
 		for (auto info : infoList) {
-			readDeviceInfoValue(info.first, info.second, "cl_khr_fp16");
+			readDeviceInfoValue(info, "cl_khr_fp16");
 		}
 	}
 	if (extensionSupported("cl_khr_il_program")) {
-		std::unordered_map<cl_device_info, clValueType> infoList = {
+		std::vector<DeviceInfoValueDescriptor> infoList = {
 			{ CL_DEVICE_IL_VERSION_KHR, clValueType::cl_char },
 		};
 		for (auto info : infoList) {
-			readDeviceInfoValue(info.first, info.second, "cl_khr_il_program");
+			readDeviceInfoValue(info, "cl_khr_il_program");
 		}
 	}
 	if (extensionSupported("cl_khr_image2D_from_buffer")) {
-		std::unordered_map<cl_device_info, clValueType> infoList = {
+		std::vector<DeviceInfoValueDescriptor> infoList = {
 			{ CL_DEVICE_IMAGE_PITCH_ALIGNMENT_KHR, clValueType::cl_uint },
 			{ CL_DEVICE_IMAGE_BASE_ADDRESS_ALIGNMENT_KHR, clValueType::cl_uint },
 		};
 		for (auto info : infoList) {
-			readDeviceInfoValue(info.first, info.second, "cl_khr_image2D_from_buffer");
+			readDeviceInfoValue(info, "cl_khr_image2D_from_buffer");
 		}
 	}	
 	if (extensionSupported("cl_khr_terminate_context")) {
-		std::unordered_map<cl_device_info, clValueType> infoList = {
+		std::vector<DeviceInfoValueDescriptor> infoList = {
 			// @todo: bitfield
 			//{ CL_DEVICE_TERMINATE_CAPABILITY_KHR, clValueType::cl_device_terminate_capability_khr },
 		};
 		for (auto info : infoList) {
-			readDeviceInfoValue(info.first, info.second, "cl_khr_terminate_context");
+			readDeviceInfoValue(info, "cl_khr_terminate_context");
 		}
 	}
 	if (extensionSupported("cl_khr_spir")) {
-		std::unordered_map<cl_device_info, clValueType> infoList = {
+		std::vector<DeviceInfoValueDescriptor> infoList = {
 			{ CL_DEVICE_SPIR_VERSIONS, clValueType::cl_char },
 		};
 		for (auto info : infoList) {
-			readDeviceInfoValue(info.first, info.second, "cl_khr_spir");
+			readDeviceInfoValue(info, "cl_khr_spir");
 		}
 	}
 	if (extensionSupported("cl_khr_subgroup_named_barrier")) {
-		std::unordered_map<cl_device_info, clValueType> infoList = {
+		std::vector<DeviceInfoValueDescriptor> infoList = {
 			{ CL_DEVICE_MAX_NAMED_BARRIER_COUNT_KHR, clValueType::cl_uint },
 		};
 		for (auto info : infoList) {
-			readDeviceInfoValue(info.first, info.second, "cl_khr_spir");
+			readDeviceInfoValue(info, "cl_khr_spir");
 		}
 	}
 	if (extensionSupported("cl_khr_device_uuid")) {
-		std::unordered_map<cl_device_info, clValueType> infoList = {
+		std::vector<DeviceInfoValueDescriptor> infoList = {
 			{ CL_DEVICE_UUID_KHR, clValueType::special },
 			{ CL_DRIVER_UUID_KHR, clValueType::special },
-			{ CL_DEVICE_LUID_VALID_KHR, clValueType::cl_bool },
+			{ CL_DEVICE_LUID_VALID_KHR, clValueType::cl_bool, utils::displayBool },
 			{ CL_DEVICE_LUID_KHR, clValueType::special },
 			{ CL_DEVICE_NODE_MASK_KHR, clValueType::cl_uint },
 		};
 		for (auto info : infoList) {
-			readDeviceInfoValue(info.first, info.second, "cl_khr_device_uuid");
+			readDeviceInfoValue(info, "cl_khr_device_uuid");
 		}
 	}
 	if (extensionSupported("cl_khr_extended_versioning")) {
-		std::unordered_map<cl_device_info, clValueType> infoList = {
+		std::vector<DeviceInfoValueDescriptor> infoList = {
 			{ CL_DEVICE_NUMERIC_VERSION_KHR, clValueType::cl_version_khr },
 			{ CL_DEVICE_OPENCL_C_NUMERIC_VERSION_KHR, clValueType::cl_version_khr },
 			// @todo
@@ -405,23 +421,22 @@ void DeviceInfo::readExtensionInfo()
 			//{ CL_DEVICE_BUILT_IN_KERNELS_WITH_VERSION_KHR, clValueType::cl_name_version_khr[] },
 		};
 		for (auto info : infoList) {
-			readDeviceInfoValue(info.first, info.second, "cl_khr_extended_versioning");
+			readDeviceInfoValue(info, "cl_khr_extended_versioning");
 		}
 	}
 	if (extensionSupported("cl_khr_pci_bus_info")) {
-		std::unordered_map<cl_device_info, clValueType> infoList = {
-			// @todo
-			//{ CL_DEVICE_PCI_BUS_INFO_KHR, clValueType::cl_device_pci_bus_info_khr },
+		std::vector<DeviceInfoValueDescriptor> infoList = {
+			{ CL_DEVICE_PCI_BUS_INFO_KHR, clValueType::cl_device_pci_bus_info_khr },
 		};
 		for (auto info : infoList) {
-			readDeviceInfoValue(info.first, info.second, "cl_khr_pci_bus_info");
+			readDeviceInfoValue(info, "cl_khr_pci_bus_info");
 		}
 	}
 	
 	// EXT
 	// @todo: types
 	if (extensionSupported("cl_ext_device_fission")) {
-		std::unordered_map<cl_device_info, clValueType> infoList = {
+		std::vector<DeviceInfoValueDescriptor> infoList = {
 			{ CL_DEVICE_PARENT_DEVICE_EXT, clValueType::cl_char },
 			{ CL_DEVICE_PARTITION_TYPES_EXT, clValueType::cl_char },
 			{ CL_DEVICE_AFFINITY_DOMAINS_EXT, clValueType::cl_char },
@@ -429,105 +444,104 @@ void DeviceInfo::readExtensionInfo()
 			{ CL_DEVICE_PARTITION_STYLE_EXT, clValueType::cl_char },
 		};
 		for (auto info : infoList) {
-			readDeviceInfoValue(info.first, info.second, "cl_ext_device_fission");
+			readDeviceInfoValue(info, "cl_ext_device_fission");
 		}
 	}
 	if (extensionSupported("cl_ext_cxx_for_opencl")) {
-		std::unordered_map<cl_device_info, clValueType> infoList = {
+		std::vector<DeviceInfoValueDescriptor> infoList = {
 			{ CL_DEVICE_CXX_FOR_OPENCL_NUMERIC_VERSION_EXT, clValueType::cl_char },
 		};
 		for (auto info : infoList) {
-			readDeviceInfoValue(info.first, info.second, "cl_ext_cxx_for_opencl");
+			readDeviceInfoValue(info, "cl_ext_cxx_for_opencl");
 		}
 	}
 
 	// ARM
 	if (extensionSupported("cl_arm_shared_virtual_memory")) {
-		std::unordered_map<cl_device_info, clValueType> infoList = {
+		std::vector<DeviceInfoValueDescriptor> infoList = {
 			{ CL_DEVICE_SVM_CAPABILITIES_ARM, clValueType::cl_char },
 		};
 		for (auto info : infoList) {
-			readDeviceInfoValue(info.first, info.second, "cl_arm_shared_virtual_memory");
+			readDeviceInfoValue(info, "cl_arm_shared_virtual_memory");
 		}
 	}
 	if (extensionSupported("cl_arm_get_core_id")) {
-		std::unordered_map<cl_device_info, clValueType> infoList = {
+		std::vector<DeviceInfoValueDescriptor> infoList = {
 			{ CL_DEVICE_COMPUTE_UNITS_BITFIELD_ARM, clValueType::cl_char },
 		};
 		for (auto info : infoList) {
-			readDeviceInfoValue(info.first, info.second, "cl_arm_get_core_id");
+			readDeviceInfoValue(info, "cl_arm_get_core_id");
 		}
 	}
 	if (extensionSupported("cl_arm_controlled_kernel_termination")) {
-		std::unordered_map<cl_device_info, clValueType> infoList = {
+		std::vector<DeviceInfoValueDescriptor> infoList = {
 			{ CL_DEVICE_CONTROLLED_TERMINATION_CAPABILITIES_ARM, clValueType::cl_char },
 		};
 		for (auto info : infoList) {
-			readDeviceInfoValue(info.first, info.second, "cl_arm_controlled_kernel_termination");
+			readDeviceInfoValue(info, "cl_arm_controlled_kernel_termination");
 		}
 	}
 	if (extensionSupported("cl_arm_scheduling_controls")) {
-		std::unordered_map<cl_device_info, clValueType> infoList = {
+		std::vector<DeviceInfoValueDescriptor> infoList = {
 			//@todo: bitfield
 			//{ CL_DEVICE_SCHEDULING_CONTROLS_CAPABILITIES_ARM, clValueType::cl_device_scheduling_controls_capabilities_arm },
 			//@todo: int[]
 			//{ CL_DEVICE_SUPPORTED_REGISTER_ALLOCATIONS_ARM, clValueType::cl_int[] },
 		};
 		for (auto info : infoList) {
-			readDeviceInfoValue(info.first, info.second, "cl_arm_scheduling_controls");
+			readDeviceInfoValue(info, "cl_arm_scheduling_controls");
 		}
 	}
 
 	// INTEL
 	if (extensionSupported("cl_intel_advanced_motion_estimation")) {
-		std::unordered_map<cl_device_info, clValueType> infoList = {
+		std::vector<DeviceInfoValueDescriptor> infoList = {
 			{ CL_DEVICE_ME_VERSION_INTEL, clValueType::cl_uint },
 		};
 		for (auto info : infoList) {
-			readDeviceInfoValue(info.first, info.second, "cl_intel_advanced_motion_estimation");
+			readDeviceInfoValue(info, "cl_intel_advanced_motion_estimation");
 		}
 	}
 	if (extensionSupported("cl_intel_simultaneous_sharing")) {
-		std::unordered_map<cl_device_info, clValueType> infoList = {
+		std::vector<DeviceInfoValueDescriptor> infoList = {
 			// @todo
 			// { CL_DEVICE_SIMULTANEOUS_INTEROPS_INTEL, clValueType::cl_uint[] }, 
 			{ CL_DEVICE_NUM_SIMULTANEOUS_INTEROPS_INTEL, clValueType::cl_uint },
 		};
 		for (auto info : infoList) {
-			readDeviceInfoValue(info.first, info.second, "cl_intel_simultaneous_sharing");
+			readDeviceInfoValue(info, "cl_intel_simultaneous_sharing");
 		}
 	}
 	if (extensionSupported("cl_intel_required_subgroup_size")) {
-		std::unordered_map<cl_device_info, clValueType> infoList = {
-			// @todo
-			// { CL_DEVICE_SUB_GROUP_SIZES_INTEL, clValueType::size_t[] },
+		std::vector<DeviceInfoValueDescriptor> infoList = {
+			{ CL_DEVICE_SUB_GROUP_SIZES_INTEL, clValueType::cl_size_t_array, utils::displayNumberArray },
 		};
 		for (auto info : infoList) {
-			readDeviceInfoValue(info.first, info.second, "cl_intel_required_subgroup_size");
+			readDeviceInfoValue(info, "cl_intel_required_subgroup_size");
 		}
 	}
 	if (extensionSupported("cl_intel_planar_yuv")) {
-		std::unordered_map<cl_device_info, clValueType> infoList = {
+		std::vector<DeviceInfoValueDescriptor> infoList = {
 			{ CL_DEVICE_PLANAR_YUV_MAX_WIDTH_INTEL, clValueType::cl_size_t },
 			{ CL_DEVICE_PLANAR_YUV_MAX_HEIGHT_INTEL, clValueType::cl_size_t },
 		};
 		for (auto info : infoList) {
-			readDeviceInfoValue(info.first, info.second, "cl_intel_planar_yuv");
+			readDeviceInfoValue(info, "cl_intel_planar_yuv");
 		}
 	}
 	if (extensionSupported("cl_intel_device_side_avc_motion_estimation")) {
-		std::unordered_map<cl_device_info, clValueType> infoList = {
+		std::vector<DeviceInfoValueDescriptor> infoList = {
 			{ CL_DEVICE_AVC_ME_VERSION_INTEL, clValueType::cl_uint },
 			{ CL_DEVICE_AVC_ME_SUPPORTS_TEXTURE_SAMPLER_USE_INTEL, clValueType::cl_bool },
 			{ CL_DEVICE_AVC_ME_SUPPORTS_PREEMPTION_INTEL, clValueType::cl_bool },
 		};
 		for (auto info : infoList) {
-			readDeviceInfoValue(info.first, info.second, "cl_intel_device_side_avc_motion_estimation");
+			readDeviceInfoValue(info, "cl_intel_device_side_avc_motion_estimation");
 		}
 	}
 	/* @todo: undocumented?
 	if (extensionSupported("cl_intel_unified_shared_memory")) {
-		std::unordered_map<cl_device_info, clValueType> infoList = {
+		std::vector<DeviceInfoValueDescriptor> infoList = {
 			{ CL_DEVICE_HOST_MEM_CAPABILITIES_INTEL, clValueType::cl_char },
 			{ CL_DEVICE_DEVICE_MEM_CAPABILITIES_INTEL, clValueType::cl_char },
 			{ CL_DEVICE_SINGLE_DEVICE_SHARED_MEM_CAPABILITIES_INTEL, clValueType::cl_char },
@@ -535,35 +549,35 @@ void DeviceInfo::readExtensionInfo()
 			{ CL_DEVICE_SHARED_SYSTEM_MEM_CAPABILITIES_INTEL, clValueType::cl_char },
 		};
 		for (auto info : infoList) {
-			readDeviceInfoValue(info.first, info.second, "cl_intel_unified_shared_memory");
+			readDeviceInfoValue(info, "cl_intel_unified_shared_memory");
 		}
 	}
 	*/
 	if (extensionSupported("cl_intel_command_queue_families")) {
-		std::unordered_map<cl_device_info, clValueType> infoList = {
+		std::vector<DeviceInfoValueDescriptor> infoList = {
 			// @todo
 			//{ CL_DEVICE_QUEUE_FAMILY_PROPERTIES_INTEL, clValueType::cl_queue_family_properties_intel },
 		};
 		for (auto info : infoList) {
-			readDeviceInfoValue(info.first, info.second, "cl_intel_command_queue_families");
+			readDeviceInfoValue(info, "cl_intel_command_queue_families");
 		}
 	}
 
 	// QCOM
 	if (extensionSupported("cl_qcom_ext_host_ptr")) {
-		std::unordered_map<cl_device_info, clValueType> infoList = {
+		std::vector<DeviceInfoValueDescriptor> infoList = {
 			{ CL_DEVICE_EXT_MEM_PADDING_IN_BYTES_QCOM, clValueType::cl_char },
 			{ CL_DEVICE_PAGE_SIZE_QCOM, clValueType::cl_char },
 		};
 		for (auto info : infoList) {
-			readDeviceInfoValue(info.first, info.second, "cl_qcom_ext_host_ptr");
+			readDeviceInfoValue(info, "cl_qcom_ext_host_ptr");
 		}
 	}
 
 	// AMD
 	// @todo: types
 	if (extensionSupported("cl_amd_device_attribute_query")) {
-		std::unordered_map<cl_device_info, clValueType> infoList = {
+		std::vector<DeviceInfoValueDescriptor> infoList = {
 			{ CL_DEVICE_PROFILING_TIMER_OFFSET_AMD, clValueType::cl_char },
 			{ CL_DEVICE_TOPOLOGY_AMD, clValueType::cl_char },
 			{ CL_DEVICE_BOARD_NAME_AMD, clValueType::cl_char },
@@ -587,13 +601,13 @@ void DeviceInfo::readExtensionInfo()
 			{ CL_DEVICE_PCIE_ID_AMD, clValueType::cl_char },
 		};
 		for (auto info : infoList) {
-			readDeviceInfoValue(info.first, info.second, "cl_amd_device_attribute_query");
+			readDeviceInfoValue(info, "cl_amd_device_attribute_query");
 		}
 	}
 
 	// NV
 	if (extensionSupported("cl_nv_device_attribute_query")) {
-		std::unordered_map<cl_device_info, clValueType> infoList = {
+		std::vector<DeviceInfoValueDescriptor> infoList = {
 			{ CL_DEVICE_COMPUTE_CAPABILITY_MAJOR_NV, clValueType::cl_uint },
 			{ CL_DEVICE_COMPUTE_CAPABILITY_MINOR_NV, clValueType::cl_uint },
 			{ CL_DEVICE_REGISTERS_PER_BLOCK_NV, clValueType::cl_uint },
@@ -603,7 +617,7 @@ void DeviceInfo::readExtensionInfo()
 			{ CL_DEVICE_INTEGRATED_MEMORY_NV, clValueType::cl_bool },
 		};
 		for (auto info : infoList) {
-			readDeviceInfoValue(info.first, info.second, "cl_nv_device_attribute_query");
+			readDeviceInfoValue(info, "cl_nv_device_attribute_query");
 		}
 	}
 }
@@ -685,10 +699,35 @@ void DeviceInfo::readExtensions()
 	delete[] extensions;
 }
 
-DeviceInfoValue::DeviceInfoValue(cl_device_info info, QVariant value, QString extension)
+DeviceInfoValue::DeviceInfoValue(cl_device_info info, QVariant value, QString extension, DisplayFn displayFunction)
 {
 	this->name = utils::deviceInfoString(info);
 	this->value = value;
 	this->extension = extension;
 	this->enumValue = info;
+	this->displayFunction = displayFunction;
+}
+
+void DeviceInfoValue::addDetailValue(QString name, QVariant value)
+{
+	DeviceInfoValueDetailValue detailValue{};
+	detailValue.name = name;
+	detailValue.value = value;
+	detailValues.push_back(detailValue);
+}
+
+DeviceInfoValueDescriptor::DeviceInfoValueDescriptor()
+{
+	this->name = 0;
+	this->valueType = clValueType::cl_char;
+	this->displayFunction = nullptr;
+}
+
+DeviceInfoValueDescriptor::DeviceInfoValueDescriptor(cl_device_info name, clValueType valueType, DisplayFn displayFunction)
+{
+	this->name = name;
+	this->valueType = valueType;
+	// @todo: nullptr or utils::displayDefault?
+	//this->displayFunction = displayFunction ? displayFunction : utils::displayDefault;
+	this->displayFunction = displayFunction;
 }
