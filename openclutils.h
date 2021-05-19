@@ -38,10 +38,12 @@ enum class clValueType {
 	cl_device_type,
 	cl_version_khr,
 	cl_size_t,
+	cl_size_t_array,
 	cl_uchar,
 	cl_uint,
 	cl_ulong,
 	cl_version,
+	cl_device_pci_bus_info_khr,
 	special
 };
 
@@ -201,6 +203,10 @@ namespace utils
 			// cl_khr_extended_versioning
 			// STR(DEVICE_NUMERIC_VERSION_KHR);
 			STR(CL_DEVICE_OPENCL_C_NUMERIC_VERSION_KHR);
+			// cl_khr_fp16
+			STR(CL_DEVICE_HALF_FP_CONFIG);
+			// cl_lhr_spir
+			STR(CL_DEVICE_SPIR_VERSIONS);
 			// STR(DEVICE_EXTENSIONS_WITH_VERSION_KHR);
 			// STR(DEVICE_BUILT_IN_KERNELS_WITH_VERSION_KHR);
 			// cl_khr_pci_bus_info
