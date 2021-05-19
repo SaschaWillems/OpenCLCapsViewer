@@ -32,5 +32,10 @@ namespace utils
 	QString displayNumberArray(QVariant value);
 	QString displayDeviceType(QVariant value);
 	QString displayAtomicCapabilities(QVariant value);
+	QString displayMemCacheType(QVariant value);
+	QString displayLocalMemType(QVariant value);
+	QString displayFloatingPointConfig(QVariant value);
+	QString displayExecCapabilities(QVariant value);
+	QString displayEnqueueCapabilities(QVariant value);
 }
 

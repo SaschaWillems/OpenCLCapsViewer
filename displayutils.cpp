@@ -97,4 +97,64 @@ namespace utils
         return displayFlags(value.toInt(), flags);
     }
 
+    QString displayMemCacheType(QVariant value)
+    {
+        switch (value.toInt())
+            {
+#define STR(r) case r: return #r
+                STR(CL_NONE);
+                STR(CL_READ_ONLY_CACHE);
+                STR(CL_READ_WRITE_CACHE);
+#undef STR
+        default: return "unknown";
+        }
+    }
+
+    QString displayLocalMemType(QVariant value)
+    {
+        switch (value.toInt())
+        {
+#define STR(r) case r: return #r
+            STR(CL_NONE);
+            STR(CL_LOCAL);
+            STR(CL_GLOBAL);
+#undef STR
+        default: return "unknown";
+        }
+    }
+
+    QString displayFloatingPointConfig(QVariant value)
+    {
+        std::unordered_map<uint32_t, QString> flags = {
+            { CL_FP_INF_NAN, "INF_NAN" },
+            { CL_FP_ROUND_TO_NEAREST, "ROUND_TO_NEAREST" },
+            { CL_FP_ROUND_TO_ZERO, "ROUND_TO_ZERO" },
+            { CL_FP_ROUND_TO_INF, "ROUND_TO_INF" },
+            { CL_FP_FMA, "FMA" },
+            // 1.1
+            { CL_FP_SOFT_FLOAT, "SOFT_FLOAT" },
+            // 1.2
+            { CL_FP_CORRECTLY_ROUNDED_DIVIDE_SQRT, "CORRECTLY_ROUNDED_DIVIDE_SQRT" },
+        };
+        return displayFlags(value.toInt(), flags);
+    }
+
+    QString displayExecCapabilities(QVariant value)
+    {
+        std::unordered_map<uint32_t, QString> flags = {
+            { CL_EXEC_KERNEL, "KERNEL" },
+            { CL_EXEC_NATIVE_KERNEL, "NATIVE_KERNEL" },
+        };
+        return displayFlags(value.toInt(), flags);
+    }
+
+    QString displayEnqueueCapabilities(QVariant value)
+    {
+        std::unordered_map<uint32_t, QString> flags = {
+            { CL_DEVICE_QUEUE_SUPPORTED, "QUEUE_SUPPORTED" },
+            { CL_DEVICE_QUEUE_REPLACEABLE_DEFAULT, "QUEUE_REPLACEABLE_DEFAULT" },
+        };
+        return displayFlags(value.toInt(), flags);
+    }
+
 }

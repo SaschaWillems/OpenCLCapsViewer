@@ -255,21 +255,21 @@ void DeviceInfo::readDeviceInfo()
 		{ CL_DEVICE_MAX_SAMPLERS, clValueType::cl_uint },
 		{ CL_DEVICE_MEM_BASE_ADDR_ALIGN, clValueType::cl_uint },
 		{ CL_DEVICE_MIN_DATA_TYPE_ALIGN_SIZE, clValueType::cl_uint}, // @todo: deprecated in 1.2
-		{ CL_DEVICE_SINGLE_FP_CONFIG, clValueType::cl_device_fp_config },
-		{ CL_DEVICE_GLOBAL_MEM_CACHE_TYPE, clValueType::cl_device_mem_cache_type },
+		{ CL_DEVICE_SINGLE_FP_CONFIG, clValueType::cl_device_fp_config, utils::displayFloatingPointConfig },
+		{ CL_DEVICE_GLOBAL_MEM_CACHE_TYPE, clValueType::cl_device_mem_cache_type, utils::displayMemCacheType },
 		{ CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE, clValueType::cl_uint },
 		{ CL_DEVICE_GLOBAL_MEM_CACHE_SIZE, clValueType::cl_ulong },
 		{ CL_DEVICE_GLOBAL_MEM_SIZE, clValueType::cl_ulong },
 		{ CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE, clValueType::cl_ulong },
 		{ CL_DEVICE_MAX_CONSTANT_ARGS, clValueType::cl_uint },
-		{ CL_DEVICE_LOCAL_MEM_TYPE, clValueType::cl_device_local_mem_type },
+		{ CL_DEVICE_LOCAL_MEM_TYPE, clValueType::cl_device_local_mem_type, utils::displayLocalMemType },
 		{ CL_DEVICE_LOCAL_MEM_SIZE, clValueType::cl_ulong },
 		{ CL_DEVICE_ERROR_CORRECTION_SUPPORT, clValueType::cl_bool, utils::displayBool },
 		{ CL_DEVICE_PROFILING_TIMER_RESOLUTION, clValueType::cl_size_t },
 		{ CL_DEVICE_ENDIAN_LITTLE, clValueType::cl_bool, utils::displayBool },
 		//{ CL_DEVICE_AVAILABLE, clValueType:: },
 		{ CL_DEVICE_COMPILER_AVAILABLE, clValueType::cl_bool, utils::displayBool },
-		{ CL_DEVICE_EXECUTION_CAPABILITIES, clValueType::cl_device_exec_capabilities },
+		{ CL_DEVICE_EXECUTION_CAPABILITIES, clValueType::cl_device_exec_capabilities, utils::displayExecCapabilities },
 		// { CL_DEVICE_QUEUE_PROPERTIES, clValueType:: }, @todo
 		{ CL_DEVICE_NAME, clValueType::cl_char },
 		{ CL_DEVICE_VENDOR, clValueType::cl_char },
@@ -299,7 +299,7 @@ void DeviceInfo::readDeviceInfo()
 			{ CL_DEVICE_WORK_GROUP_COLLECTIVE_FUNCTIONS_SUPPORT, clValueType::cl_bool, utils::displayBool },
 			{ CL_DEVICE_GENERIC_ADDRESS_SPACE_SUPPORT, clValueType::cl_bool, utils::displayBool },
 			//{ CL_DEVICE_OPENCL_C_FEATURES, clValueType:: }, array of descriptors
-			{ CL_DEVICE_DEVICE_ENQUEUE_CAPABILITIES, clValueType::cl_device_device_enqueue_capabilities },
+			{ CL_DEVICE_DEVICE_ENQUEUE_CAPABILITIES, clValueType::cl_device_device_enqueue_capabilities, utils::displayEnqueueCapabilities },
 			{ CL_DEVICE_PIPE_SUPPORT, clValueType::cl_bool, utils::displayBool },
 			{ CL_DEVICE_LATEST_CONFORMANCE_VERSION_PASSED, clValueType::cl_char },
 		};
@@ -343,7 +343,7 @@ void DeviceInfo::readExtensionInfo()
 	// KHR
 	if (extensionSupported("cl_khr_fp64")) {
 		std::vector<DeviceInfoValueDescriptor> infoList = {
-			{ CL_DEVICE_DOUBLE_FP_CONFIG, clValueType::cl_device_fp_config },
+			{ CL_DEVICE_DOUBLE_FP_CONFIG, clValueType::cl_device_fp_config, utils::displayFloatingPointConfig },
 		};
 		for (auto info : infoList) {
 			readDeviceInfoValue(info, "cl_khr_fp64");
@@ -351,7 +351,7 @@ void DeviceInfo::readExtensionInfo()
 	}
 	if (extensionSupported("cl_khr_fp16")) {
 		std::vector<DeviceInfoValueDescriptor> infoList = {
-			{ CL_DEVICE_HALF_FP_CONFIG, clValueType::cl_device_fp_config },
+			{ CL_DEVICE_HALF_FP_CONFIG, clValueType::cl_device_fp_config, utils::displayFloatingPointConfig },
 		};
 		for (auto info : infoList) {
 			readDeviceInfoValue(info, "cl_khr_fp16");
