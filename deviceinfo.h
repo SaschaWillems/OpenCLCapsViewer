@@ -42,14 +42,22 @@ struct DeviceExtension
     cl_version version;
 };
 
+struct DeviceInfoValueDetailValue
+{
+    QString name;
+    QVariant value;
+};
+
 struct DeviceInfoValue
 {
     QString name;
     QVariant value;
     QString extension;
     qint32 enumValue;
+    std::vector<DeviceInfoValueDetailValue> detailValues;
     // @todo: add display "translation" rule?
-    DeviceInfoValue(cl_device_info info, QVariant value, QString extension = "");
+    DeviceInfoValue(cl_device_info info, QVariant value, QString extension, DisplayFn displayFunction = nullptr);
+    void addDetailValue(QString name, QVariant value);
 };
 
 class DeviceInfo

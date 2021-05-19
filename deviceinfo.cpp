@@ -146,6 +146,16 @@ void DeviceInfo::readDeviceInfoValue(cl_device_info info, clValueType valueType,
 		cl_device_type value;
 		clGetDeviceInfo(this->deviceId, info, sizeof(cl_device_type), &value, nullptr);
 		deviceInfo.push_back(DeviceInfoValue(info, value, extension));
+	case clValueType::cl_device_pci_bus_info_khr:
+	{
+		cl_device_pci_bus_info_khr value;
+		clGetDeviceInfo(this->deviceId, descriptor.name, sizeof(cl_device_type), &value, nullptr);
+		DeviceInfoValue infoValue(descriptor.name, QVariant(), extension, descriptor.displayFunction);
+		infoValue.addDetailValue("pci_domain", value.pci_domain);
+		infoValue.addDetailValue("pci_bus", value.pci_bus);
+		infoValue.addDetailValue("pci_device", value.pci_device);
+		infoValue.addDetailValue("pci_function", value.pci_function);
+		deviceInfo.push_back(infoValue);
 		break;
 	}
 	/* Special cases */
@@ -635,6 +645,15 @@ QJsonObject DeviceInfo::toJson()
 		jsonNode["extension"] = info.extension;
 		jsonNode["enumvalue"] = info.enumValue;
 		jsonNode["value"] = info.value.toJsonValue();
+		if (info.detailValues.size() > 0) {
+			QJsonArray jsonDetails;
+			for (auto& detail : info.detailValues) {
+				QJsonObject jsonNodeDetail;
+				jsonNodeDetail["name"] = detail.name;
+				jsonNodeDetail["value"] = detail.value.toJsonValue();
+				jsonDetails.append(jsonNodeDetail);
+			}
+			jsonNode["details"] = jsonDetails;
 		}
 		jsonDeviceInfos.append(jsonNode);
 	}
