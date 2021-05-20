@@ -30,7 +30,9 @@ namespace utils
 	QString displayDefault(QVariant value);
 	QString displayBool(QVariant value);
 	QString displayNumberArray(QVariant value);
+	QString displayByteSize(QVariant value);
 	QString displayDeviceType(QVariant value);
+	QString displayVersion(QVariant value);
 	QString displayAtomicCapabilities(QVariant value);
 	QString displayMemCacheType(QVariant value);
 	QString displayLocalMemType(QVariant value);

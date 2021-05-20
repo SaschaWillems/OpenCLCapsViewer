@@ -244,26 +244,26 @@ void DeviceInfo::readDeviceInfo()
 		{ CL_DEVICE_ADDRESS_BITS, clValueType::cl_uint },
 		{ CL_DEVICE_MAX_READ_IMAGE_ARGS, clValueType::cl_uint },
 		{ CL_DEVICE_MAX_WRITE_IMAGE_ARGS, clValueType::cl_uint },
-		{ CL_DEVICE_MAX_MEM_ALLOC_SIZE, clValueType::cl_ulong },
+		{ CL_DEVICE_MAX_MEM_ALLOC_SIZE, clValueType::cl_ulong, utils::displayByteSize },
 		{ CL_DEVICE_IMAGE2D_MAX_WIDTH, clValueType::cl_size_t },
 		{ CL_DEVICE_IMAGE2D_MAX_HEIGHT, clValueType::cl_size_t },
 		{ CL_DEVICE_IMAGE3D_MAX_WIDTH, clValueType::cl_size_t },
 		{ CL_DEVICE_IMAGE3D_MAX_HEIGHT, clValueType::cl_size_t },
 		{ CL_DEVICE_IMAGE3D_MAX_DEPTH, clValueType::cl_size_t },
 		{ CL_DEVICE_IMAGE_SUPPORT, clValueType::cl_bool, utils::displayBool },
-		{ CL_DEVICE_MAX_PARAMETER_SIZE, clValueType::cl_size_t },
+		{ CL_DEVICE_MAX_PARAMETER_SIZE, clValueType::cl_size_t, utils::displayByteSize },
 		{ CL_DEVICE_MAX_SAMPLERS, clValueType::cl_uint },
 		{ CL_DEVICE_MEM_BASE_ADDR_ALIGN, clValueType::cl_uint },
-		{ CL_DEVICE_MIN_DATA_TYPE_ALIGN_SIZE, clValueType::cl_uint}, // @todo: deprecated in 1.2
+		{ CL_DEVICE_MIN_DATA_TYPE_ALIGN_SIZE, clValueType::cl_uint, utils::displayByteSize }, // @todo: deprecated in 1.2
 		{ CL_DEVICE_SINGLE_FP_CONFIG, clValueType::cl_device_fp_config, utils::displayFloatingPointConfig },
 		{ CL_DEVICE_GLOBAL_MEM_CACHE_TYPE, clValueType::cl_device_mem_cache_type, utils::displayMemCacheType },
-		{ CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE, clValueType::cl_uint },
-		{ CL_DEVICE_GLOBAL_MEM_CACHE_SIZE, clValueType::cl_ulong },
-		{ CL_DEVICE_GLOBAL_MEM_SIZE, clValueType::cl_ulong },
-		{ CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE, clValueType::cl_ulong },
+		{ CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE, clValueType::cl_uint, utils::displayByteSize },
+		{ CL_DEVICE_GLOBAL_MEM_CACHE_SIZE, clValueType::cl_ulong, utils::displayByteSize },
+		{ CL_DEVICE_GLOBAL_MEM_SIZE, clValueType::cl_ulong, utils::displayByteSize },
+		{ CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE, clValueType::cl_ulong, utils::displayByteSize },
 		{ CL_DEVICE_MAX_CONSTANT_ARGS, clValueType::cl_uint },
 		{ CL_DEVICE_LOCAL_MEM_TYPE, clValueType::cl_device_local_mem_type, utils::displayLocalMemType },
-		{ CL_DEVICE_LOCAL_MEM_SIZE, clValueType::cl_ulong },
+		{ CL_DEVICE_LOCAL_MEM_SIZE, clValueType::cl_ulong, utils::displayByteSize },
 		{ CL_DEVICE_ERROR_CORRECTION_SUPPORT, clValueType::cl_bool, utils::displayBool },
 		{ CL_DEVICE_PROFILING_TIMER_RESOLUTION, clValueType::cl_size_t },
 		{ CL_DEVICE_ENDIAN_LITTLE, clValueType::cl_bool, utils::displayBool },
@@ -288,7 +288,7 @@ void DeviceInfo::readDeviceInfo()
 	if (clVersionMajor == 3) 
 	{
 		std::vector<DeviceInfoValueDescriptor> infoListCL30 = {
-			{ CL_DEVICE_NUMERIC_VERSION, clValueType::cl_version },
+			{ CL_DEVICE_NUMERIC_VERSION, clValueType::cl_version, utils::displayVersion },
 			// { CL_DEVICE_ILS_WITH_VERSION, clValueType::cl_device_type }, array of descriptors
 			// { CL_DEVICE_BUILT_IN_KERNELS_WITH_VERSION, clValueType::cl_device_type }, array of descriptors
 			{ CL_DEVICE_ATOMIC_MEMORY_CAPABILITIES, clValueType::cl_device_atomic_capabilities, utils::displayAtomicCapabilities },
@@ -413,8 +413,8 @@ void DeviceInfo::readExtensionInfo()
 	}
 	if (extensionSupported("cl_khr_extended_versioning")) {
 		std::vector<DeviceInfoValueDescriptor> infoList = {
-			{ CL_DEVICE_NUMERIC_VERSION_KHR, clValueType::cl_version_khr },
-			{ CL_DEVICE_OPENCL_C_NUMERIC_VERSION_KHR, clValueType::cl_version_khr },
+			{ CL_DEVICE_NUMERIC_VERSION_KHR, clValueType::cl_version_khr, utils::displayVersion },
+			{ CL_DEVICE_OPENCL_C_NUMERIC_VERSION_KHR, clValueType::cl_version_khr, utils::displayVersion },
 			// @todo
 			//{ CL_DEVICE_EXTENSIONS_WITH_VERSION_KHR, clValueType::cl_name_version_khr[] },
 			//{ CL_DEVICE_ILS_WITH_VERSION_KHR, clValueType::cl_name_version_khr[] },
@@ -612,9 +612,9 @@ void DeviceInfo::readExtensionInfo()
 			{ CL_DEVICE_COMPUTE_CAPABILITY_MINOR_NV, clValueType::cl_uint },
 			{ CL_DEVICE_REGISTERS_PER_BLOCK_NV, clValueType::cl_uint },
 			{ CL_DEVICE_WARP_SIZE_NV, clValueType::cl_uint },
-			{ CL_DEVICE_GPU_OVERLAP_NV, clValueType::cl_bool },
-			{ CL_DEVICE_KERNEL_EXEC_TIMEOUT_NV, clValueType::cl_bool },
-			{ CL_DEVICE_INTEGRATED_MEMORY_NV, clValueType::cl_bool },
+			{ CL_DEVICE_GPU_OVERLAP_NV, clValueType::cl_bool, utils::displayBool },
+			{ CL_DEVICE_KERNEL_EXEC_TIMEOUT_NV, clValueType::cl_bool, utils::displayBool },
+			{ CL_DEVICE_INTEGRATED_MEMORY_NV, clValueType::cl_bool, utils::displayBool },
 		};
 		for (auto info : infoList) {
 			readDeviceInfoValue(info, "cl_nv_device_attribute_query");

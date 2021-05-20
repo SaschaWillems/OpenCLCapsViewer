@@ -68,6 +68,11 @@ namespace utils
         return "[" + imploded + "]";
     }
 
+    QString displayByteSize(QVariant value)
+    {
+        return QString("%L1 bytes").arg(value.toUInt());
+    }
+
     QString displayDeviceType(QVariant value)
     {
         switch (value.toInt())
@@ -83,6 +88,12 @@ namespace utils
         }
     }
 
+    QString displayVersion(QVariant value)
+    {
+        cl_version version = static_cast<cl_version>(value.toUInt());
+        QString dv = QString("%1.%2.%3").arg(CL_VERSION_MAJOR(version)).arg(CL_VERSION_MINOR(version)).arg(CL_VERSION_PATCH(version));
+        return dv;
+    }
 
     QString displayAtomicCapabilities(QVariant value) {
         std::unordered_map<uint32_t, QString> flags = {
