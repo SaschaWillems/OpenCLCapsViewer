@@ -276,7 +276,6 @@ void DeviceInfo::readDeviceInfo()
 		{ CL_DRIVER_VERSION, clValueType::cl_char },
 		{ CL_DEVICE_PROFILE, clValueType::cl_char },
 		{ CL_DEVICE_VERSION, clValueType::cl_char },
-		//{ CL_DEVICE_EXTENSIONS, clValueType:: },
 		//{ CL_DEVICE_PLATFOR, clValueType:: },
 	};
 	for (auto info : infoList)
@@ -684,19 +683,35 @@ QJsonObject DeviceInfo::toJson()
 
 void DeviceInfo::readExtensions()
 {
-	// @todo: 3.0 vs. older way of reading (no version)
 	extensions.clear();
-	size_t extSize;
-	clGetDeviceInfo(this->deviceId, CL_DEVICE_EXTENSIONS_WITH_VERSION, 0, nullptr, &extSize);
-	cl_name_version* extensions = new cl_name_version[4096];
-	clGetDeviceInfo(this->deviceId, CL_DEVICE_EXTENSIONS_WITH_VERSION, extSize, extensions, nullptr);
-	for (size_t i = 0; i < extSize / sizeof(cl_name_version); i++) {
-		DeviceExtension extension{};
-		extension.name = extensions[i].name;
-		extension.version = extensions[i].version;
-		this->extensions.push_back(extension);
+	if (clVersionMajor >= 3) {
+		size_t extSize;
+		clGetDeviceInfo(this->deviceId, CL_DEVICE_EXTENSIONS_WITH_VERSION, 0, nullptr, &extSize);
+		cl_name_version* extensions = new cl_name_version[4096];
+		clGetDeviceInfo(this->deviceId, CL_DEVICE_EXTENSIONS_WITH_VERSION, extSize, extensions, nullptr);
+		for (size_t i = 0; i < extSize / sizeof(cl_name_version); i++) {
+			DeviceExtension extension{};
+			extension.name = extensions[i].name;
+			extension.version = extensions[i].version;
+			this->extensions.push_back(extension);
+		}
+		delete[] extensions;
+	} else {
+		size_t extStrSize;
+		clGetDeviceInfo(this->deviceId, CL_DEVICE_EXTENSIONS, 0, nullptr, &extStrSize);
+		std::string extensionString;
+		extensionString.resize(extStrSize);
+		clGetDeviceInfo(this->deviceId, CL_DEVICE_EXTENSIONS, extStrSize, &extensionString[0], nullptr);
+		std::vector<std::string> extensions;
+		extensions = utils::explode(extensionString, ' ');
+		for (size_t i = 0; i < extensions.size(); i++) {
+			DeviceExtension extension{};
+			extension.name = QString::fromStdString(extensions[i]);
+			// @todo
+			extension.version = 0;
+			this->extensions.push_back(extension);
+		}
 	}
-	delete[] extensions;
 }
 
 DeviceInfoValue::DeviceInfoValue(cl_device_info info, QVariant value, QString extension, DisplayFn displayFunction)

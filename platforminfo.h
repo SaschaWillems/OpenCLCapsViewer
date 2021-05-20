@@ -46,6 +46,7 @@ struct PlatformInfoValue
 class PlatformInfo
 {
 private:
+    void readOpenCLVersion();
 	void readPlatformInfoValue(cl_platform_info info, clValueType valueType, QString extension = "");
     void readExtensions();
     bool extensionSupported(const char* name);
@@ -53,6 +54,8 @@ public:
 	cl_platform_id platformId;
     std::vector<PlatformInfoValue> platformInfo;
     std::vector<PlatformExtension> extensions;
+    qint32 clVersionMajor;
+    qint32 clVersionMinor;
 	void read();
     void readExtensionInfo();
     QJsonObject toJson();

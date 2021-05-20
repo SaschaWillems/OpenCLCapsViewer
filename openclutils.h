@@ -22,6 +22,7 @@
 
 #include "CL/cl.h"
 #include "CL/cl_ext.h"
+#include <vector>
 #include <sstream>
 #include <QString>
 
@@ -283,6 +284,17 @@ namespace utils
 #undef STR
 		default: return "?";
 		}
+	}
+
+	inline std::vector<std::string> explode(const std::string& str, char delimiter)
+	{
+		std::vector<std::string> tokens;
+		std::stringstream tokenStream(str);
+		std::string tempStr;
+		while (std::getline(tokenStream, tempStr, delimiter)) {
+			tokens.push_back(tempStr);
+		}
+		return tokens;
 	}
 
 }

@@ -21,6 +21,24 @@
 #include <unordered_map>
 #include "platforminfo.h"
 
+void PlatformInfo::readOpenCLVersion()
+{
+	size_t valueSize;
+	clGetPlatformInfo(this->platformId, CL_PLATFORM_VERSION, 0, nullptr, &valueSize);
+	std::string value;
+	value.resize(valueSize);
+	clGetPlatformInfo(this->platformId, CL_PLATFORM_VERSION, valueSize, &value[0], nullptr);
+	// OpenCL<space><major_version.minor_version><space>
+	size_t versStart = value.find(' ', 0);
+	size_t versSplit = value.find('.', versStart + 1);
+	size_t versEnd = value.find(' ', versStart + 1);
+	std::string major, minor;
+	major = value.substr(versStart, versSplit - versStart);
+	minor = value.substr(versSplit + 1, versEnd - versSplit - 1);
+	clVersionMajor = std::stoi(major);
+	clVersionMinor = std::stoi(minor);
+}
+
 void PlatformInfo::readPlatformInfoValue(cl_platform_info info, clValueType valueType, QString extension)
 {
 	switch (valueType)
@@ -56,21 +74,35 @@ void PlatformInfo::readPlatformInfoValue(cl_platform_info info, clValueType valu
 
 void PlatformInfo::readExtensions()
 {
-	// @todo: 3.0 vs. older way of reading (no version)
 	extensions.clear();
-	cl_int status;
-	size_t extSize;
-	status = clGetPlatformInfo(this->platformId, CL_PLATFORM_EXTENSIONS_WITH_VERSION, 0, nullptr, &extSize);
-	assert(status == CL_SUCCESS);
-	cl_name_version* extensions = new cl_name_version[4096];
-	clGetPlatformInfo(this->platformId, CL_PLATFORM_EXTENSIONS_WITH_VERSION, extSize, extensions, nullptr);
-	for (size_t i = 0; i < extSize / sizeof(cl_name_version); i++) {
-		PlatformExtension extension{};
-		extension.name = extensions[i].name;
-		extension.version = extensions[i].version;
-		this->extensions.push_back(extension);
+	if (clVersionMajor >= 3) {
+		size_t extSize;
+		clGetPlatformInfo(this->platformId, CL_PLATFORM_EXTENSIONS_WITH_VERSION, 0, nullptr, &extSize);
+		cl_name_version* extensions = new cl_name_version[4096];
+		clGetPlatformInfo(this->platformId, CL_PLATFORM_EXTENSIONS_WITH_VERSION, extSize, extensions, nullptr);
+		for (size_t i = 0; i < extSize / sizeof(cl_name_version); i++) {
+			PlatformExtension extension{};
+			extension.name = extensions[i].name;
+			extension.version = extensions[i].version;
+			this->extensions.push_back(extension);
+		}
+		delete[] extensions;
+	} else {
+		size_t extStrSize;
+		clGetPlatformInfo(this->platformId, CL_PLATFORM_EXTENSIONS, 0, nullptr, &extStrSize);
+		std::string extensionString;
+		extensionString.resize(extStrSize);
+		clGetPlatformInfo(this->platformId, CL_PLATFORM_EXTENSIONS, extStrSize, &extensionString[0], nullptr);
+		std::vector<std::string> extensions;
+		extensions = utils::explode(extensionString, ' ');
+		for (size_t i = 0; i < extensions.size(); i++) {
+			PlatformExtension extension{};
+			extension.name = QString::fromStdString(extensions[i]);
+			// @todo
+			extension.version = 0;
+			this->extensions.push_back(extension);
+		}
 	}
-	delete[] extensions;
 }
 
 bool PlatformInfo::extensionSupported(const char* name)
@@ -93,7 +125,6 @@ void PlatformInfo::read()
 		{ CL_PLATFORM_VERSION, clValueType::cl_char },
 		{ CL_PLATFORM_NAME, clValueType::cl_char },
 		{ CL_PLATFORM_VENDOR, clValueType::cl_char },
-		//{ CL_PLATFORM_EXTENSIONS, clValueType::cl_char },
 	};
 	for (auto info : infoList)
 	{
@@ -107,6 +138,7 @@ void PlatformInfo::read()
 	// CL_PLATFORM_NUMERIC_VERSION
 	// CL_PLATFORM_EXTENSIONS_WITH_VERSION
 
+	readOpenCLVersion();
 	readExtensions();
 	readExtensionInfo();
 }
