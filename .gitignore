@@ -224,6 +224,6 @@ CMakeLists.txt.user*
 libs/openssl/*/*.so
 
 redist/**
+android/.gradle/**
 
 devdatabase.ini
-

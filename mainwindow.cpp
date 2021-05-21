@@ -60,6 +60,38 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->toolButtonAbout, SIGNAL(pressed()), this, SLOT(slotAbout()));
     connect(ui->toolButtonExit, SIGNAL(pressed()), this, SLOT(slotClose()));
 
+    // Optimize the UI for mobile platforms
+#if defined(ANDROID)
+    // Adjust toolbar to better fit mobile devices
+    foreach (QToolButton *toolButton, findChildren<QToolButton *>()) {
+        toolButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+    }
+    // Touch scrolling
+    foreach (QTreeView *widget, findChildren<QTreeWidget  *>()) {
+        setTouchProps(widget);
+        widget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        widget->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        widget->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+        widget->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+        widget->setSelectionMode(QAbstractItemView::NoSelection);
+        widget->setFrameStyle(QFrame::NoFrame);
+    }
+
+    foreach (QTreeView *widget, findChildren<QTreeView *>()) {
+        setTouchProps(widget);
+        widget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        widget->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        widget->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+        widget->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+        widget->setSelectionMode(QAbstractItemView::NoSelection);
+        widget->setFrameStyle(QFrame::NoFrame);
+    }
+    // No identation
+    for (int i = 0; i < ui->tabWidgetDevice->count(); i++) {
+        ui->tabWidgetDevice->widget(i)->layout()->setMargin(0);
+    }
+#endif
+
     getOperatingSystem();
     getDevices();
 }
@@ -472,4 +504,25 @@ void MainWindow::slotClose()
 {
     close();
 }
+
+#if defined(ANDROID)
+void MainWindow::setTouchProps(QWidget *widget) {
+    QScroller *scroller = QScroller::scroller(widget);
+    QScrollerProperties properties = scroller->scrollerProperties();
+    QVariant overshootPolicy = QVariant::fromValue<QScrollerProperties::OvershootPolicy>(QScrollerProperties::OvershootAlwaysOff);
+    properties.setScrollMetric(QScrollerProperties::VerticalOvershootPolicy, overshootPolicy);
+    properties.setScrollMetric(QScrollerProperties::HorizontalOvershootPolicy, overshootPolicy);
+    properties.setScrollMetric(QScrollerProperties::DragVelocitySmoothingFactor, 0.6);
+    properties.setScrollMetric(QScrollerProperties::MinimumVelocity, 0.0);
+    properties.setScrollMetric(QScrollerProperties::MaximumVelocity, 0.5);
+    properties.setScrollMetric(QScrollerProperties::AcceleratingFlickMaximumTime, 0.4);
+    properties.setScrollMetric(QScrollerProperties::AcceleratingFlickSpeedupFactor, 1.2);
+    properties.setScrollMetric(QScrollerProperties::SnapPositionRatio, 0.2);
+    properties.setScrollMetric(QScrollerProperties::MaximumClickThroughVelocity, 0);
+    properties.setScrollMetric(QScrollerProperties::DragStartDistance, 0.001);
+    properties.setScrollMetric(QScrollerProperties::MousePressEventDelay, 0.5);
+    scroller->grabGesture(widget, QScroller::LeftMouseButtonGesture);
+    scroller->setScrollerProperties(properties);
+}
+#endif
 

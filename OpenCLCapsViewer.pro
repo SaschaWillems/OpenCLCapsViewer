@@ -55,6 +55,22 @@ linux:!android {
     INSTALLS += target
 }
 
+android {
+    QT += androidextras
+    CONFIG += mobility
+    MOBILITY =
+    LIBS += -landroid
+
+    ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
+
+    DISTFILES += \
+        android/AndroidManifest.xml \
+        android/build.gradle \
+        android/res/values/libs.xml
+
+    LIBS += $$PWD/libs/opencl/libOpenCL.so
+}
+
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin

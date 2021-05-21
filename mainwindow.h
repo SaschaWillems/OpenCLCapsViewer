@@ -30,6 +30,9 @@
 #include <QWindow>
 #include <QFileDialog>
 #include <QDesktopServices>
+#if defined(ANDROID)
+#include <QScroller>
+#endif
 #include <treeproxyfilter.h>
 
 #include <vector>
@@ -104,6 +107,9 @@ private:
     void reportToJson(DeviceInfo& device, QString submitter, QString comment, QJsonObject& jsonObject);
     void saveReport(QString fileName, QString submitter, QString comment);
 
+#if defined(ANDROID)
+    void setTouchProps(QWidget *widget);
+#endif
 private Q_SLOTS:
     void slotComboBoxDeviceChanged(int index);
     void slotClose();
