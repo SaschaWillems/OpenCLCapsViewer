@@ -18,7 +18,7 @@
 *
 */
 
-#include "submitDialog.h"
+#include "submitdialog.h"
 
 #include <QFormLayout>
 #include <QMessageBox>
