@@ -11,6 +11,7 @@ DEFINES += QT_DLL QT_NETWORK_LIB QT_WIDGETS_LIB
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    displayutils.cpp \
     main.cpp \
     mainwindow.cpp \
     database.cpp \
@@ -20,6 +21,7 @@ SOURCES += \
     submitdialog.cpp
 
 HEADERS += \
+    displayutils.h \
     mainwindow.h \
     database.h \
     deviceinfo.h \
