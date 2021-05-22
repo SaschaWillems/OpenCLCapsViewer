@@ -181,6 +181,21 @@ void DeviceInfo::readDeviceInfoValue(DeviceInfoValueDescriptor descriptor, QStri
 		deviceInfo.push_back(infoValue);
 		break;
 	}
+	/* ARM */
+	case clValueType::cl_device_controlled_termination_capabilities_arm:
+	{
+		cl_device_controlled_termination_capabilities_arm value;
+		clGetDeviceInfo(this->deviceId, descriptor.name, sizeof(cl_device_controlled_termination_capabilities_arm), &value, nullptr);
+		deviceInfo.push_back(DeviceInfoValue(descriptor.name, QVariant::fromValue(value), extension, descriptor.displayFunction));
+		break;
+	}
+	case clValueType::cl_device_scheduling_controls_capabilities_arm:
+	{
+		cl_device_scheduling_controls_capabilities_arm value;
+		clGetDeviceInfo(this->deviceId, descriptor.name, sizeof(cl_device_scheduling_controls_capabilities_arm), &value, nullptr);
+		deviceInfo.push_back(DeviceInfoValue(descriptor.name, QVariant::fromValue(value), extension, descriptor.displayFunction));
+		break;
+	}
 	/* Special cases */
 	case clValueType::special:
 	{
@@ -493,7 +508,7 @@ void DeviceInfo::readExtensionInfo()
 	// ARM
 	if (extensionSupported("cl_arm_shared_virtual_memory")) {
 		std::vector<DeviceInfoValueDescriptor> infoList = {
-			{ CL_DEVICE_SVM_CAPABILITIES_ARM, clValueType::cl_char },
+			{ CL_DEVICE_SVM_CAPABILITIES_ARM, clValueType::cl_device_svm_capabilities, utils::displayDeviceSvmCapabilities },
 		};
 		for (auto info : infoList) {
 			readDeviceInfoValue(info, "cl_arm_shared_virtual_memory");
@@ -501,7 +516,7 @@ void DeviceInfo::readExtensionInfo()
 	}
 	if (extensionSupported("cl_arm_get_core_id")) {
 		std::vector<DeviceInfoValueDescriptor> infoList = {
-			{ CL_DEVICE_COMPUTE_UNITS_BITFIELD_ARM, clValueType::cl_char },
+			{ CL_DEVICE_COMPUTE_UNITS_BITFIELD_ARM, clValueType::cl_ulong },
 		};
 		for (auto info : infoList) {
 			readDeviceInfoValue(info, "cl_arm_get_core_id");
@@ -509,7 +524,7 @@ void DeviceInfo::readExtensionInfo()
 	}
 	if (extensionSupported("cl_arm_controlled_kernel_termination")) {
 		std::vector<DeviceInfoValueDescriptor> infoList = {
-			{ CL_DEVICE_CONTROLLED_TERMINATION_CAPABILITIES_ARM, clValueType::cl_char },
+			{ CL_DEVICE_CONTROLLED_TERMINATION_CAPABILITIES_ARM, clValueType::cl_device_controlled_termination_capabilities_arm, utils::displayControlledTerminationCapabilitiesARM },
 		};
 		for (auto info : infoList) {
 			readDeviceInfoValue(info, "cl_arm_controlled_kernel_termination");
@@ -517,8 +532,7 @@ void DeviceInfo::readExtensionInfo()
 	}
 	if (extensionSupported("cl_arm_scheduling_controls")) {
 		std::vector<DeviceInfoValueDescriptor> infoList = {
-			//@todo: bitfield
-			//{ CL_DEVICE_SCHEDULING_CONTROLS_CAPABILITIES_ARM, clValueType::cl_device_scheduling_controls_capabilities_arm },
+			{ CL_DEVICE_SCHEDULING_CONTROLS_CAPABILITIES_ARM, clValueType::cl_device_scheduling_controls_capabilities_arm, utils::displaySchedulingControlsCapabilitiesARM },
 			//@todo: int[]
 			//{ CL_DEVICE_SUPPORTED_REGISTER_ALLOCATIONS_ARM, clValueType::cl_int[] },
 		};
@@ -600,8 +614,8 @@ void DeviceInfo::readExtensionInfo()
 	// QCOM
 	if (extensionSupported("cl_qcom_ext_host_ptr")) {
 		std::vector<DeviceInfoValueDescriptor> infoList = {
-			{ CL_DEVICE_EXT_MEM_PADDING_IN_BYTES_QCOM, clValueType::cl_char },
-			{ CL_DEVICE_PAGE_SIZE_QCOM, clValueType::cl_char },
+			{ CL_DEVICE_EXT_MEM_PADDING_IN_BYTES_QCOM, clValueType::cl_size_t, utils::displayByteSize },
+			{ CL_DEVICE_PAGE_SIZE_QCOM, clValueType::cl_size_t, utils::displayByteSize},
 		};
 		for (auto info : infoList) {
 			readDeviceInfoValue(info, "cl_qcom_ext_host_ptr");

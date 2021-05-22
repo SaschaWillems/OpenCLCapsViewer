@@ -46,6 +46,8 @@ enum class clValueType {
 	cl_ulong,
 	cl_version,
 	cl_device_pci_bus_info_khr,
+	cl_device_controlled_termination_capabilities_arm,
+	cl_device_scheduling_controls_capabilities_arm,
 	special
 };
 

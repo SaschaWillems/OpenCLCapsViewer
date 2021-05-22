@@ -18,7 +18,6 @@
 *
 */
 
-#include "CL/cl.h"
 #include "displayutils.h"
 
 namespace utils
@@ -184,6 +183,28 @@ namespace utils
             { CL_DEVICE_SVM_FINE_GRAIN_BUFFER, "SVM_FINE_GRAIN_BUFFER" },
             { CL_DEVICE_SVM_FINE_GRAIN_SYSTEM, "SVM_FINE_GRAIN_SYSTEM" },
             { CL_DEVICE_SVM_ATOMICS, "SVM_ATOMICS" }
+        };
+        return displayFlags(value.toInt(), flags);
+    }
+
+    QString displayControlledTerminationCapabilitiesARM(QVariant value)
+    {
+        std::unordered_map<uint32_t, QString> flags = {
+            { CL_DEVICE_CONTROLLED_TERMINATION_SUCCESS_ARM, "CONTROLLED_TERMINATION_SUCCESS_ARM"},
+            { CL_DEVICE_CONTROLLED_TERMINATION_FAILURE_ARM, "CONTROLLED_TERMINATION_FAILURE_ARM" },
+            { CL_DEVICE_CONTROLLED_TERMINATION_QUERY_ARM, "CONTROLLED_TERMINATION_QUERY_ARM" },
+        };
+        return displayFlags(value.toInt(), flags);
+    }
+
+    QString displaySchedulingControlsCapabilitiesARM(QVariant value)
+    {
+        std::unordered_map<uint32_t, QString> flags = {
+            { CL_DEVICE_SCHEDULING_KERNEL_BATCHING_ARM, "CSCHEDULING_KERNEL_BATCHING_ARM"},
+            { CL_DEVICE_SCHEDULING_WORKGROUP_BATCH_SIZE_ARM, "SCHEDULING_WORKGROUP_BATCH_SIZE_ARM" },
+            { CL_DEVICE_SCHEDULING_WORKGROUP_BATCH_SIZE_MODIFIER_ARM, "SCHEDULING_WORKGROUP_BATCH_SIZE_MODIFIER_ARM" },
+            { CL_DEVICE_SCHEDULING_DEFERRED_FLUSH_ARM, "SCHEDULING_DEFERRED_FLUSH_ARM" },
+            { CL_DEVICE_SCHEDULING_REGISTER_ALLOCATION_ARM, "SCHEDULING_REGISTER_ALLOCATION_ARM" },
         };
         return displayFlags(value.toInt(), flags);
     }

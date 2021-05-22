@@ -20,6 +20,9 @@
 
 #pragma once
 
+#include "CL/cl.h"
+#include "CL/cl_ext.h"
+
 #include <QString>
 #include <QVariant>
 #include <QList>
@@ -41,5 +44,7 @@ namespace utils
 	QString displayEnqueueCapabilities(QVariant value);
 	QString displayCommandQueueCapabilities(QVariant value);
 	QString displayDeviceSvmCapabilities(QVariant value);
+	QString displayControlledTerminationCapabilitiesARM(QVariant value);
+	QString displaySchedulingControlsCapabilitiesARM(QVariant value);
 }
 
