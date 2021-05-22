@@ -93,8 +93,6 @@ private:
 
     Database database;
 
-    QString getDisplayInfoDisplayValue(DeviceInfoValue& value);
-
     void displayDeviceInfo(DeviceInfo &device);
     void displayDeviceExtensions(DeviceInfo &device);
     void displayPlatformInfo(PlatformInfo& platform);

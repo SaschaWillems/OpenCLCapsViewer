@@ -182,15 +182,6 @@ void MainWindow::getOperatingSystem()
     operatingSystem.version = QSysInfo::productVersion();
 }
 
-QString MainWindow::getDisplayInfoDisplayValue(DeviceInfoValue& value)
-{
-    if (value.displayFunction) {
-        QString displayValue = value.displayFunction(value.value);
-        return displayValue;
-    }
-    return value.value.toString();
-}
-
 void MainWindow::displayDeviceInfo(DeviceInfo& device)
 {
     models.deviceinfo.clear();
@@ -198,7 +189,7 @@ void MainWindow::displayDeviceInfo(DeviceInfo& device)
     for (auto info : device.deviceInfo) {
         if (info.extension.isEmpty()) {
             QList<QStandardItem*> extItem;
-            QString displayValue = getDisplayInfoDisplayValue(info);
+            QString displayValue = info.getDisplayValue();
             extItem << new QStandardItem(info.name);
             extItem << new QStandardItem(displayValue);
             if (displayValue == "true") {
@@ -210,11 +201,9 @@ void MainWindow::displayDeviceInfo(DeviceInfo& device)
             // Append additional device info detail values
             if (info.detailValues.size() > 0) {
                 for (auto& detailItem : info.detailValues) {
-                    // @todo: explicit display functions?
                     QList<QStandardItem*> additionalInfoItem;
                     additionalInfoItem << new QStandardItem(detailItem.name);
-                    additionalInfoItem << new QStandardItem(detailItem.value.toString());
-                    // @todo: value
+                    additionalInfoItem << new QStandardItem(detailItem.getDisplayValue());
                     extItem.first()->appendRow(additionalInfoItem);
                 }
             }
@@ -237,7 +226,7 @@ void MainWindow::displayDeviceExtensions(DeviceInfo& device)
         for (auto info : device.deviceInfo) {
             if (extension.name == info.extension) {
                 QList<QStandardItem*> extInfoItem;
-                QString displayValue = getDisplayInfoDisplayValue(info);
+                QString displayValue = info.getDisplayValue();
                 extInfoItem << new QStandardItem(info.name);
                 extInfoItem << new QStandardItem(displayValue);
                 if (displayValue == "true") {

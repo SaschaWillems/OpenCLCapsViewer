@@ -94,7 +94,7 @@ void DeviceInfo::readDeviceInfoValue(DeviceInfoValueDescriptor descriptor, QStri
 			infoValue.value = values.size();
 			clGetDeviceInfo(this->deviceId, descriptor.name, valueSize, &values[0], nullptr);
 			for (auto& value : values) {
-				infoValue.addDetailValue(value.name, utils::clVersionString(value.version));
+				infoValue.addDetailValue(value.name, QVariant::fromValue(value.version), utils::displayVersion);
 			}
 		}
 		deviceInfo.push_back(infoValue);
@@ -191,6 +191,7 @@ void DeviceInfo::readDeviceInfoValue(DeviceInfoValueDescriptor descriptor, QStri
 		cl_device_pci_bus_info_khr value;
 		clGetDeviceInfo(this->deviceId, descriptor.name, sizeof(cl_device_type), &value, nullptr);
 		DeviceInfoValue infoValue(descriptor.name, QVariant(), extension, descriptor.displayFunction);
+		// @todo: display functions
 		infoValue.addDetailValue("pci_domain", value.pci_domain);
 		infoValue.addDetailValue("pci_bus", value.pci_bus);
 		infoValue.addDetailValue("pci_device", value.pci_device);
@@ -779,12 +780,18 @@ DeviceInfoValue::DeviceInfoValue(cl_device_info info, QVariant value, QString ex
 	this->displayFunction = displayFunction;
 }
 
-void DeviceInfoValue::addDetailValue(QString name, QVariant value)
+void DeviceInfoValue::addDetailValue(QString name, QVariant value, DisplayFn displayFunction)
 {
-	DeviceInfoValueDetailValue detailValue{};
-	detailValue.name = name;
-	detailValue.value = value;
-	detailValues.push_back(detailValue);
+	detailValues.push_back(DeviceInfoValueDetailValue(name, value, displayFunction));
+}
+
+QString DeviceInfoValue::getDisplayValue()
+{
+	if (displayFunction) {
+		return displayFunction(value);
+	} else {
+		return value.toString();
+	}
 }
 
 DeviceInfoValueDescriptor::DeviceInfoValueDescriptor()
@@ -801,4 +808,20 @@ DeviceInfoValueDescriptor::DeviceInfoValueDescriptor(cl_device_info name, clValu
 	// @todo: nullptr or utils::displayDefault?
 	//this->displayFunction = displayFunction ? displayFunction : utils::displayDefault;
 	this->displayFunction = displayFunction;
+}
+
+DeviceInfoValueDetailValue::DeviceInfoValueDetailValue(QString name, QVariant value, DisplayFn displayFunction)
+{
+	this->name = name;
+	this->value = value;
+	this->displayFunction = displayFunction;
+}
+
+QString DeviceInfoValueDetailValue::getDisplayValue()
+{
+	if (displayFunction) {
+		return displayFunction(value);
+	} else {
+		return value.toString();
+	}
 }
