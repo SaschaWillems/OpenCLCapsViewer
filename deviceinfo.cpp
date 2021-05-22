@@ -83,6 +83,23 @@ void DeviceInfo::readDeviceInfoValue(DeviceInfoValueDescriptor descriptor, QStri
 		deviceInfo.push_back(DeviceInfoValue(descriptor.name, variantList, extension, descriptor.displayFunction));
 		break;
 	}
+	case clValueType::cl_name_version_array:
+	{
+		size_t valueSize;
+		clGetDeviceInfo(this->deviceId, descriptor.name, 0, nullptr, &valueSize);
+		std::vector<cl_name_version> values;
+		DeviceInfoValue infoValue(descriptor.name, 0, extension, descriptor.displayFunction);
+		if (valueSize > 0) {
+			values.resize(valueSize / sizeof(cl_name_version));
+			infoValue.value = values.size();
+			clGetDeviceInfo(this->deviceId, descriptor.name, valueSize, &values[0], nullptr);
+			for (auto& value : values) {
+				infoValue.addDetailValue(value.name, utils::clVersionString(value.version));
+			}
+		}
+		deviceInfo.push_back(infoValue);
+		break;
+	}
 	case clValueType::cl_uint:
 	{
 		cl_uint value;
@@ -338,16 +355,16 @@ void DeviceInfo::readDeviceInfo()
 	{
 		std::vector<DeviceInfoValueDescriptor> infoListCL30 = {
 			{ CL_DEVICE_NUMERIC_VERSION, clValueType::cl_version, utils::displayVersion },
-			// { CL_DEVICE_ILS_WITH_VERSION, clValueType::cl_device_type }, array of descriptors
-			// { CL_DEVICE_BUILT_IN_KERNELS_WITH_VERSION, clValueType::cl_device_type }, array of descriptors
+			{ CL_DEVICE_ILS_WITH_VERSION, clValueType::cl_name_version_array, utils::displayNameVersionArray },
+			{ CL_DEVICE_BUILT_IN_KERNELS_WITH_VERSION, clValueType::cl_name_version_array, utils::displayNameVersionArray },
 			{ CL_DEVICE_ATOMIC_MEMORY_CAPABILITIES, clValueType::cl_device_atomic_capabilities, utils::displayAtomicCapabilities },
 			{ CL_DEVICE_ATOMIC_FENCE_CAPABILITIES, clValueType::cl_device_atomic_capabilities, utils::displayAtomicCapabilities },
 			{ CL_DEVICE_NON_UNIFORM_WORK_GROUP_SUPPORT, clValueType::cl_bool, utils::displayBool },
-			// { CL_DEVICE_OPENCL_C_ALL_VERSIONS, clValueType::cl_device_type },  array of descriptors
+			{ CL_DEVICE_OPENCL_C_ALL_VERSIONS, clValueType::cl_name_version_array, utils::displayNameVersionArray },
 			{ CL_DEVICE_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, clValueType::cl_size_t },
 			{ CL_DEVICE_WORK_GROUP_COLLECTIVE_FUNCTIONS_SUPPORT, clValueType::cl_bool, utils::displayBool },
 			{ CL_DEVICE_GENERIC_ADDRESS_SPACE_SUPPORT, clValueType::cl_bool, utils::displayBool },
-			//{ CL_DEVICE_OPENCL_C_FEATURES, clValueType:: }, array of descriptors
+			{ CL_DEVICE_OPENCL_C_FEATURES, clValueType::cl_name_version_array, utils::displayNameVersionArray },
 			{ CL_DEVICE_DEVICE_ENQUEUE_CAPABILITIES, clValueType::cl_device_device_enqueue_capabilities, utils::displayEnqueueCapabilities },
 			{ CL_DEVICE_PIPE_SUPPORT, clValueType::cl_bool, utils::displayBool },
 			{ CL_DEVICE_LATEST_CONFORMANCE_VERSION_PASSED, clValueType::cl_char },
@@ -356,16 +373,6 @@ void DeviceInfo::readDeviceInfo()
 		{
 			readDeviceInfoValue(info);
 		}
-
-		// @todo: OpenCL CL_DEVICE_OPENCL_C_FEATURES
-		size_t featuresSize;
-		clGetDeviceInfo(this->deviceId, CL_DEVICE_OPENCL_C_FEATURES, 0, nullptr, &featuresSize);
-		cl_name_version* features = new cl_name_version[4096];
-		clGetDeviceInfo(this->deviceId, CL_DEVICE_OPENCL_C_FEATURES, featuresSize, features, nullptr);
-		for (size_t i = 0; i < featuresSize / sizeof(cl_name_version); i++) {
-			qDebug(features[i].name);
-		}
-		delete[] features;
 	}
 }
 

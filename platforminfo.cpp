@@ -57,7 +57,7 @@ void PlatformInfo::readPlatformInfoValue(cl_platform_info info, clValueType valu
 	{
 		cl_ulong value;
 		clGetPlatformInfo(this->platformId, info, sizeof(cl_ulong), &value, nullptr);
-		platformInfo.push_back(PlatformInfoValue(info, value, extension));
+        platformInfo.push_back(PlatformInfoValue(info, QVariant::fromValue(value), extension));
 		break;
 	}
 	case clValueType::cl_version:

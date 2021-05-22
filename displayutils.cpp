@@ -94,6 +94,11 @@ namespace utils
         return dv;
     }
 
+    QString displayNameVersionArray(QVariant value)
+    {                
+        return QString("[%1]").arg(value.toInt());
+    }
+
     QString displayAtomicCapabilities(QVariant value) {
         std::unordered_map<uint32_t, QString> flags = {
             { CL_DEVICE_ATOMIC_ORDER_RELAXED, "ATOMIC_ORDER_RELAXED" },

@@ -108,6 +108,7 @@ void MainWindow::getDevices()
 	if (status != CL_SUCCESS)
 	{
         QMessageBox::warning(this, tr("Error"), "Could not get platform count!");
+        // @todo: fatal error, app should close
         return;
     }
 
@@ -206,6 +207,17 @@ void MainWindow::displayDeviceInfo(DeviceInfo& device)
             if (displayValue == "false") {
                 extItem[1]->setForeground(QColor::fromRgb(255, 0, 0));
             }
+            // Append additional device info detail values
+            if (info.detailValues.size() > 0) {
+                for (auto& detailItem : info.detailValues) {
+                    // @todo: explicit display functions?
+                    QList<QStandardItem*> additionalInfoItem;
+                    additionalInfoItem << new QStandardItem(detailItem.name);
+                    additionalInfoItem << new QStandardItem(detailItem.value.toString());
+                    // @todo: value
+                    extItem.first()->appendRow(additionalInfoItem);
+                }
+            }
             rootItem->appendRow(extItem);
         }
     }
@@ -220,7 +232,7 @@ void MainWindow::displayDeviceExtensions(DeviceInfo& device)
     for (auto& extension : device.extensions) {
         QList<QStandardItem*> extItem;
         extItem << new QStandardItem(extension.name);
-        extItem << new QStandardItem(utils::clVersionString(extension.version));
+        extItem << new QStandardItem(extension.version > 0 ? utils::clVersionString(extension.version) : "");
         // Append extension related device info
         for (auto info : device.deviceInfo) {
             if (extension.name == info.extension) {
@@ -266,7 +278,7 @@ void MainWindow::displayPlatformExtensions(PlatformInfo& platform)
     for (auto& extension : platform.extensions) {
         QList<QStandardItem*> extItem;
         extItem << new QStandardItem(extension.name);
-        extItem << new QStandardItem(utils::clVersionString(extension.version));
+        extItem << new QStandardItem(extension.version > 0 ? utils::clVersionString(extension.version) : "");
         // Append extension related device info
         for (auto info : platform.platformInfo) {
             if (extension.name == info.extension) {
@@ -348,6 +360,10 @@ void MainWindow::checkReportDatabaseState()
     if (database.getReportState(jsonReport, state))
     {
         setReportState(state);
+    }
+    else
+    {
+        // @todo
     }
     QApplication::restoreOverrideCursor();
 }
