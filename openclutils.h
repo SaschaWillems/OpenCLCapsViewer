@@ -36,6 +36,7 @@ enum class clValueType {
 	cl_device_fp_config,
 	cl_device_local_mem_type,
 	cl_device_mem_cache_type,
+	cl_device_svm_capabilities,
 	cl_device_type,
 	cl_version_khr,
 	cl_size_t,

@@ -66,7 +66,7 @@ void DeviceInfo::readDeviceInfoValue(DeviceInfoValueDescriptor descriptor, QStri
 	{
 		size_t value;
 		clGetDeviceInfo(this->deviceId, descriptor.name, sizeof(size_t), &value, nullptr);
-		deviceInfo.push_back(DeviceInfoValue(descriptor.name, value, extension, descriptor.displayFunction));
+        deviceInfo.push_back(DeviceInfoValue(descriptor.name, QVariant::fromValue(value), extension, descriptor.displayFunction));
 		break;
 	}
 	case clValueType::cl_size_t_array:
@@ -78,7 +78,7 @@ void DeviceInfo::readDeviceInfoValue(DeviceInfoValueDescriptor descriptor, QStri
 		clGetDeviceInfo(this->deviceId, descriptor.name, valueSize, &values[0], nullptr);
 		QVariantList variantList;
 		for (auto value : values) {
-			variantList << value;
+            variantList << QVariant::fromValue(value);
 		}
 		deviceInfo.push_back(DeviceInfoValue(descriptor.name, variantList, extension, descriptor.displayFunction));
 		break;
@@ -94,7 +94,7 @@ void DeviceInfo::readDeviceInfoValue(DeviceInfoValueDescriptor descriptor, QStri
 	{
 		cl_ulong value;
 		clGetDeviceInfo(this->deviceId, descriptor.name, sizeof(cl_ulong), &value, nullptr);
-		deviceInfo.push_back(DeviceInfoValue(descriptor.name, value, extension, descriptor.displayFunction));
+        deviceInfo.push_back(DeviceInfoValue(descriptor.name, QVariant::fromValue(value), extension, descriptor.displayFunction));
 		break;
 	}
 	case clValueType::cl_version:
@@ -110,14 +110,14 @@ void DeviceInfo::readDeviceInfoValue(DeviceInfoValueDescriptor descriptor, QStri
 	{
 		cl_device_atomic_capabilities value;
 		clGetDeviceInfo(this->deviceId, descriptor.name, sizeof(cl_device_atomic_capabilities), &value, nullptr);
-		deviceInfo.push_back(DeviceInfoValue(descriptor.name, value, extension, descriptor.displayFunction));
+        deviceInfo.push_back(DeviceInfoValue(descriptor.name, QVariant::fromValue(value), extension, descriptor.displayFunction));
 		break;
 	}
 	case clValueType::cl_device_device_enqueue_capabilities:
 	{
 		cl_device_device_enqueue_capabilities value;
 		clGetDeviceInfo(this->deviceId, descriptor.name, sizeof(cl_device_device_enqueue_capabilities), &value, nullptr);
-		deviceInfo.push_back(DeviceInfoValue(descriptor.name, value, extension, descriptor.displayFunction));
+        deviceInfo.push_back(DeviceInfoValue(descriptor.name, QVariant::fromValue(value), extension, descriptor.displayFunction));
 		break;
 	}
 	case clValueType::cl_device_local_mem_type:
@@ -131,7 +131,7 @@ void DeviceInfo::readDeviceInfoValue(DeviceInfoValueDescriptor descriptor, QStri
 	{
 		cl_device_exec_capabilities value;
 		clGetDeviceInfo(this->deviceId, descriptor.name, sizeof(cl_device_exec_capabilities), &value, nullptr);
-		deviceInfo.push_back(DeviceInfoValue(descriptor.name, value, extension, descriptor.displayFunction));
+		deviceInfo.push_back(DeviceInfoValue(descriptor.name, QVariant::fromValue(value), extension, descriptor.displayFunction));
 		break;
 	}
 	case clValueType::cl_device_mem_cache_type:
@@ -145,21 +145,28 @@ void DeviceInfo::readDeviceInfoValue(DeviceInfoValueDescriptor descriptor, QStri
 	{
 		cl_command_queue_properties value;
 		clGetDeviceInfo(this->deviceId, descriptor.name, sizeof(cl_command_queue_properties), &value, nullptr);
-		deviceInfo.push_back(DeviceInfoValue(descriptor.name, value, extension, descriptor.displayFunction));
+        deviceInfo.push_back(DeviceInfoValue(descriptor.name, QVariant::fromValue(value), extension, descriptor.displayFunction));
 		break;
 	}
 	case clValueType::cl_device_fp_config:
 	{
 		cl_device_fp_config value;
 		clGetDeviceInfo(this->deviceId, descriptor.name, sizeof(cl_device_fp_config), &value, nullptr);
-		deviceInfo.push_back(DeviceInfoValue(descriptor.name, value, extension, descriptor.displayFunction));
+        deviceInfo.push_back(DeviceInfoValue(descriptor.name, QVariant::fromValue(value), extension, descriptor.displayFunction));
+		break;
+	}
+	case clValueType::cl_device_svm_capabilities:
+	{
+		cl_device_svm_capabilities value;
+		clGetDeviceInfo(this->deviceId, descriptor.name, sizeof(cl_device_svm_capabilities), &value, nullptr);
+        deviceInfo.push_back(DeviceInfoValue(descriptor.name, QVariant::fromValue(value), extension, descriptor.displayFunction));
 		break;
 	}
 	case clValueType::cl_device_type:
 	{
 		cl_device_type value;
 		clGetDeviceInfo(this->deviceId, descriptor.name, sizeof(cl_device_type), &value, nullptr);
-		deviceInfo.push_back(DeviceInfoValue(descriptor.name, value, extension, descriptor.displayFunction));
+        deviceInfo.push_back(DeviceInfoValue(descriptor.name, QVariant::fromValue(value), extension, descriptor.displayFunction));
 		break;
 	}
 	case clValueType::cl_device_pci_bus_info_khr:
@@ -187,7 +194,7 @@ void DeviceInfo::readDeviceInfoValue(DeviceInfoValueDescriptor descriptor, QStri
 			clGetDeviceInfo(this->deviceId, CL_DEVICE_MAX_WORK_ITEM_SIZES, sizeof(size_t) * dim, &dimensions[0], nullptr);
 			QVariantList variantList;
 			for (auto dimension : dimensions) {
-				variantList << dimension;
+                variantList << QVariant::fromValue(dimension);
 			}
 			deviceInfo.push_back(DeviceInfoValue(descriptor.name, variantList, extension, utils::displayNumberArray));
 			break;
@@ -276,11 +283,39 @@ void DeviceInfo::readDeviceInfo()
 		{ CL_DRIVER_VERSION, clValueType::cl_char },
 		{ CL_DEVICE_PROFILE, clValueType::cl_char },
 		{ CL_DEVICE_VERSION, clValueType::cl_char },
-		//{ CL_DEVICE_PLATFOR, clValueType:: },
+		//{ CL_DEVICE_PLATFORM, clValueType:: },
 	};
 	for (auto info : infoList)
 	{
 		readDeviceInfoValue(info);
+	}
+
+	// OpenCL 2.0
+	if (clVersionMajor == 2)
+	{
+		std::vector<DeviceInfoValueDescriptor> infoListCL20 = {
+			{ CL_DEVICE_IMAGE_PITCH_ALIGNMENT, clValueType::cl_uint },
+			{ CL_DEVICE_IMAGE_BASE_ADDRESS_ALIGNMENT, clValueType::cl_uint },
+			{ CL_DEVICE_MAX_READ_WRITE_IMAGE_ARGS, clValueType::cl_uint },
+			{ CL_DEVICE_MAX_GLOBAL_VARIABLE_SIZE, clValueType::cl_size_t, utils::displayByteSize },
+			{ CL_DEVICE_QUEUE_ON_DEVICE_PROPERTIES, clValueType::cl_command_queue_properties, utils::displayCommandQueueCapabilities },
+			{ CL_DEVICE_QUEUE_ON_DEVICE_PREFERRED_SIZE, clValueType::cl_uint, utils::displayByteSize },
+			{ CL_DEVICE_QUEUE_ON_DEVICE_MAX_SIZE, clValueType::cl_uint, utils::displayByteSize },
+			{ CL_DEVICE_MAX_ON_DEVICE_QUEUES, clValueType::cl_uint },
+			{ CL_DEVICE_MAX_ON_DEVICE_EVENTS, clValueType::cl_uint },
+			{ CL_DEVICE_SVM_CAPABILITIES, clValueType::cl_device_svm_capabilities, utils::displayDeviceSvmCapabilities },
+			{ CL_DEVICE_GLOBAL_VARIABLE_PREFERRED_TOTAL_SIZE, clValueType::cl_size_t, utils::displayByteSize },
+			{ CL_DEVICE_MAX_PIPE_ARGS, clValueType::cl_uint },
+			{ CL_DEVICE_PIPE_MAX_ACTIVE_RESERVATIONS, clValueType::cl_uint },
+			{ CL_DEVICE_PIPE_MAX_PACKET_SIZE, clValueType::cl_uint, utils::displayByteSize },
+			{ CL_DEVICE_PREFERRED_PLATFORM_ATOMIC_ALIGNMENT, clValueType::cl_uint, utils::displayByteSize },
+			{ CL_DEVICE_PREFERRED_GLOBAL_ATOMIC_ALIGNMENT, clValueType::cl_uint, utils::displayByteSize },
+			{ CL_DEVICE_PREFERRED_LOCAL_ATOMIC_ALIGNMENT, clValueType::cl_uint, utils::displayByteSize }
+		};
+		for (auto info : infoListCL20)
+		{
+			readDeviceInfoValue(info);
+		}
 	}
 
 	// OpenCL 3.0

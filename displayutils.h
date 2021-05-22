@@ -39,5 +39,7 @@ namespace utils
 	QString displayFloatingPointConfig(QVariant value);
 	QString displayExecCapabilities(QVariant value);
 	QString displayEnqueueCapabilities(QVariant value);
+	QString displayCommandQueueCapabilities(QVariant value);
+	QString displayDeviceSvmCapabilities(QVariant value);
 }
 

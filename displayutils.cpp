@@ -168,4 +168,24 @@ namespace utils
         return displayFlags(value.toInt(), flags);
     }
 
+    QString displayCommandQueueCapabilities(QVariant value)
+    {
+        std::unordered_map<uint32_t, QString> flags = {
+            { CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE, "QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE" },
+            { CL_QUEUE_PROFILING_ENABLE, "QUEUE_PROFILING_ENABLE" },
+        };
+        return displayFlags(value.toInt(), flags);
+    }
+
+    QString displayDeviceSvmCapabilities(QVariant value)
+    {
+        std::unordered_map<uint32_t, QString> flags = {
+            { CL_DEVICE_SVM_COARSE_GRAIN_BUFFER, "SVM_COARSE_GRAIN_BUFFER"},
+            { CL_DEVICE_SVM_FINE_GRAIN_BUFFER, "SVM_FINE_GRAIN_BUFFER" },
+            { CL_DEVICE_SVM_FINE_GRAIN_SYSTEM, "SVM_FINE_GRAIN_SYSTEM" },
+            { CL_DEVICE_SVM_ATOMICS, "SVM_ATOMICS" }
+        };
+        return displayFlags(value.toInt(), flags);
+    }
+
 }
