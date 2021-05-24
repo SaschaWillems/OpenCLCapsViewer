@@ -321,6 +321,30 @@ void DeviceInfo::readDeviceInfo()
 		readDeviceInfoValue(info);
 	}
 
+	// OpenCL 1.2
+	if (((clVersionMajor >= 1) && (clVersionMinor >= 2)) || (clVersionMajor > 2))
+	{
+		// @todo: types
+		std::vector<DeviceInfoValueDescriptor> infoListCL12 = {
+			{ CL_DEVICE_LINKER_AVAILABLE, clValueType::cl_bool, utils::displayBool },
+			//{ CL_DEVICE_BUILT_IN_KERNELS, clValueType::cl_char_array },
+			{ CL_DEVICE_IMAGE_MAX_BUFFER_SIZE, clValueType::cl_size_t },
+			{ CL_DEVICE_IMAGE_MAX_ARRAY_SIZE, clValueType::cl_size_t },
+			//{ CL_DEVICE_PARENT_DEVICE, clValueType::cl_device_id },
+			{ CL_DEVICE_PARTITION_MAX_SUB_DEVICES, clValueType::cl_uint },
+			//{ CL_DEVICE_PARTITION_PROPERTIES, clValueType::cl_device_partition_property_array },
+			//{ CL_DEVICE_PARTITION_AFFINITY_DOMAIN, clValueType::l_device_affinity_domain },
+			//{ CL_DEVICE_PARTITION_TYPE, clValueType::cl_device_partition_property[] },
+			{ CL_DEVICE_REFERENCE_COUNT, clValueType::cl_uint },
+			{ CL_DEVICE_PREFERRED_INTEROP_USER_SYNC, clValueType::cl_bool, utils::displayBool },
+			{ CL_DEVICE_PRINTF_BUFFER_SIZE, clValueType::cl_size_t, utils::displayByteSize },
+		};
+		for (auto info : infoListCL12)
+		{
+			readDeviceInfoValue(info);
+		}
+	}
+
 	// OpenCL 2.0
 	if (clVersionMajor == 2)
 	{
