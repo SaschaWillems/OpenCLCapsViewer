@@ -268,8 +268,13 @@ void DeviceInfo::readDeviceInfo()
 	deviceInfo.clear();
 
 	std::vector<DeviceInfoValueDescriptor> infoList = {
+		{ CL_DEVICE_NAME, clValueType::cl_char },
 		{ CL_DEVICE_TYPE, clValueType::cl_device_type, utils::displayDeviceType },
 		{ CL_DEVICE_VENDOR_ID, clValueType::cl_uint },
+		{ CL_DEVICE_VENDOR, clValueType::cl_char },
+		{ CL_DRIVER_VERSION, clValueType::cl_char },
+		{ CL_DEVICE_PROFILE, clValueType::cl_char },
+		{ CL_DEVICE_VERSION, clValueType::cl_char },
 		{ CL_DEVICE_MAX_COMPUTE_UNITS, clValueType::cl_uint },
 		{ CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS, clValueType::cl_uint },
 		{ CL_DEVICE_MAX_WORK_GROUP_SIZE, clValueType::cl_size_t },
@@ -307,16 +312,9 @@ void DeviceInfo::readDeviceInfo()
 		{ CL_DEVICE_ERROR_CORRECTION_SUPPORT, clValueType::cl_bool, utils::displayBool },
 		{ CL_DEVICE_PROFILING_TIMER_RESOLUTION, clValueType::cl_size_t },
 		{ CL_DEVICE_ENDIAN_LITTLE, clValueType::cl_bool, utils::displayBool },
-		//{ CL_DEVICE_AVAILABLE, clValueType:: },
 		{ CL_DEVICE_COMPILER_AVAILABLE, clValueType::cl_bool, utils::displayBool },
 		{ CL_DEVICE_EXECUTION_CAPABILITIES, clValueType::cl_device_exec_capabilities, utils::displayExecCapabilities },
 		// { CL_DEVICE_QUEUE_PROPERTIES, clValueType:: }, @todo
-		{ CL_DEVICE_NAME, clValueType::cl_char },
-		{ CL_DEVICE_VENDOR, clValueType::cl_char },
-		{ CL_DRIVER_VERSION, clValueType::cl_char },
-		{ CL_DEVICE_PROFILE, clValueType::cl_char },
-		{ CL_DEVICE_VERSION, clValueType::cl_char },
-		//{ CL_DEVICE_PLATFORM, clValueType:: },
 	};
 	for (auto info : infoList)
 	{
