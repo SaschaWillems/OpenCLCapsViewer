@@ -91,7 +91,7 @@ void DeviceInfo::readDeviceInfoValue(DeviceInfoValueDescriptor descriptor, QStri
 		DeviceInfoValue infoValue(descriptor.name, 0, extension, descriptor.displayFunction);
 		if (valueSize > 0) {
 			values.resize(valueSize / sizeof(cl_name_version));
-			infoValue.value = values.size();
+            infoValue.value = QVariant::fromValue(values.size());
 			clGetDeviceInfo(this->deviceId, descriptor.name, valueSize, &values[0], nullptr);
 			for (auto& value : values) {
 				infoValue.addDetailValue(value.name, QVariant::fromValue(value.version), utils::displayVersion);
