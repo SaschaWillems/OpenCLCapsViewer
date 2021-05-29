@@ -180,6 +180,16 @@ void MainWindow::getOperatingSystem()
     operatingSystem.name = QSysInfo::productType();
     operatingSystem.architecture = QSysInfo::buildCpuArchitecture();
     operatingSystem.version = QSysInfo::productVersion();
+    operatingSystem.type = -1;
+#if defined(_WIN32)
+    operatingSystem.type = 0;
+#elif defined(__ANDROID__)
+    operatingSystem.type = 2;
+#elif defined(__linux__)
+    operatingSystem.type = 1;
+#elif __APPLE__
+    // @todo: dinstinguish between macos and ios
+#endif
 }
 
 void MainWindow::displayDeviceInfo(DeviceInfo& device)
@@ -364,6 +374,7 @@ void MainWindow::reportToJson(DeviceInfo& device, QString submitter, QString com
     jsonEnv["name"] = operatingSystem.name;
     jsonEnv["version"] = operatingSystem.version;
     jsonEnv["architecture"] = operatingSystem.architecture;
+    jsonEnv["type"] = operatingSystem.type;
     jsonEnv["submitter"] = submitter;
     jsonEnv["comment"] = comment;
     jsonEnv["reportversion"] = reportVersion;

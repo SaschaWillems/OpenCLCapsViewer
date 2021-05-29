@@ -63,6 +63,7 @@ public:
         QString name;
         QString version;
         QString architecture;
+        int type;
     } operatingSystem;
 
     std::vector<PlatformInfo> platforms;
