@@ -56,10 +56,10 @@ void DeviceInfo::readDeviceInfoValue(DeviceInfoValueDescriptor descriptor, QStri
 	{
 		size_t valueSize;
 		clGetDeviceInfo(this->deviceId, descriptor.name, 0, nullptr, &valueSize);
-		std::string value;
-		value.resize(valueSize);
+		char* value = new char[valueSize];
 		clGetDeviceInfo(this->deviceId, descriptor.name, valueSize, &value[0], nullptr);
-		deviceInfo.push_back(DeviceInfoValue(descriptor.name, QString::fromStdString(value), extension, descriptor.displayFunction));
+		deviceInfo.push_back(DeviceInfoValue(descriptor.name, QString::fromUtf8(value), extension, descriptor.displayFunction));
+		delete[] value;
 		break;
 	}
 	case clValueType::cl_size_t:

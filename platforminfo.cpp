@@ -47,10 +47,10 @@ void PlatformInfo::readPlatformInfoValue(cl_platform_info info, clValueType valu
 	{
 		size_t valueSize;
 		clGetPlatformInfo(this->platformId, info, 0, nullptr, &valueSize);
-		std::string value;
-		value.resize(valueSize);
+		char* value = new char[valueSize];
 		clGetPlatformInfo(this->platformId, info, valueSize, &value[0], nullptr);
-		platformInfo.push_back(PlatformInfoValue(info, QString::fromStdString(value), extension));
+		platformInfo.push_back(PlatformInfoValue(info, QString::fromUtf8(value), extension));
+		delete[] value;
 		break;
 	}
 	case clValueType::cl_ulong:
