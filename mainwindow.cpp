@@ -208,6 +208,9 @@ void MainWindow::displayDeviceInfo(DeviceInfo& device)
             if (displayValue == "false") {
                 extItem[1]->setForeground(QColor::fromRgb(255, 0, 0));
             }
+            if (displayValue == "none") {
+                extItem[1]->setForeground(QColor::fromRgb(128, 128, 128));
+            }
             // Append additional device info detail values
             if (info.detailValues.size() > 0) {
                 for (auto& detailItem : info.detailValues) {

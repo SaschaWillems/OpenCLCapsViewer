@@ -192,6 +192,27 @@ namespace utils
         return displayFlags(value.toInt(), flags);
     }
 
+    QString displayDevicePartitionProperties(QVariant value)
+    {
+        if (value.isNull()) {
+            return "none";
+        }
+        return value.toString();
+    }
+
+    QString displayDeviceAffinityDomains(QVariant value)
+    {
+        std::unordered_map<uint32_t, QString> flags = {
+            { CL_DEVICE_AFFINITY_DOMAIN_NUMA, "CL_DEVICE_AFFINITY_DOMAIN_NUMA" },
+            { CL_DEVICE_AFFINITY_DOMAIN_L4_CACHE, "CL_DEVICE_AFFINITY_DOMAIN_L4_CACHE" },
+            { CL_DEVICE_AFFINITY_DOMAIN_L3_CACHE, "CL_DEVICE_AFFINITY_DOMAIN_L3_CACHE" },
+            { CL_DEVICE_AFFINITY_DOMAIN_L2_CACHE, "CL_DEVICE_AFFINITY_DOMAIN_L2_CACHE" },
+            { CL_DEVICE_AFFINITY_DOMAIN_L1_CACHE, "CL_DEVICE_AFFINITY_DOMAIN_L1_CACHE" },
+            { CL_DEVICE_AFFINITY_DOMAIN_NEXT_PARTITIONABLE, "CL_DEVICE_AFFINITY_DOMAIN_NEXT_PARTITIONABLE" }
+        };
+        return displayFlags(value.toInt(), flags);
+    }
+
     QString displayControlledTerminationCapabilitiesARM(QVariant value)
     {
         std::unordered_map<uint32_t, QString> flags = {

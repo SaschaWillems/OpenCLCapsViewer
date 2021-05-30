@@ -45,6 +45,8 @@ namespace utils
 	QString displayEnqueueCapabilities(QVariant value);
 	QString displayCommandQueueCapabilities(QVariant value);
 	QString displayDeviceSvmCapabilities(QVariant value);
+	QString displayDevicePartitionProperties(QVariant value);
+	QString displayDeviceAffinityDomains(QVariant value);
 	QString displayControlledTerminationCapabilitiesARM(QVariant value);
 	QString displaySchedulingControlsCapabilitiesARM(QVariant value);
 }
