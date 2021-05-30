@@ -494,10 +494,9 @@ void DeviceInfo::readExtensionInfo()
 		std::vector<DeviceInfoValueDescriptor> infoList = {
 			{ CL_DEVICE_NUMERIC_VERSION_KHR, clValueType::cl_version_khr, utils::displayVersion },
 			{ CL_DEVICE_OPENCL_C_NUMERIC_VERSION_KHR, clValueType::cl_version_khr, utils::displayVersion },
-			// @todo
-			//{ CL_DEVICE_EXTENSIONS_WITH_VERSION_KHR, clValueType::cl_name_version_khr[] },
-			//{ CL_DEVICE_ILS_WITH_VERSION_KHR, clValueType::cl_name_version_khr[] },
-			//{ CL_DEVICE_BUILT_IN_KERNELS_WITH_VERSION_KHR, clValueType::cl_name_version_khr[] },
+			{ CL_DEVICE_EXTENSIONS_WITH_VERSION_KHR, clValueType::cl_name_version_array, utils::displayNameVersionArray },
+			{ CL_DEVICE_ILS_WITH_VERSION_KHR, clValueType::cl_name_version_array, utils::displayNameVersionArray },
+			{ CL_DEVICE_BUILT_IN_KERNELS_WITH_VERSION_KHR, clValueType::cl_name_version_array, utils::displayNameVersionArray },
 		};
 		for (auto info : infoList) {
 			readDeviceInfoValue(info, "cl_khr_extended_versioning");
