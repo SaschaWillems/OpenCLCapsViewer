@@ -72,6 +72,14 @@ namespace utils
         return QString("%L1 bytes").arg(value.toUInt());
     }
 
+    QString displayText(QVariant value)
+    {
+        if (value.toString().isEmpty()) {
+            return "none";
+        }
+        return value.toString();
+    }
+
     QString displayDeviceType(QVariant value)
     {
         switch (value.toInt())

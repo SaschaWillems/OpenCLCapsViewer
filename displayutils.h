@@ -34,6 +34,7 @@ namespace utils
 	QString displayBool(QVariant value);
 	QString displayNumberArray(QVariant value);
 	QString displayByteSize(QVariant value);
+	QString displayText(QVariant value);
 	QString displayDeviceType(QVariant value);
 	QString displayVersion(QVariant value);
 	QString displayNameVersionArray(QVariant value);

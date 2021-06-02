@@ -349,13 +349,34 @@ void DeviceInfo::readDeviceInfo()
 		readDeviceInfoValue(info);
 	}
 
+	// OpenCL 1.1
+	if (((clVersionMajor >= 1) && (clVersionMinor >= 1)) || (clVersionMajor > 2))
+	{
+		std::vector<DeviceInfoValueDescriptor> infoListCL11 = {
+			{ CL_DEVICE_PREFERRED_VECTOR_WIDTH_HALF, clValueType::cl_uint },
+			{ CL_DEVICE_HOST_UNIFIED_MEMORY, clValueType::cl_bool, utils::displayBool },
+			{ CL_DEVICE_NATIVE_VECTOR_WIDTH_CHAR, clValueType::cl_uint },
+			{ CL_DEVICE_NATIVE_VECTOR_WIDTH_SHORT, clValueType::cl_uint },
+			{ CL_DEVICE_NATIVE_VECTOR_WIDTH_INT, clValueType::cl_uint },
+			{ CL_DEVICE_NATIVE_VECTOR_WIDTH_LONG, clValueType::cl_uint },
+			{ CL_DEVICE_NATIVE_VECTOR_WIDTH_FLOAT, clValueType::cl_uint },
+			{ CL_DEVICE_NATIVE_VECTOR_WIDTH_DOUBLE, clValueType::cl_uint },
+			{ CL_DEVICE_NATIVE_VECTOR_WIDTH_HALF, clValueType::cl_uint },
+			{ CL_DEVICE_NATIVE_VECTOR_WIDTH_HALF, clValueType::cl_uint },
+			{ CL_DEVICE_OPENCL_C_VERSION, clValueType::cl_char, utils::displayText },
+		};
+		for (auto info : infoListCL11)
+		{
+			readDeviceInfoValue(info);
+		}
+	}
+
 	// OpenCL 1.2
 	if (((clVersionMajor >= 1) && (clVersionMinor >= 2)) || (clVersionMajor > 2))
 	{
-		// @todo: types
 		std::vector<DeviceInfoValueDescriptor> infoListCL12 = {
 			{ CL_DEVICE_LINKER_AVAILABLE, clValueType::cl_bool, utils::displayBool },
-			{ CL_DEVICE_BUILT_IN_KERNELS, clValueType::cl_char },
+			{ CL_DEVICE_BUILT_IN_KERNELS, clValueType::cl_char, utils::displayText },
 			{ CL_DEVICE_IMAGE_MAX_BUFFER_SIZE, clValueType::cl_size_t },
 			{ CL_DEVICE_IMAGE_MAX_ARRAY_SIZE, clValueType::cl_size_t },
 			//{ CL_DEVICE_PARENT_DEVICE, clValueType::cl_device_id },
@@ -466,7 +487,7 @@ void DeviceInfo::readExtensionInfo()
 	}
 	if (extensionSupported("cl_khr_il_program")) {
 		std::vector<DeviceInfoValueDescriptor> infoList = {
-			{ CL_DEVICE_IL_VERSION_KHR, clValueType::cl_char },
+			{ CL_DEVICE_IL_VERSION_KHR, clValueType::cl_char, utils::displayText },
 		};
 		for (auto info : infoList) {
 			readDeviceInfoValue(info, "cl_khr_il_program");
@@ -492,7 +513,7 @@ void DeviceInfo::readExtensionInfo()
 	}
 	if (extensionSupported("cl_khr_spir")) {
 		std::vector<DeviceInfoValueDescriptor> infoList = {
-			{ CL_DEVICE_SPIR_VERSIONS, clValueType::cl_char },
+			{ CL_DEVICE_SPIR_VERSIONS, clValueType::cl_char, utils::displayText },
 		};
 		for (auto info : infoList) {
 			readDeviceInfoValue(info, "cl_khr_spir");
@@ -555,7 +576,7 @@ void DeviceInfo::readExtensionInfo()
 	}
 	if (extensionSupported("cl_ext_cxx_for_opencl")) {
 		std::vector<DeviceInfoValueDescriptor> infoList = {
-			{ CL_DEVICE_CXX_FOR_OPENCL_NUMERIC_VERSION_EXT, clValueType::cl_char },
+			{ CL_DEVICE_CXX_FOR_OPENCL_NUMERIC_VERSION_EXT, clValueType::cl_char, utils::displayText },
 		};
 		for (auto info : infoList) {
 			readDeviceInfoValue(info, "cl_ext_cxx_for_opencl");
