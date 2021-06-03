@@ -42,7 +42,11 @@ MainWindow::MainWindow(QWidget *parent)
     ui->treeViewDeviceExtensions->setModel(&filterProxies.deviceExtensions);
     filterProxies.deviceExtensions.setSourceModel(&models.deviceExtensions);
     connect(ui->filterLineEditExtensions, SIGNAL(textChanged(QString)), this, SLOT(slotFilterDeviceExtensions(QString)));
-    
+
+    ui->treeViewDeviceImageFormats->setModel(&filterProxies.deviceImageFormats);
+    filterProxies.deviceImageFormats.setSourceModel(&models.deviceImageFormats);
+    connect(ui->filterLineEditDeviceImageFormats, SIGNAL(textChanged(QString)), this, SLOT(slotFilterDeviceImageFormats(QString)));
+
     ui->treeViewPlatformExtensions->setModel(&filterProxies.platformExtensions);
     filterProxies.platformExtensions.setSourceModel(&models.platformExtensions);
     connect(ui->filterLineEditPlatformExtensions, SIGNAL(textChanged(QString)), this, SLOT(slotFilterPlatformExtensions(QString)));
@@ -169,6 +173,7 @@ void MainWindow::displayDevice(uint32_t index)
     DeviceInfo& device = devices[index];
     displayDeviceExtensions(device);
     displayDeviceInfo(device);
+    displayDeviceImageFormats(device);
     displayPlatformExtensions(*device.platform);
     displayPlatformInfo(*device.platform);
     displayOperatingSystem();
@@ -255,6 +260,40 @@ void MainWindow::displayDeviceExtensions(DeviceInfo& device)
     }
     ui->treeViewDeviceExtensions->expandAll();
     ui->treeViewDeviceExtensions->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+}
+
+void MainWindow::displayDeviceImageFormats(DeviceInfo& device)
+{
+    models.deviceImageFormats.clear();
+    QStandardItem* rootItem = models.deviceImageFormats.invisibleRootItem();
+    for (auto& imageType : device.imageTypes) 
+    {
+        QList<QStandardItem*> imageTypeItem;
+        imageTypeItem << new QStandardItem(utils::imageTypeString(imageType.first));
+        imageTypeItem << new QStandardItem();
+        for (auto& channelOrder : imageType.second.channelOrders)
+        {
+            QList<QStandardItem*> channelOrderItem;
+            channelOrderItem << new QStandardItem(utils::channelOrderString(channelOrder.first));
+            channelOrderItem << new QStandardItem();
+            for (auto& channelType : channelOrder.second.channelTypes)
+            {
+                QList<QStandardItem*> channelTypeItem;
+                channelTypeItem << new QStandardItem(utils::channelTypeString(channelType.first));
+                QList<QString> supportedMemFlags;
+                for (auto& memFlag : channelType.second.memFlags) {
+                    supportedMemFlags.push_back(utils::memFlagsString(memFlag));
+                }
+                channelTypeItem << new QStandardItem(utils::implode(supportedMemFlags));
+                channelOrderItem.first()->appendRow(channelTypeItem);
+            }
+            imageTypeItem.first()->appendRow(channelOrderItem);
+        }
+        rootItem->appendRow(imageTypeItem);
+    }
+
+    ui->treeViewDeviceImageFormats->expandAll();
+    ui->treeViewDeviceImageFormats->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
 }
 
 void MainWindow::displayPlatformInfo(PlatformInfo& platform)
@@ -497,6 +536,12 @@ void MainWindow::slotFilterDeviceExtensions(QString text)
 {
     QRegExp regExp(text, Qt::CaseInsensitive, QRegExp::RegExp);
     filterProxies.deviceExtensions.setFilterRegExp(regExp);
+}
+
+void MainWindow::slotFilterDeviceImageFormats(QString text)
+{
+    QRegExp regExp(text, Qt::CaseInsensitive, QRegExp::RegExp);
+    filterProxies.deviceImageFormats.setFilterRegExp(regExp);
 }
 
 void MainWindow::slotFilterPlatformInfo(QString text)

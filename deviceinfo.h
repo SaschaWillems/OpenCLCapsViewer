@@ -77,6 +77,24 @@ struct DeviceInfoValue
     QString getDisplayValue();
 };
 
+struct DeviceImageChannelTypeInfo 
+{
+    std::vector<cl_mem_flags> memFlags;
+    void addFlag(cl_mem_flags flag) {
+        memFlags.push_back(flag);
+    }
+};
+
+struct DeviceImageChannelOrderInfo
+{
+    std::unordered_map<cl_channel_type, DeviceImageChannelTypeInfo> channelTypes;
+};
+
+struct DeviceImageTypeInfo 
+{
+    std::unordered_map<cl_channel_order, DeviceImageChannelOrderInfo> channelOrders;
+};
+
 class DeviceInfo
 {
 private:
@@ -87,6 +105,7 @@ private:
     void readOpenCLVersion();
     void readExtensions();
     void readExtensionInfo();
+    void readSupportedImageFormats();
 public:
     DeviceInfo();
     cl_device_id deviceId;
@@ -96,6 +115,7 @@ public:
     qint32 clVersionMinor;
     std::vector<DeviceInfoValue> deviceInfo;
     std::vector<DeviceExtension> extensions;
+    std::unordered_map<cl_mem_object_type, DeviceImageTypeInfo> imageTypes;
     void read();
     QJsonObject toJson();
 };

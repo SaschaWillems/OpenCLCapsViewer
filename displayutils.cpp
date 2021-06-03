@@ -22,7 +22,7 @@
 
 namespace utils
 {
-    QString implode(QList<QString>& items, char separator = ',')
+    QString implode(QList<QString>& items, char separator)
     {
         QString imploded;
         for (int i = 0; i < items.size(); i++) {

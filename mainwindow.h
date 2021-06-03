@@ -40,7 +40,6 @@
 #include "platforminfo.h"
 #include "database.h"
 #include "submitdialog.h"
-#include "displayutils.h"
 #include "CL/cl.h"
 
 QT_BEGIN_NAMESPACE
@@ -82,12 +81,14 @@ private:
     struct FilterProxies {
         TreeProxyFilter deviceinfo;
         TreeProxyFilter deviceExtensions;
+        TreeProxyFilter deviceImageFormats;
         TreeProxyFilter platformInfo;
         TreeProxyFilter platformExtensions;
     } filterProxies;
     struct Models {
         QStandardItemModel deviceinfo;
         QStandardItemModel deviceExtensions;
+        QStandardItemModel deviceImageFormats;
         QStandardItemModel platformInfo;
         QStandardItemModel platformExtensions;
     } models;
@@ -96,6 +97,7 @@ private:
 
     void displayDeviceInfo(DeviceInfo &device);
     void displayDeviceExtensions(DeviceInfo &device);
+    void displayDeviceImageFormats(DeviceInfo &device);
     void displayPlatformInfo(PlatformInfo& platform);
     void displayPlatformExtensions(PlatformInfo& platform);
     void displayOperatingSystem();
@@ -119,6 +121,7 @@ private Q_SLOTS:
     void slotUploadReport();
     void slotFilterDeviceInfo(QString text);
     void slotFilterDeviceExtensions(QString text);
+    void slotFilterDeviceImageFormats(QString text);
     void slotFilterPlatformInfo(QString text);
     void slotFilterPlatformExtensions(QString text);
 };

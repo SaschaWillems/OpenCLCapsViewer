@@ -30,6 +30,7 @@
 
 namespace utils
 {
+	QString implode(QList<QString>& items, char separator = ',');
 	QString displayDefault(QVariant value);
 	QString displayBool(QVariant value);
 	QString displayNumberArray(QVariant value);
