@@ -748,6 +748,50 @@ void DeviceInfo::readExtensionInfo()
 	}
 }
 
+void DeviceInfo::readSupportedImageFormats()
+{
+	// @todo: check version support
+	std::vector<cl_mem_object_type> imageTypeList = {
+		CL_MEM_OBJECT_IMAGE2D,
+		CL_MEM_OBJECT_IMAGE3D,
+		// CL_VERSION_1_2
+		CL_MEM_OBJECT_IMAGE2D_ARRAY,
+		CL_MEM_OBJECT_IMAGE1D,
+		CL_MEM_OBJECT_IMAGE1D_ARRAY,
+		CL_MEM_OBJECT_IMAGE1D_BUFFER,
+	};
+	// 
+	std::vector<cl_mem_flags> memFlagList = {
+		CL_MEM_READ_WRITE,
+		CL_MEM_READ_ONLY,
+		CL_MEM_WRITE_ONLY,
+		CL_MEM_KERNEL_READ_AND_WRITE
+	};
+
+	// Device has to support images, so we need to check the device info first	
+	cl_bool imageSupport = false;
+	clGetDeviceInfo(deviceId, CL_DEVICE_IMAGE_SUPPORT, sizeof(cl_bool), &imageSupport, nullptr);
+	if (imageSupport) {
+		cl_int error;
+		cl_context context = clCreateContext(nullptr, 1, &this->deviceId, nullptr, nullptr, &error);
+		if (error == NULL) {
+			for (auto& imgType : imageTypeList) {
+				for (auto& memFlag : memFlagList) {
+					cl_uint numSupportedFormats;
+					clGetSupportedImageFormats(context, memFlag, imgType, NULL, nullptr, &numSupportedFormats);
+					std::vector<cl_image_format> imageFormats(numSupportedFormats);
+					clGetSupportedImageFormats(context, memFlag, imgType, numSupportedFormats, imageFormats.data(), nullptr);
+					for (auto& imageFormat : imageFormats) {
+						imageTypes[imgType].channelOrders[imageFormat.image_channel_order].channelTypes[imageFormat.image_channel_data_type].addFlag(memFlag);
+					}
+				}
+			}
+			clReleaseContext(context);
+		}
+	}
+
+}
+
 DeviceInfo::DeviceInfo()
 {
 }
@@ -759,6 +803,7 @@ void DeviceInfo::read()
 	readDeviceInfo();
 	readExtensions();
 	readExtensionInfo();
+	readSupportedImageFormats();
 }
 
 QJsonObject DeviceInfo::toJson()

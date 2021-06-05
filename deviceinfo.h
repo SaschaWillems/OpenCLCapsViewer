@@ -79,9 +79,9 @@ struct DeviceInfoValue
 
 struct DeviceImageChannelTypeInfo 
 {
-    std::vector<cl_mem_flags> memFlags;
+    cl_mem_flags memFlags = 0;
     void addFlag(cl_mem_flags flag) {
-        memFlags.push_back(flag);
+        memFlags |= flag;
     }
 };
 
