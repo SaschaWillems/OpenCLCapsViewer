@@ -687,11 +687,17 @@ padding-bottom:5px;</string>
              <property name="alternatingRowColors">
               <bool>true</bool>
              </property>
+             <property name="uniformRowHeights">
+              <bool>true</bool>
+             </property>
              <attribute name="headerVisible">
               <bool>false</bool>
              </attribute>
              <attribute name="headerMinimumSectionSize">
-              <number>200</number>
+              <number>15</number>
+             </attribute>
+             <attribute name="headerStretchLastSection">
+              <bool>true</bool>
              </attribute>
             </widget>
            </item>

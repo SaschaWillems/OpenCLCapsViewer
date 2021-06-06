@@ -296,13 +296,13 @@ namespace utils
 	{
 		switch (type)
 		{
-#define STR(r) case r: return #r
-			STR(CL_MEM_OBJECT_IMAGE1D);
-			STR(CL_MEM_OBJECT_IMAGE1D_BUFFER);
-			STR(CL_MEM_OBJECT_IMAGE2D);
-			STR(CL_MEM_OBJECT_IMAGE3D);
-			STR(CL_MEM_OBJECT_IMAGE1D_ARRAY);
-			STR(CL_MEM_OBJECT_IMAGE2D_ARRAY);
+#define STR(r) case CL_MEM_OBJECT_##r: return #r
+			STR(IMAGE1D);
+			STR(IMAGE1D_BUFFER);
+			STR(IMAGE2D);
+			STR(IMAGE3D);
+			STR(IMAGE1D_ARRAY);
+			STR(IMAGE2D_ARRAY);
 #undef STR
 		default: return "?";
 		}
@@ -312,27 +312,27 @@ namespace utils
 	{
 		switch (order)
 		{
-#define STR(r) case r: return #r
-			STR(CL_R);
-			STR(CL_A);
-			STR(CL_RG);
-			STR(CL_RA);
-			STR(CL_RGB);
-			STR(CL_RGBA);
-			STR(CL_BGRA);
-			STR(CL_ARGB);
-			STR(CL_INTENSITY);
-			STR(CL_LUMINANCE);
-			STR(CL_Rx);
-			STR(CL_RGx);
-			STR(CL_RGBx);
-			STR(CL_DEPTH);
-			STR(CL_DEPTH_STENCIL);
-			STR(CL_sRGB);
-			STR(CL_sRGBx);
-			STR(CL_sRGBA);
-			STR(CL_sBGRA);
-			STR(CL_ABGR);
+#define STR(r) case CL_##r: return #r
+			STR(R);
+			STR(A);
+			STR(RG);
+			STR(RA);
+			STR(RGB);
+			STR(RGBA);
+			STR(BGRA);
+			STR(ARGB);
+			STR(INTENSITY);
+			STR(LUMINANCE);
+			STR(Rx);
+			STR(RGx);
+			STR(RGBx);
+			STR(DEPTH);
+			STR(DEPTH_STENCIL);
+			STR(sRGB);
+			STR(sRGBx);
+			STR(sRGBA);
+			STR(sBGRA);
+			STR(ABGR);
 #undef STR
 		default: return "?";
 		}
@@ -342,24 +342,24 @@ namespace utils
 	{
 		switch (type)
 		{
-#define STR(r) case r: return #r
-			STR(CL_SNORM_INT8);
-			STR(CL_SNORM_INT16);
-			STR(CL_UNORM_INT8);
-			STR(CL_UNORM_INT16);
-			STR(CL_UNORM_SHORT_565);
-			STR(CL_UNORM_SHORT_555);
-			STR(CL_UNORM_INT_101010);
-			STR(CL_SIGNED_INT8);
-			STR(CL_SIGNED_INT16);
-			STR(CL_SIGNED_INT32);
-			STR(CL_UNSIGNED_INT8);
-			STR(CL_UNSIGNED_INT16);
-			STR(CL_UNSIGNED_INT32);
-			STR(CL_HALF_FLOAT);
-			STR(CL_FLOAT);
-			STR(CL_UNORM_INT24);
-			STR(CL_UNORM_INT_101010_2);
+#define STR(r) case CL_##r: return #r
+			STR(SNORM_INT8);
+			STR(SNORM_INT16);
+			STR(UNORM_INT8);
+			STR(UNORM_INT16);
+			STR(UNORM_SHORT_565);
+			STR(UNORM_SHORT_555);
+			STR(UNORM_INT_101010);
+			STR(SIGNED_INT8);
+			STR(SIGNED_INT16);
+			STR(SIGNED_INT32);
+			STR(UNSIGNED_INT8);
+			STR(UNSIGNED_INT16);
+			STR(UNSIGNED_INT32);
+			STR(HALF_FLOAT);
+			STR(FLOAT);
+			STR(UNORM_INT24);
+			STR(UNORM_INT_101010_2);
 #undef STR
 		default: return "?";
 		}
@@ -369,11 +369,11 @@ namespace utils
 	{
 		switch (flag)
 		{
-#define STR(r) case r: return #r
-			STR(CL_MEM_READ_WRITE);
-			STR(CL_MEM_READ_ONLY);
-			STR(CL_MEM_WRITE_ONLY);
-			STR(CL_MEM_KERNEL_READ_AND_WRITE);
+#define STR(r) case CL_MEM_##r: return #r
+			STR(READ_WRITE);
+			STR(READ_ONLY);
+			STR(WRITE_ONLY);
+			STR(KERNEL_READ_AND_WRITE);
 #undef STR
 		default: return "?";
 		}

@@ -30,6 +30,7 @@
 #include <QWindow>
 #include <QFileDialog>
 #include <QDesktopServices>
+#include <QStyleFactory>
 #if defined(ANDROID)
 #include <QScroller>
 #endif
@@ -94,6 +95,8 @@ private:
     } models;
 
     Database database;
+
+    void connectFilterAndModel(QStandardItemModel& model, TreeProxyFilter& filter);
 
     void displayDeviceInfo(DeviceInfo &device);
     void displayDeviceExtensions(DeviceInfo &device);

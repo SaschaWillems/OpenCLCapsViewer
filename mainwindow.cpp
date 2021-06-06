@@ -33,26 +33,27 @@ MainWindow::MainWindow(QWidget *parent)
     const QString title = "OpenCL Hardware Capability Viewer " + version;
     setWindowTitle(title);
     ui->labelTitle->setText(title);
+    qApp->setStyle(QStyleFactory::create("Fusion"));
 
     // Models
     ui->treeViewDeviceInfo->setModel(&filterProxies.deviceinfo);
-    filterProxies.deviceinfo.setSourceModel(&models.deviceinfo);
+    connectFilterAndModel(models.deviceinfo, filterProxies.deviceinfo);
     connect(ui->filterLineEditDeviceInfo, SIGNAL(textChanged(QString)), this, SLOT(slotFilterDeviceInfo(QString)));
     
     ui->treeViewDeviceExtensions->setModel(&filterProxies.deviceExtensions);
-    filterProxies.deviceExtensions.setSourceModel(&models.deviceExtensions);
+    connectFilterAndModel(models.deviceExtensions, filterProxies.deviceExtensions);
     connect(ui->filterLineEditExtensions, SIGNAL(textChanged(QString)), this, SLOT(slotFilterDeviceExtensions(QString)));
 
     ui->treeViewDeviceImageFormats->setModel(&filterProxies.deviceImageFormats);
-    filterProxies.deviceImageFormats.setSourceModel(&models.deviceImageFormats);
+    connectFilterAndModel(models.deviceImageFormats, filterProxies.deviceImageFormats);
     connect(ui->filterLineEditDeviceImageFormats, SIGNAL(textChanged(QString)), this, SLOT(slotFilterDeviceImageFormats(QString)));
 
     ui->treeViewPlatformExtensions->setModel(&filterProxies.platformExtensions);
-    filterProxies.platformExtensions.setSourceModel(&models.platformExtensions);
+    connectFilterAndModel(models.platformExtensions, filterProxies.platformExtensions);
     connect(ui->filterLineEditPlatformExtensions, SIGNAL(textChanged(QString)), this, SLOT(slotFilterPlatformExtensions(QString)));
 
     ui->treeViewPlatformInfo->setModel(&filterProxies.platformInfo);
-    filterProxies.platformInfo.setSourceModel(&models.platformInfo);
+    connectFilterAndModel(models.platformInfo, filterProxies.platformInfo);
     connect(ui->filterLineEditPlatformInfo, SIGNAL(textChanged(QString)), this, SLOT(slotFilterPlatformInfo(QString)));
 
     // Slots
@@ -197,6 +198,13 @@ void MainWindow::getOperatingSystem()
 #endif
 }
 
+void MainWindow::connectFilterAndModel(QStandardItemModel& model, TreeProxyFilter& filter)
+{
+    filter.setSourceModel(&model);
+    filter.setFilterKeyColumn(-1);
+    filter.setRecursiveFilteringEnabled(true);
+}
+
 void MainWindow::displayDeviceInfo(DeviceInfo& device)
 {
     models.deviceinfo.clear();
@@ -265,35 +273,52 @@ void MainWindow::displayDeviceExtensions(DeviceInfo& device)
 void MainWindow::displayDeviceImageFormats(DeviceInfo& device)
 {
     models.deviceImageFormats.clear();
+
+    std::vector<cl_mem_flags> memFlagList = {
+        CL_MEM_READ_WRITE,
+        CL_MEM_READ_ONLY,
+        CL_MEM_WRITE_ONLY,
+        CL_MEM_KERNEL_READ_AND_WRITE
+    };
+
+    models.deviceImageFormats.setHorizontalHeaderLabels({"Format", "Order", "Type", "Read/Write", "Read only", "Write only", "Kernel Read/Write"});
+    ui->treeViewDeviceImageFormats->setHeaderHidden(false);
+
     QStandardItem* rootItem = models.deviceImageFormats.invisibleRootItem();
-    for (auto& imageType : device.imageTypes) 
+    for (auto& imageType : device.imageTypes)
     {
-        QList<QStandardItem*> imageTypeItem;
-        imageTypeItem << new QStandardItem(utils::imageTypeString(imageType.first));
-        imageTypeItem << new QStandardItem();
         for (auto& channelOrder : imageType.second.channelOrders)
         {
-            QList<QStandardItem*> channelOrderItem;
-            channelOrderItem << new QStandardItem(utils::channelOrderString(channelOrder.first));
-            channelOrderItem << new QStandardItem();
             for (auto& channelType : channelOrder.second.channelTypes)
             {
-                QList<QStandardItem*> channelTypeItem;
-                channelTypeItem << new QStandardItem(utils::channelTypeString(channelType.first));
-                QList<QString> supportedMemFlags;
-                for (auto& memFlag : channelType.second.memFlags) {
-                    supportedMemFlags.push_back(utils::memFlagsString(memFlag));
+                QList<QStandardItem*> imageTypeItem;
+                imageTypeItem << new QStandardItem(utils::imageTypeString(imageType.first));
+                imageTypeItem << new QStandardItem(utils::channelOrderString(channelOrder.first));
+                imageTypeItem << new QStandardItem(utils::channelTypeString(channelType.first));
+                // Display mem flags as columns
+                int colIndex = 3;
+                for (auto& memFlag : memFlagList)
+                {
+                    bool flagSupported = channelType.second.memFlags & memFlag;
+                    if (flagSupported)
+                    {
+                        imageTypeItem << new QStandardItem("true");
+                        imageTypeItem[colIndex]->setForeground(QColor::fromRgb(0, 128, 0));
+                    }
+                    else {
+                        imageTypeItem << new QStandardItem("false");
+                        imageTypeItem[colIndex]->setForeground(QColor::fromRgb(255, 0, 0));
+                    }
+                    colIndex++;
                 }
-                channelTypeItem << new QStandardItem(utils::implode(supportedMemFlags));
-                channelOrderItem.first()->appendRow(channelTypeItem);
+                rootItem->appendRow(imageTypeItem);
             }
-            imageTypeItem.first()->appendRow(channelOrderItem);
         }
-        rootItem->appendRow(imageTypeItem);
     }
 
     ui->treeViewDeviceImageFormats->expandAll();
     ui->treeViewDeviceImageFormats->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    ui->treeViewDeviceImageFormats->header()->setStretchLastSection(true);
 }
 
 void MainWindow::displayPlatformInfo(PlatformInfo& platform)
@@ -541,6 +566,7 @@ void MainWindow::slotFilterDeviceExtensions(QString text)
 void MainWindow::slotFilterDeviceImageFormats(QString text)
 {
     QRegExp regExp(text, Qt::CaseInsensitive, QRegExp::RegExp);
+    filterProxies.deviceImageFormats.setRecursiveFilteringEnabled(true);
     filterProxies.deviceImageFormats.setFilterRegExp(regExp);
 }
 
