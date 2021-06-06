@@ -144,7 +144,7 @@ bool Database::uploadReport(QJsonObject json, QString &message)
 	manager = new QNetworkAccessManager(nullptr);
 	QHttpMultiPart* multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
 	QHttpPart httpPart;
-	httpPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"data\"; filename=\"update_check_report.json\""));
+	httpPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"data\"; filename=\"openclreport.json\""));
 	QJsonDocument doc(json);
 	httpPart.setBody(doc.toJson());
 	multiPart->append(httpPart);
