@@ -333,6 +333,11 @@ namespace utils
 			STR(sRGBA);
 			STR(sBGRA);
 			STR(ABGR);
+			STR(YUYV_INTEL);
+			STR(UYVY_INTEL);
+			STR(YVYU_INTEL);
+			STR(VYUY_INTEL);
+			STR(NV12_INTEL);
 #undef STR
 		default: return "?";
 		}
