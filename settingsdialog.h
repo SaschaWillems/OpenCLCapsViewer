@@ -20,23 +20,21 @@
 
 #pragma once
 #include <QDialog>
-#include <QLineEdit>
-#include "submitdialog.h"
+#include "settings.h"
 
-class SubmitDialog : public QDialog
+class SettingsDialog : public QDialog
 {
 	Q_OBJECT
 private:
-	QLineEdit *editSubmitter;
-	QLineEdit *editComment;
+	Settings appSettings;
 public:
-	QString submitter;
-	QString comment;
-    SubmitDialog(QString submitter, QString caption = "Submit new report");
-	~SubmitDialog();
-	QString getSubmitter();
-	QString getComment();
+    SettingsDialog(Settings appSet);
+	~SettingsDialog();
 private Q_SLOTS:
 	void slotAccept();
 	void slotCancel();
 };
+
+
+
+

@@ -79,12 +79,12 @@ void SubmitDialog::slotCancel()
 	this->reject();
 }
 
-std::string SubmitDialog::getSubmitter()
+QString SubmitDialog::getSubmitter()
 {
-	return editSubmitter->text().toStdString();
+	return editSubmitter->text();
 }
 
-std::string SubmitDialog::getComment()
+QString SubmitDialog::getComment()
 {
-	return editComment->text().toStdString();
+	return editComment->text();
 }

@@ -5,6 +5,9 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 CONFIG += c++11
 
 DEFINES += QT_DLL QT_NETWORK_LIB QT_WIDGETS_LIB
+INCLUDEPATH += ./GeneratedFiles \
+    . \
+    ./GeneratedFiles/Release
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -18,7 +21,9 @@ SOURCES += \
     deviceinfo.cpp \
     platforminfo.cpp \
     treeproxyfilter.cpp \
-    submitdialog.cpp
+    submitdialog.cpp \
+    settings.cpp \
+    settingsdialog.cpp 
 
 HEADERS += \
     displayutils.h \
@@ -27,7 +32,9 @@ HEADERS += \
     deviceinfo.h \
     platforminfo.h \
     treeproxyfilter.h \
-    submitdialog.h
+    submitdialog.h \
+    settings.h \
+    settingsdialog.h
 
 FORMS += \
     mainwindow.ui

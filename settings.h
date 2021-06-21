@@ -19,24 +19,21 @@
 */
 
 #pragma once
-#include <QDialog>
-#include <QLineEdit>
-#include "submitdialog.h"
 
-class SubmitDialog : public QDialog
+#include <QSettings>
+#include <QString>
+
+class Settings
 {
-	Q_OBJECT
-private:
-	QLineEdit *editSubmitter;
-	QLineEdit *editComment;
 public:
-	QString submitter;
-	QString comment;
-    SubmitDialog(QString submitter, QString caption = "Submit new report");
-	~SubmitDialog();
-	QString getSubmitter();
-	QString getComment();
-private Q_SLOTS:
-	void slotAccept();
-	void slotCancel();
+	Settings();
+	~Settings();
+	QString submitterName;
+	QString proxyDns;
+	QString proxyPort;
+	QString proxyUserName;
+	QString proxyUserPassword;
+	bool proxyEnabled;
+	void restore();
 };
+

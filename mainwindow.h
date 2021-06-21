@@ -37,6 +37,8 @@
 #include <treeproxyfilter.h>
 
 #include <vector>
+#include <settings.h>
+#include <settingsdialog.h>
 #include "deviceinfo.h"
 #include "platforminfo.h"
 #include "database.h"
@@ -77,6 +79,8 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    Settings appSettings;
+
     int selectedDeviceIndex = 0;
 
     struct FilterProxies {
@@ -118,6 +122,7 @@ private Q_SLOTS:
     void slotComboBoxDeviceChanged(int index);
     void slotClose();
     void slotAbout();
+    void slotSettings();
     void slotDisplayOnlineReport();
     void slotBrowseDatabase();
     void slotSaveReport();

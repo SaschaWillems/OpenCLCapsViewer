@@ -35,6 +35,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->labelTitle->setText(title);
     qApp->setStyle(QStyleFactory::create("Fusion"));
 
+    appSettings.restore();
+
     // Models
     ui->treeViewDeviceInfo->setModel(&filterProxies.deviceinfo);
     connectFilterAndModel(models.deviceinfo, filterProxies.deviceinfo);
@@ -63,6 +65,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->toolButtonOnlineDataBase, SIGNAL(pressed()), this, SLOT(slotBrowseDatabase()));
     connect(ui->toolButtonUpload, SIGNAL(pressed()), this, SLOT(slotUploadReport()));
     connect(ui->toolButtonAbout, SIGNAL(pressed()), this, SLOT(slotAbout()));
+    connect(ui->toolButtonSettings, SIGNAL(pressed()), this, SLOT(slotSettings()));
     connect(ui->toolButtonExit, SIGNAL(pressed()), this, SLOT(slotClose()));
 
     // Optimize the UI for mobile platforms
@@ -474,6 +477,14 @@ void MainWindow::slotAbout()
     QMessageBox::about(this, tr("About the OpenCL Hardware Capability Viewer"), QString::fromStdString(aboutText.str()));
 }
 
+void MainWindow::slotSettings()
+{
+    SettingsDialog dialog(appSettings);
+    dialog.setModal(true);
+    dialog.exec();
+    appSettings.restore();
+}
+
 void MainWindow::slotDisplayOnlineReport()
 {
     QJsonObject jsonReport;
@@ -531,12 +542,12 @@ void MainWindow::slotUploadReport()
     }
     // Upload new report
     if (reportState == ReportState::not_present) {
-        SubmitDialog dialog("", /*appSettings.submitterName,*/ "Submit new report");
+        SubmitDialog dialog(appSettings.submitterName,  "Submit new report");
 
         if (dialog.exec() == QDialog::Accepted) {
             QString message;
             QJsonObject reportJson;
-            reportToJson(devices[selectedDeviceIndex], "", "", reportJson);
+            reportToJson(devices[selectedDeviceIndex], dialog.getSubmitter(), dialog.getComment(), reportJson);
             if (database.uploadReport(reportJson, message))
             {
                 QMessageBox::information(this, "Report submitted", "Your report has been uploaded to the database!\n\nThank you for your contribution!");
