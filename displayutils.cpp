@@ -149,6 +149,7 @@ namespace utils
     QString displayFloatingPointConfig(QVariant value)
     {
         std::unordered_map<uint32_t, QString> flags = {
+            { CL_FP_DENORM, "DENORM" },
             { CL_FP_INF_NAN, "INF_NAN" },
             { CL_FP_ROUND_TO_NEAREST, "ROUND_TO_NEAREST" },
             { CL_FP_ROUND_TO_ZERO, "ROUND_TO_ZERO" },
