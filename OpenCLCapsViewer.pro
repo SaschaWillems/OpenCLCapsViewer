@@ -42,7 +42,8 @@ FORMS += \
 INCLUDEPATH += "OpenCL-Headers"
 
 win32 {
-    LIBS += OpenCL.lib
+# todo
+    LIBS += "vcpkg/packages/opencl_x86-windows/lib/OpenCL.lib/OpenCL.lib"
 }
 
 linux:!android {
