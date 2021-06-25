@@ -22,15 +22,21 @@ jobs:
 
       - uses: jurplel/install-qt-action@v2
 
-      - uses: lukka/run-vcpkg@v6
-        with:
-          setupOnly: true
+      # - uses: lukka/run-vcpkg@v6
+      #   with:
+      #     setupOnly: true
+
+      - name: OpenCL
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git
+          cd vcpkg
+          .\bootstrap-vcpkg.bat
+          vcpkg.exe install opencl
 
       - name: Build
         env:
           TARGET_PLATFORM: windows
         run: |
-          vcpkg.exe install opencl
           qmake OpenCLCapsViewer.pro
           nmake release
           windeployqt.exe release --no-opengl-sw --no-angle --no-webkit2 --no-translations --no-system-d3d-compiler
