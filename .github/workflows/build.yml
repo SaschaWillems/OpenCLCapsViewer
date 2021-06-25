@@ -22,17 +22,6 @@ jobs:
 
       - uses: jurplel/install-qt-action@v2
 
-      # - uses: lukka/run-vcpkg@v6
-      #   with:
-      #     setupOnly: true
-
-      - name: OpenCL
-        run: |
-          git clone https://github.com/microsoft/vcpkg.git
-          cd vcpkg
-          .\bootstrap-vcpkg.bat
-          vcpkg.exe install opencl
-
       - name: Build
         env:
           TARGET_PLATFORM: windows

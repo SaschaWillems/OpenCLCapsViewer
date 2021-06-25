@@ -43,7 +43,7 @@ INCLUDEPATH += "OpenCL-Headers"
 
 win32 {
 # todo
-    LIBS += "vcpkg/packages/opencl_x86-windows/lib/OpenCL.lib/OpenCL.lib"
+    LIBS += "$$PWD\libs\windows\x64\OpenCL.lib"
 }
 
 linux:!android {
