@@ -221,9 +221,9 @@ Makefile*
 # QtCtreator CMake
 CMakeLists.txt.user*
 
-libs/openssl/*/*.so
-
 redist/**
 android/.gradle/**
 
 devdatabase.ini
+
+!/libs/windows/x64
