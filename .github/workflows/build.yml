@@ -32,6 +32,7 @@ jobs:
           Remove-Item release\*.obj
           Remove-Item release\*.res
           Compress-Archive -Path release\ -DestinationPath OpenCL_Caps_Viewer-windows.zip
-      # - name: Upload
-      #   if: github.ref == 'refs/heads/master'
-      #   run: curl -T Vulkan_Caps_Viewer-windows.zip  ftp://${{ secrets.FTP_USER_NAME }}:${{ secrets.FTP_PASS }}@${{ secrets.FTP_SERVER_NAME }}
+          
+      - name: Upload
+        if: github.ref == 'refs/heads/master'
+        run: curl -T OpenCL_Caps_Viewer-windows.zip  ftp://${{ secrets.FTP_USER_NAME }}:${{ secrets.FTP_PASS }}@${{ secrets.FTP_SERVER_NAME }}
