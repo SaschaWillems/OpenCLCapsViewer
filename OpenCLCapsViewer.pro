@@ -42,8 +42,7 @@ FORMS += \
 INCLUDEPATH += "OpenCL-Headers"
 
 win32 {
-# todo
-    LIBS += "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.3\lib\x64\OpenCL.lib"
+    LIBS += OpenCL.lib
 }
 
 linux:!android {
