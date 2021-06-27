@@ -1,6 +1,6 @@
 # OpenCL Hardware Capability Viewer
 
-<img src="images/vulkanlogo.png" width="480px">
+<img src="images/opencllogo.png" width="360px">
 
 Client application to display hardware implementation details for devices supporting the [OpenCL](https://www.khronos.org/opencl/) API by Khronos.
 
