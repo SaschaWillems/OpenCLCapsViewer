@@ -69,6 +69,7 @@ jobs:
           chmod a+x linuxdeployqt-continuous-x86_64.AppImage
           export VERSION=${TARGET_PLATFORM}
           cp openclCapsViewer.png appdir/usr/share/icons/hicolor/256x256/apps/openclCapsViewer.png
+          mv appdir/opt/OpenCLCapsViewer appdir/usr/share/OpenCLCapsViewer
           ./linuxdeployqt-continuous-x86_64.AppImage appdir/usr/share/applications/* -appimage
 
       - name: Upload
