@@ -1,9 +1,8 @@
+TEMPLATE = app
+TARGET = OpenCLCapsViewer
 QT       += core network gui
-
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-
 CONFIG += c++11
-
 DEFINES += QT_DLL QT_NETWORK_LIB QT_WIDGETS_LIB
 INCLUDEPATH += ./GeneratedFiles \
     . \
@@ -60,6 +59,12 @@ linux:!android {
     }
     target.path = /usr/bin
     INSTALLS += target
+    desktop.files = OpenCLCapsViewer.desktop
+    desktop.path = /usr/share/applications
+    icon.extra = cp $$PWD/Resources/icon.png openclCapsViewer.png
+    icon.files = openclCapsViewer.png
+    icon.path = /usr/share/icons/hicolor/256x256/apps/
+    INSTALLS += desktop icon    
 }
 
 android {

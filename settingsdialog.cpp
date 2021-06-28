@@ -18,7 +18,7 @@
 *
 */
 
-#include "settingsDialog.h"
+#include "settingsdialog.h"
 #include "settings.h"
 
 #include <QFormLayout>
