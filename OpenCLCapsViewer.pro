@@ -61,8 +61,8 @@ linux:!android {
         QT += waylandclient
         DEFINES += VK_USE_PLATFORM_WAYLAND_KHR
     }
-    target.path = /usr/bin
-    INSTALLS += target
+#    target.path = /usr/bin
+#   INSTALLS += target
     desktop.files = openclCapsViewer.desktop
     desktop.path = /usr/share/applications
     icon.extra = cp $$PWD/Resources/icon.png openclCapsViewer.png
