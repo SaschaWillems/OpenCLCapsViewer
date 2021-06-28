@@ -54,7 +54,7 @@ jobs:
       - name: Install OpenCL ICD loader
         run: |
           sudo apt update
-          sudo apt install cl-icd-opencl-dev
+          sudo apt install ocl-icd-opencl-dev
 
       - name: Build
         env:
