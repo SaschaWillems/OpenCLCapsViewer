@@ -1,0 +1,10 @@
+[Desktop Entry]
+Encoding=UTF-8
+Type=Application
+Name=OpenCL Caps Viewer
+Comment=OpenCL Hardware Capability Viewer
+Exec=openclCapsViewer
+Icon=openclCapsViewer
+Terminal=false
+StartupNotify=false
+Categories=Application;Graphics;Development;
