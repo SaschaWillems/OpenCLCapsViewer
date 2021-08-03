@@ -291,6 +291,28 @@ void DeviceInfo::readDeviceInfoValue(DeviceInfoValueDescriptor descriptor, QStri
 	}
 }
 
+void DeviceInfo::readDeviceIdentification()
+{
+	// To distinguish android devices, we use the device name from the operating system as an identifier
+	// CL_DEVICE_NAME only contains the GPU name, which may be the same for many different android devices
+#if defined(__ANDROID__)
+	QString productModel = getSystemProperty("ro.product.model");
+	QString productManufacturer = getSystemProperty("ro.product.manufacturer");
+	name = "";
+	if (productManufacturer.trimmed() != "") {
+		name = productManufacturer + " ";
+	}
+	name += productModel;
+	gpuName = getDeviceInfoString(CL_DEVICE_NAME);
+#else
+	name = getDeviceInfoString(CL_DEVICE_NAME);
+	gpuName = name;
+#endif
+	driverVersion = getDeviceInfoString(CL_DRIVER_VERSION);
+	deviceVersion = getDeviceInfoString(CL_DEVICE_VERSION);
+
+}
+
 void DeviceInfo::readDeviceInfo()
 {
 	deviceInfo.clear();
@@ -792,14 +814,28 @@ void DeviceInfo::readSupportedImageFormats()
 
 }
 
+#if defined(__ANDROID__)
+QString getSystemProperty(const char* propname)
+{
+    char prop[PROP_VALUE_MAX+1];
+    int len = __system_property_get(propname, prop);
+    if (len > 0) {
+        return QString(prop);
+    } else {
+        return "";
+    }
+}
+#endif
+
+
 DeviceInfo::DeviceInfo()
 {
 }
 
 void DeviceInfo::read()
 {
-	name = getDeviceInfoString(CL_DEVICE_NAME);
 	readOpenCLVersion();
+	readDeviceIdentification();
 	readDeviceInfo();
 	readExtensions();
 	readExtensionInfo();
@@ -820,6 +856,15 @@ QJsonObject DeviceInfo::toJson()
 		jsonExtensions.append(jsonNode);
 	}
 	jsonRoot["extensions"] = jsonExtensions;
+
+	// Device identfication
+	// Used by the database to uniquely identify the device
+	QJsonObject jsonDeviceIdentification;
+	jsonDeviceIdentification["devicename"] = name;
+	jsonDeviceIdentification["gpuname"] = gpuName;
+	jsonDeviceIdentification["deviceversion"] = deviceVersion;
+	jsonDeviceIdentification["driverversion"] = driverVersion;
+	jsonRoot["identification"] = jsonDeviceIdentification;
 
 	// Device info
 	QJsonArray jsonDeviceInfos;

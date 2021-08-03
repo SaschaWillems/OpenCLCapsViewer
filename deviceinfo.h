@@ -36,6 +36,9 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#ifdef __ANDROID__
+#include <sys/system_properties.h>
+#endif
 
 struct DeviceExtension
 {
@@ -101,6 +104,7 @@ private:
     QString getDeviceInfoString(cl_device_info info);
     bool extensionSupported(const char* name);
     void readDeviceInfoValue(DeviceInfoValueDescriptor descriptor, QString extension = "");
+    void readDeviceIdentification();
     void readDeviceInfo();
     void readOpenCLVersion();
     void readExtensions();
@@ -111,6 +115,9 @@ public:
     cl_device_id deviceId;
     PlatformInfo* platform;
     QString name;
+    QString gpuName;
+    QString deviceVersion;
+    QString driverVersion;
     qint32 clVersionMajor;
     qint32 clVersionMinor;
     std::vector<DeviceInfoValue> deviceInfo;
