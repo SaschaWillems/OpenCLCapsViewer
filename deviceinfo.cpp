@@ -290,6 +290,20 @@ void DeviceInfo::readDeviceInfoValue(DeviceInfoValueDescriptor descriptor, QStri
 	}
 }
 
+#if defined(__ANDROID__)
+QString getSystemProperty(const char* propname)
+{
+	char prop[PROP_VALUE_MAX + 1];
+	int len = __system_property_get(propname, prop);
+	if (len > 0) {
+		return QString(prop);
+	}
+	else {
+		return "";
+	}
+}
+#endif
+
 void DeviceInfo::readDeviceIdentifier()
 {
 	// To distinguish android devices, we use the device name from the operating system as an identifier
@@ -821,20 +835,6 @@ void DeviceInfo::readSupportedImageFormats()
 	}
 
 }
-
-#if defined(__ANDROID__)
-QString getSystemProperty(const char* propname)
-{
-    char prop[PROP_VALUE_MAX+1];
-    int len = __system_property_get(propname, prop);
-    if (len > 0) {
-        return QString(prop);
-    } else {
-        return "";
-    }
-}
-#endif
-
 
 DeviceInfo::DeviceInfo()
 {
