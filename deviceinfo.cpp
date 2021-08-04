@@ -24,10 +24,9 @@ QString DeviceInfo::getDeviceInfoString(cl_device_info info)
 {
 	size_t valueSize;
 	clGetDeviceInfo(this->deviceId, info, 0, nullptr, &valueSize);
-	std::string value;
-	value.resize(valueSize);
+	char* value = new char[valueSize];
 	clGetDeviceInfo(this->deviceId, info, valueSize, &value[0], nullptr);
-	return QString::fromStdString(value);
+	return QString::fromUtf8(value);
 }
 
 bool DeviceInfo::extensionSupported(const char* name)
@@ -291,26 +290,25 @@ void DeviceInfo::readDeviceInfoValue(DeviceInfoValueDescriptor descriptor, QStri
 	}
 }
 
-void DeviceInfo::readDeviceIdentification()
+void DeviceInfo::readDeviceIdentifier()
 {
 	// To distinguish android devices, we use the device name from the operating system as an identifier
 	// CL_DEVICE_NAME only contains the GPU name, which may be the same for many different android devices
 #if defined(__ANDROID__)
 	QString productModel = getSystemProperty("ro.product.model");
 	QString productManufacturer = getSystemProperty("ro.product.manufacturer");
-	name = "";
+	identifier.name = "";
 	if (productManufacturer.trimmed() != "") {
-		name = productManufacturer + " ";
+		identifier.name = productManufacturer + " ";
 	}
-	name += productModel;
-	gpuName = getDeviceInfoString(CL_DEVICE_NAME);
+	identifier.name += productModel;
+	identifier.gpuName = getDeviceInfoString(CL_DEVICE_NAME);
 #else
-	name = getDeviceInfoString(CL_DEVICE_NAME);
-	gpuName = name;
+	identifier.name = getDeviceInfoString(CL_DEVICE_NAME);
+	identifier.gpuName = identifier.name;
 #endif
-	driverVersion = getDeviceInfoString(CL_DRIVER_VERSION);
-	deviceVersion = getDeviceInfoString(CL_DEVICE_VERSION);
-
+	identifier.driverVersion = getDeviceInfoString(CL_DRIVER_VERSION);
+	identifier.deviceVersion = getDeviceInfoString(CL_DEVICE_VERSION);
 }
 
 void DeviceInfo::readDeviceInfo()
@@ -401,7 +399,7 @@ void DeviceInfo::readDeviceInfo()
 			{ CL_DEVICE_BUILT_IN_KERNELS, clValueType::cl_char, utils::displayText },
 			{ CL_DEVICE_IMAGE_MAX_BUFFER_SIZE, clValueType::cl_size_t },
 			{ CL_DEVICE_IMAGE_MAX_ARRAY_SIZE, clValueType::cl_size_t },
-			//{ CL_DEVICE_PARENT_DEVICE, clValueType::cl_device_id },
+			// { CL_DEVICE_PARENT_DEVICE, clValueType::cl_device_id },
 			{ CL_DEVICE_PARTITION_MAX_SUB_DEVICES, clValueType::cl_uint },
 			{ CL_DEVICE_PARTITION_PROPERTIES, clValueType::cl_device_partition_property_array, utils::displayDevicePartitionProperties },
 			{ CL_DEVICE_PARTITION_AFFINITY_DOMAIN, clValueType::cl_device_affinity_domain, utils::displayDeviceAffinityDomains },
@@ -523,7 +521,8 @@ void DeviceInfo::readExtensionInfo()
 		for (auto info : infoList) {
 			readDeviceInfoValue(info, "cl_khr_image2D_from_buffer");
 		}
-	}	
+	}
+	// @todo: values not defined in spec?
 	if (extensionSupported("cl_khr_terminate_context")) {
 		std::vector<DeviceInfoValueDescriptor> infoList = {
 			// @todo: bitfield
@@ -606,6 +605,11 @@ void DeviceInfo::readExtensionInfo()
 	}
 
 	// ARM
+	/*
+	* @todo: 
+	* cl_arm_job_slot_selection
+	*/
+
 	if (extensionSupported("cl_arm_shared_virtual_memory")) {
 		std::vector<DeviceInfoValueDescriptor> infoList = {
 			{ CL_DEVICE_SVM_CAPABILITIES_ARM, clValueType::cl_device_svm_capabilities, utils::displayDeviceSvmCapabilities },
@@ -642,6 +646,10 @@ void DeviceInfo::readExtensionInfo()
 	}
 
 	// INTEL
+	/*
+	* @todo:
+	* cl_intel_device_partition_by_names
+	*/
 	if (extensionSupported("cl_intel_advanced_motion_estimation")) {
 		std::vector<DeviceInfoValueDescriptor> infoList = {
 			{ CL_DEVICE_ME_VERSION_INTEL, clValueType::cl_uint },
@@ -687,7 +695,7 @@ void DeviceInfo::readExtensionInfo()
 			readDeviceInfoValue(info, "cl_intel_device_side_avc_motion_estimation");
 		}
 	}
-	/* @todo: undocumented?
+	/* @todo: Extension is still in draft and not yet released
 	if (extensionSupported("cl_intel_unified_shared_memory")) {
 		std::vector<DeviceInfoValueDescriptor> infoList = {
 			{ CL_DEVICE_HOST_MEM_CAPABILITIES_INTEL, clValueType::cl_char },
@@ -835,7 +843,7 @@ DeviceInfo::DeviceInfo()
 void DeviceInfo::read()
 {
 	readOpenCLVersion();
-	readDeviceIdentification();
+	readDeviceIdentifier();
 	readDeviceInfo();
 	readExtensions();
 	readExtensionInfo();
@@ -859,12 +867,12 @@ QJsonObject DeviceInfo::toJson()
 
 	// Device identfication
 	// Used by the database to uniquely identify the device
-	QJsonObject jsonDeviceIdentification;
-	jsonDeviceIdentification["devicename"] = name;
-	jsonDeviceIdentification["gpuname"] = gpuName;
-	jsonDeviceIdentification["deviceversion"] = deviceVersion;
-	jsonDeviceIdentification["driverversion"] = driverVersion;
-	jsonRoot["identification"] = jsonDeviceIdentification;
+	QJsonObject jsonDeviceIdentifier;
+	jsonDeviceIdentifier["devicename"] = identifier.name;
+	jsonDeviceIdentifier["gpuname"] = identifier.gpuName;
+	jsonDeviceIdentifier["deviceversion"] = identifier.deviceVersion;
+	jsonDeviceIdentifier["driverversion"] = identifier.driverVersion;
+	jsonRoot["identifier"] = jsonDeviceIdentifier;
 
 	// Device info
 	QJsonArray jsonDeviceInfos;
@@ -888,6 +896,28 @@ QJsonObject DeviceInfo::toJson()
 		jsonDeviceInfos.append(jsonNode);
 	}
 	jsonRoot["info"] = jsonDeviceInfos;
+
+	// Supported image formats
+	// @todo
+	QJsonArray jsonImages;
+	int cnt = 0;
+	for (auto& imageType : imageTypes) 
+	{
+		for (auto& channelOrder : imageType.second.channelOrders) 
+		{
+			for (auto& channelType : channelOrder.second.channelTypes) 
+			{
+				QJsonObject jsonNode;
+				jsonNode["type"] = QJsonValue(int(imageType.first));
+				jsonNode["channelorder"] = QJsonValue(int(channelOrder.first));
+				jsonNode["channeltype"] = QJsonValue(int(channelType.first));
+				jsonNode["flags"] = QJsonValue(int(channelType.second.memFlags));
+				jsonImages.append(jsonNode);
+				cnt++;
+			}
+		}
+	}
+	jsonRoot["imageformats"] = jsonImages;
 
 	// Additional OpenCL info
 	QJsonObject jsonDeviceInfosOpenCL;

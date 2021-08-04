@@ -98,13 +98,22 @@ struct DeviceImageTypeInfo
     std::unordered_map<cl_channel_order, DeviceImageChannelOrderInfo> channelOrders;
 };
 
+// Contains values to uniquely identify the device when talking to the database
+struct DeviceIdentifier
+{
+    QString name;
+    QString gpuName;
+    QString deviceVersion;
+    QString driverVersion;
+};
+
 class DeviceInfo
 {
 private:
     QString getDeviceInfoString(cl_device_info info);
     bool extensionSupported(const char* name);
     void readDeviceInfoValue(DeviceInfoValueDescriptor descriptor, QString extension = "");
-    void readDeviceIdentification();
+    void readDeviceIdentifier();
     void readDeviceInfo();
     void readOpenCLVersion();
     void readExtensions();
@@ -114,10 +123,7 @@ public:
     DeviceInfo();
     cl_device_id deviceId;
     PlatformInfo* platform;
-    QString name;
-    QString gpuName;
-    QString deviceVersion;
-    QString driverVersion;
+    DeviceIdentifier identifier;
     qint32 clVersionMajor;
     qint32 clVersionMinor;
     std::vector<DeviceInfoValue> deviceInfo;

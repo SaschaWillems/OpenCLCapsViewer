@@ -156,7 +156,7 @@ void MainWindow::getDevices()
     ui->comboBoxDevice->clear();
     for (DeviceInfo device : devices)
     {
-        QString deviceName = device.name;
+        QString deviceName = device.identifier.name;
         ui->comboBoxDevice->addItem(deviceName);
     }
 
@@ -507,7 +507,7 @@ void MainWindow::slotSaveReport()
 {
     DeviceInfo& device = devices[selectedDeviceIndex];
 #ifndef VK_USE_PLATFORM_IOS_MVK
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Report to disk"), device.name + ".json", tr("json (*.json)"));
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Report to disk"), device.identifier.name + ".json", tr("json (*.json)"));
 
     if (!fileName.isEmpty()) {
         saveReport(fileName, "", "");
