@@ -313,6 +313,7 @@ void DeviceInfo::readDeviceIdentifier()
 	QString productManufacturer = getSystemProperty("ro.product.manufacturer");
 	identifier.name = "";
 	if (productManufacturer.trimmed() != "") {
+        productManufacturer[0] = productManufacturer[0].toUpper();
 		identifier.name = productManufacturer + " ";
 	}
 	identifier.name += productModel;

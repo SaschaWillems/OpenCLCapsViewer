@@ -27,6 +27,7 @@
 #include <QXmlStreamReader>
 #include <QJsonObject>
 #include <QJsonDocument>
+#include <QMessageBox>
 
 #pragma once
 

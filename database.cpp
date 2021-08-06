@@ -22,9 +22,7 @@
 
 QString Database::username = "";
 QString Database::password = "";
-// @todo: https
-//QString Database::databaseUrl = "http://opencl.gpuinfo.org/";
-QString Database::databaseUrl = "http://localhost:8000/";
+QString Database::databaseUrl = "http://opencl.gpuinfo.org/";
 
 void Database::setCredentials(QUrl& url)
 {
@@ -134,7 +132,10 @@ bool Database::getReportState(QJsonObject json, ReportState& state)
 			state = ReportState::is_updatable;
 		}
 		result = true;
-	}
+    } else {
+        QString message = reply->errorString();
+        QMessageBox::warning(nullptr, tr("Error"), "Could not get report state: " + message);
+    }
 	delete(manager);
 	return result;
 }
