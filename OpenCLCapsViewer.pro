@@ -38,7 +38,7 @@ HEADERS += \
 FORMS += \
     mainwindow.ui
 
-INCLUDEPATH += "OpenCL-Headers"
+INCLUDEPATH += "external/OpenCL-Headers"
 
 win32 {
 # todo
