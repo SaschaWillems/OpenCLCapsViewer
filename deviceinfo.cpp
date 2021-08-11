@@ -241,6 +241,31 @@ void DeviceInfo::readDeviceInfoValue(DeviceInfoValueDescriptor descriptor, QStri
 		deviceInfo.push_back(DeviceInfoValue(descriptor.name, QVariant::fromValue(value), extension, descriptor.displayFunction));
 		break;
 	}
+	/* INTEL */
+	case clValueType::cl_queue_family_properties_intel:
+	{
+		size_t valueSize;
+		clGetDeviceInfo(this->deviceId, descriptor.name, 0, nullptr, &valueSize);
+		std::vector<cl_queue_family_properties_intel> values;
+		DeviceInfoValue infoValue(descriptor.name, 0, extension, descriptor.displayFunction);
+		if (valueSize > 0) {
+			values.resize(valueSize / sizeof(cl_queue_family_properties_intel));
+			infoValue.value = QVariant::fromValue(values.size());
+			clGetDeviceInfo(this->deviceId, descriptor.name, valueSize, &values[0], nullptr);
+			uint32_t index = 0;
+			// @todo: add detail column to deviceinfodetials for queue family index?
+			for (auto& value : values) {
+				QString queueId = "Queue family " + QString::number(index);
+				infoValue.addDetailValue(queueId + " name", value.name);
+				infoValue.addDetailValue(queueId + " count", value.count);
+				infoValue.addDetailValue(queueId + " properties", value.properties);
+				infoValue.addDetailValue(queueId + " capabilities", value.capabilities);
+				index++;
+				}
+		}
+		deviceInfo.push_back(infoValue);
+		break;
+	}
 	/* Special cases */
 	case clValueType::special:
 	{
@@ -726,8 +751,7 @@ void DeviceInfo::readExtensionInfo()
 	*/
 	if (extensionSupported("cl_intel_command_queue_families")) {
 		std::vector<DeviceInfoValueDescriptor> infoList = {
-			// @todo
-			//{ CL_DEVICE_QUEUE_FAMILY_PROPERTIES_INTEL, clValueType::cl_queue_family_properties_intel },
+			{ CL_DEVICE_QUEUE_FAMILY_PROPERTIES_INTEL, clValueType::cl_queue_family_properties_intel },
 		};
 		for (auto info : infoList) {
 			readDeviceInfoValue(info, "cl_intel_command_queue_families");
