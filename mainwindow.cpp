@@ -264,6 +264,15 @@ void MainWindow::displayDeviceExtensions(DeviceInfo& device)
                 if (displayValue == "false") {
                     extInfoItem[1]->setForeground(QColor::fromRgb(255, 0, 0));
                 }
+                // Append additional device info detail values
+                if (info.detailValues.size() > 0) {
+                    for (auto& detailItem : info.detailValues) {
+                        QList<QStandardItem*> additionalInfoItem;
+                        additionalInfoItem << new QStandardItem(detailItem.name);
+                        additionalInfoItem << new QStandardItem(detailItem.getDisplayValue());
+                        extInfoItem.first()->appendRow(additionalInfoItem);
+                    }
+                }
                 extItem.first()->appendRow(extInfoItem);
             }
         }
