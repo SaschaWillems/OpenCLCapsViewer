@@ -253,15 +253,14 @@ void DeviceInfo::readDeviceInfoValue(DeviceInfoValueDescriptor descriptor, QStri
 			infoValue.value = QVariant::fromValue(values.size());
 			clGetDeviceInfo(this->deviceId, descriptor.name, valueSize, &values[0], nullptr);
 			uint32_t index = 0;
-			// @todo: add detail column to deviceinfodetials for queue family index?
 			for (auto& value : values) {
 				QString queueId = "Queue family " + QString::number(index);
-				infoValue.addDetailValue(queueId + " name", value.name);
+				infoValue.addDetailValue(queueId + " name", value.name, utils::displayText);
 				infoValue.addDetailValue(queueId + " count", value.count);
-				infoValue.addDetailValue(queueId + " properties", value.properties);
-				infoValue.addDetailValue(queueId + " capabilities", value.capabilities);
+				infoValue.addDetailValue(queueId + " properties", value.properties, utils::displayCommandQueueProperties);
+				infoValue.addDetailValue(queueId + " capabilities", value.capabilities, utils::displayCommandQueueCapabilitiesIntel);
 				index++;
-				}
+			}
 		}
 		deviceInfo.push_back(infoValue);
 		break;
@@ -462,7 +461,7 @@ void DeviceInfo::readDeviceInfo()
 			{ CL_DEVICE_IMAGE_BASE_ADDRESS_ALIGNMENT, clValueType::cl_uint },
 			{ CL_DEVICE_MAX_READ_WRITE_IMAGE_ARGS, clValueType::cl_uint },
 			{ CL_DEVICE_MAX_GLOBAL_VARIABLE_SIZE, clValueType::cl_size_t, utils::displayByteSize },
-			{ CL_DEVICE_QUEUE_ON_DEVICE_PROPERTIES, clValueType::cl_command_queue_properties, utils::displayCommandQueueCapabilities },
+			{ CL_DEVICE_QUEUE_ON_DEVICE_PROPERTIES, clValueType::cl_command_queue_properties, utils::displayCommandQueueProperties },
 			{ CL_DEVICE_QUEUE_ON_DEVICE_PREFERRED_SIZE, clValueType::cl_uint, utils::displayByteSize },
 			{ CL_DEVICE_QUEUE_ON_DEVICE_MAX_SIZE, clValueType::cl_uint, utils::displayByteSize },
 			{ CL_DEVICE_MAX_ON_DEVICE_QUEUES, clValueType::cl_uint },
@@ -751,7 +750,7 @@ void DeviceInfo::readExtensionInfo()
 	*/
 	if (extensionSupported("cl_intel_command_queue_families")) {
 		std::vector<DeviceInfoValueDescriptor> infoList = {
-			{ CL_DEVICE_QUEUE_FAMILY_PROPERTIES_INTEL, clValueType::cl_queue_family_properties_intel },
+			{ CL_DEVICE_QUEUE_FAMILY_PROPERTIES_INTEL, clValueType::cl_queue_family_properties_intel, utils::displayQueueFamilyPropertiesIntel },
 		};
 		for (auto info : infoList) {
 			readDeviceInfoValue(info, "cl_intel_command_queue_families");

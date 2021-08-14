@@ -45,11 +45,13 @@ namespace utils
 	QString displayFloatingPointConfig(QVariant value);
 	QString displayExecCapabilities(QVariant value);
 	QString displayEnqueueCapabilities(QVariant value);
-	QString displayCommandQueueCapabilities(QVariant value);
+	QString displayCommandQueueProperties(QVariant value);
 	QString displayDeviceSvmCapabilities(QVariant value);
 	QString displayDevicePartitionProperties(QVariant value);
 	QString displayDeviceAffinityDomains(QVariant value);
 	QString displayControlledTerminationCapabilitiesARM(QVariant value);
 	QString displaySchedulingControlsCapabilitiesARM(QVariant value);
+	QString displayQueueFamilyPropertiesIntel(QVariant value);
+	QString displayCommandQueueCapabilitiesIntel(QVariant value);
 }
 

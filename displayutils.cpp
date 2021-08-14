@@ -181,7 +181,7 @@ namespace utils
         return displayFlags(value.toInt(), flags);
     }
 
-    QString displayCommandQueueCapabilities(QVariant value)
+    QString displayCommandQueueProperties(QVariant value)
     {
         std::unordered_map<uint32_t, QString> flags = {
             { CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE, "QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE" },
@@ -235,13 +235,45 @@ namespace utils
     QString displaySchedulingControlsCapabilitiesARM(QVariant value)
     {
         std::unordered_map<uint32_t, QString> flags = {
-            { CL_DEVICE_SCHEDULING_KERNEL_BATCHING_ARM, "CSCHEDULING_KERNEL_BATCHING_ARM"},
+            { CL_DEVICE_SCHEDULING_KERNEL_BATCHING_ARM, "SCHEDULING_KERNEL_BATCHING_ARM"},
             { CL_DEVICE_SCHEDULING_WORKGROUP_BATCH_SIZE_ARM, "SCHEDULING_WORKGROUP_BATCH_SIZE_ARM" },
             { CL_DEVICE_SCHEDULING_WORKGROUP_BATCH_SIZE_MODIFIER_ARM, "SCHEDULING_WORKGROUP_BATCH_SIZE_MODIFIER_ARM" },
             { CL_DEVICE_SCHEDULING_DEFERRED_FLUSH_ARM, "SCHEDULING_DEFERRED_FLUSH_ARM" },
             { CL_DEVICE_SCHEDULING_REGISTER_ALLOCATION_ARM, "SCHEDULING_REGISTER_ALLOCATION_ARM" },
         };
         return displayFlags(value.toInt(), flags);
+    }
+
+    QString displayQueueFamilyPropertiesIntel(QVariant value)
+    {
+        return QString("[%1]").arg(value.toInt());
+    }
+
+    QString displayCommandQueueCapabilitiesIntel(QVariant value)
+    {
+        if (value.toInt() == CL_QUEUE_DEFAULT_CAPABILITIES_INTEL) {
+            return "DEFAULT_CAPABILITIES_INTEL";
+        } else {
+            std::unordered_map<uint32_t, QString> flags = {
+                { CL_QUEUE_CAPABILITY_CREATE_SINGLE_QUEUE_EVENTS_INTEL, "CAPABILITY_CREATE_SINGLE_QUEUE_EVENTS_INTEL" },
+                { CL_QUEUE_CAPABILITY_CREATE_CROSS_QUEUE_EVENTS_INTEL, "CAPABILITY_CREATE_CROSS_QUEUE_EVENTS_INTEL" },
+                { CL_QUEUE_CAPABILITY_SINGLE_QUEUE_EVENT_WAIT_LIST_INTEL, "CAPABILITY_SINGLE_QUEUE_EVENT_WAIT_LIST_INTEL" },
+                { CL_QUEUE_CAPABILITY_CROSS_QUEUE_EVENT_WAIT_LIST_INTEL, "CAPABILITY_CROSS_QUEUE_EVENT_WAIT_LIST_INTEL" },
+                { CL_QUEUE_CAPABILITY_TRANSFER_BUFFER_INTEL, "CAPABILITY_TRANSFER_BUFFER_INTEL" },
+                { CL_QUEUE_CAPABILITY_TRANSFER_BUFFER_RECT_INTEL, "CAPABILITY_TRANSFER_BUFFER_RECT_INTEL" },
+                { CL_QUEUE_CAPABILITY_MAP_BUFFER_INTEL, "CAPABILITY_MAP_BUFFER_INTEL" },
+                { CL_QUEUE_CAPABILITY_FILL_BUFFER_INTEL, "CAPABILITY_FILL_BUFFER_INTEL" },
+                { CL_QUEUE_CAPABILITY_TRANSFER_IMAGE_INTEL, "CAPABILITY_TRANSFER_IMAGE_INTEL" },
+                { CL_QUEUE_CAPABILITY_MAP_IMAGE_INTEL, "CAPABILITY_MAP_IMAGE_INTEL" },
+                { CL_QUEUE_CAPABILITY_FILL_IMAGE_INTEL, "CAPABILITY_FILL_IMAGE_INTEL" },
+                { CL_QUEUE_CAPABILITY_TRANSFER_BUFFER_IMAGE_INTEL, "CAPABILITY_TRANSFER_BUFFER_IMAGE_INTEL" },
+                { CL_QUEUE_CAPABILITY_TRANSFER_IMAGE_BUFFER_INTEL, "CAPABILITY_TRANSFER_IMAGE_BUFFER_INTEL" },
+                { CL_QUEUE_CAPABILITY_MARKER_INTEL, "CAPABILITY_MARKER_INTEL" },
+                { CL_QUEUE_CAPABILITY_BARRIER_INTEL, "CAPABILITY_BARRIER_INTEL" },
+                { CL_QUEUE_CAPABILITY_KERNEL_INTEL, "CAPABILITY_KERNEL_INTEL" }
+            };
+            return displayFlags(value.toInt(), flags);
+        }
     }
 
 }
