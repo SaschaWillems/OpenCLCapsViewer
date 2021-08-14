@@ -231,7 +231,11 @@ void MainWindow::displayDeviceInfo(DeviceInfo& device)
             if (info.detailValues.size() > 0) {
                 for (auto& detailItem : info.detailValues) {
                     QList<QStandardItem*> additionalInfoItem;
-                    additionalInfoItem << new QStandardItem(detailItem.name);
+                    QString caption = detailItem.name;
+                    if (!detailItem.detail.isEmpty()) {
+                        caption += " - " + detailItem.detail;
+                    }
+                    additionalInfoItem << new QStandardItem(caption);
                     additionalInfoItem << new QStandardItem(detailItem.getDisplayValue());
                     extItem.first()->appendRow(additionalInfoItem);
                 }
@@ -268,7 +272,11 @@ void MainWindow::displayDeviceExtensions(DeviceInfo& device)
                 if (info.detailValues.size() > 0) {
                     for (auto& detailItem : info.detailValues) {
                         QList<QStandardItem*> additionalInfoItem;
-                        additionalInfoItem << new QStandardItem(detailItem.name);
+                        QString caption = detailItem.name;
+                        if (!detailItem.detail.isEmpty()) {
+                            caption += " - " + detailItem.detail;
+                        }
+                        additionalInfoItem << new QStandardItem(caption);
                         additionalInfoItem << new QStandardItem(detailItem.getDisplayValue());
                         extInfoItem.first()->appendRow(additionalInfoItem);
                     }

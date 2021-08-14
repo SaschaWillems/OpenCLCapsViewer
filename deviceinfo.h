@@ -60,9 +60,11 @@ struct DeviceInfoValueDescriptor
 struct DeviceInfoValueDetailValue
 {
     QString name;
+    QString detail;
     QVariant value;
     DisplayFn displayFunction = nullptr;
     DeviceInfoValueDetailValue(QString name, QVariant value, DisplayFn displayFunction = nullptr);
+    DeviceInfoValueDetailValue(QString name, QString detail, QVariant value, DisplayFn displayFunction = nullptr);
     QString getDisplayValue();
 };
 
@@ -77,6 +79,7 @@ struct DeviceInfoValue
     // @todo: add display "translation" rule?
     DeviceInfoValue(cl_device_info info, QVariant value, QString extension, DisplayFn displayFunction = nullptr);
     void addDetailValue(QString name, QVariant value, DisplayFn displayFunction = nullptr);
+    void addDetailValue(QString name, QString detail, QVariant value, DisplayFn displayFunction = nullptr);
     QString getDisplayValue();
 };
 

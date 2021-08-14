@@ -255,10 +255,10 @@ void DeviceInfo::readDeviceInfoValue(DeviceInfoValueDescriptor descriptor, QStri
 			uint32_t index = 0;
 			for (auto& value : values) {
 				QString queueId = "Queue family " + QString::number(index);
-				infoValue.addDetailValue(queueId + " name", value.name, utils::displayText);
-				infoValue.addDetailValue(queueId + " count", value.count);
-				infoValue.addDetailValue(queueId + " properties", value.properties, utils::displayCommandQueueProperties);
-				infoValue.addDetailValue(queueId + " capabilities", value.capabilities, utils::displayCommandQueueCapabilitiesIntel);
+				infoValue.addDetailValue(queueId, "Name", value.name, utils::displayText);
+				infoValue.addDetailValue(queueId, "Count", value.count);
+				infoValue.addDetailValue(queueId, "Properties", value.properties, utils::displayCommandQueueProperties);
+				infoValue.addDetailValue(queueId, "Capabilities", value.capabilities, utils::displayCommandQueueCapabilitiesIntel);
 				index++;
 			}
 		}
@@ -310,7 +310,7 @@ void DeviceInfo::readDeviceInfoValue(DeviceInfoValueDescriptor descriptor, QStri
 		}
 	}
 	default:
-		qDebug("Unknwon device info type");
+		qDebug("Unknown device info type");
 	}
 }
 
@@ -889,7 +889,7 @@ QJsonObject DeviceInfo::toJson()
 	}
 	jsonRoot["extensions"] = jsonExtensions;
 
-	// Device identfication
+	// Device identification
 	// Used by the database to uniquely identify the device
 	QJsonObject jsonDeviceIdentifier;
 	jsonDeviceIdentifier["devicename"] = identifier.name;
@@ -907,11 +907,17 @@ QJsonObject DeviceInfo::toJson()
 		jsonNode["extension"] = info.extension;
 		jsonNode["enumvalue"] = info.enumValue;
 		jsonNode["value"] = info.value.toJsonValue();
+		// Optional details for the device info
 		if (info.detailValues.size() > 0) {
 			QJsonArray jsonDetails;
 			for (auto& detail : info.detailValues) {
 				QJsonObject jsonNodeDetail;
 				jsonNodeDetail["name"] = detail.name;
+				if (detail.detail.isEmpty()) {
+					jsonNodeDetail["detail"] = QJsonValue::Null;
+				} else {
+					jsonNodeDetail["detail"] = detail.detail;
+				}
 				jsonNodeDetail["value"] = detail.value.toJsonValue();
 				jsonDetails.append(jsonNodeDetail);
 			}
@@ -922,7 +928,6 @@ QJsonObject DeviceInfo::toJson()
 	jsonRoot["info"] = jsonDeviceInfos;
 
 	// Supported image formats
-	// @todo
 	QJsonArray jsonImages;
 	int cnt = 0;
 	for (auto& imageType : imageTypes) 
@@ -999,6 +1004,11 @@ void DeviceInfoValue::addDetailValue(QString name, QVariant value, DisplayFn dis
 	detailValues.push_back(DeviceInfoValueDetailValue(name, value, displayFunction));
 }
 
+void DeviceInfoValue::addDetailValue(QString name, QString detail, QVariant value, DisplayFn displayFunction)
+{
+	detailValues.push_back(DeviceInfoValueDetailValue(name, detail, value, displayFunction));
+}
+
 QString DeviceInfoValue::getDisplayValue()
 {
 	if (displayFunction) {
@@ -1019,14 +1029,21 @@ DeviceInfoValueDescriptor::DeviceInfoValueDescriptor(cl_device_info name, clValu
 {
 	this->name = name;
 	this->valueType = valueType;
-	// @todo: nullptr or utils::displayDefault?
-	//this->displayFunction = displayFunction ? displayFunction : utils::displayDefault;
 	this->displayFunction = displayFunction;
 }
 
 DeviceInfoValueDetailValue::DeviceInfoValueDetailValue(QString name, QVariant value, DisplayFn displayFunction)
 {
 	this->name = name;
+	this->detail = "";
+	this->value = value;
+	this->displayFunction = displayFunction;
+}
+
+DeviceInfoValueDetailValue::DeviceInfoValueDetailValue(QString name, QString detail, QVariant value, DisplayFn displayFunction)
+{
+	this->name = name;
+	this->detail = detail;
 	this->value = value;
 	this->displayFunction = displayFunction;
 }
