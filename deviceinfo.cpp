@@ -257,8 +257,8 @@ void DeviceInfo::readDeviceInfoValue(DeviceInfoValueDescriptor descriptor, QStri
 				QString queueId = "Queue family " + QString::number(index);
 				infoValue.addDetailValue(queueId, "Name", value.name, utils::displayText);
 				infoValue.addDetailValue(queueId, "Count", value.count);
-				infoValue.addDetailValue(queueId, "Properties", value.properties, utils::displayCommandQueueProperties);
-				infoValue.addDetailValue(queueId, "Capabilities", value.capabilities, utils::displayCommandQueueCapabilitiesIntel);
+				infoValue.addDetailValue(queueId, "Properties", QVariant::fromValue(value.properties), utils::displayCommandQueueProperties);
+				infoValue.addDetailValue(queueId, "Capabilities", QVariant::fromValue(value.capabilities), utils::displayCommandQueueCapabilitiesIntel);
 				index++;
 			}
 		}
@@ -846,7 +846,7 @@ void DeviceInfo::readSupportedImageFormats()
 			for (auto& imgType : imageTypeList) {
 				for (auto& memFlag : memFlagList) {
 					cl_uint numSupportedFormats;
-					clGetSupportedImageFormats(context, memFlag, imgType, NULL, nullptr, &numSupportedFormats);
+					clGetSupportedImageFormats(context, memFlag, imgType, 0, nullptr, &numSupportedFormats);
 					std::vector<cl_image_format> imageFormats(numSupportedFormats);
 					clGetSupportedImageFormats(context, memFlag, imgType, numSupportedFormats, imageFormats.data(), nullptr);
 					for (auto& imageFormat : imageFormats) {
