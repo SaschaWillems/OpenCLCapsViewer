@@ -97,8 +97,13 @@ void PlatformInfo::readExtensions()
 		extensions = utils::explode(extensionString, ' ');
 		for (size_t i = 0; i < extensions.size(); i++) {
 			PlatformExtension extension{};
+			// Remove trailing zeros
+			extensions[i].erase(std::find(extensions[i].begin(), extensions[i].end(), '\0'), extensions[i].end());
 			extension.name = QString::fromStdString(extensions[i]);
-			// @todo
+			// Skip empty extension strings
+			if (extensions[i].length() == 0) {
+				continue;
+			}
 			extension.version = 0;
 			this->extensions.push_back(extension);
 		}
