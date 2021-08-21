@@ -98,9 +98,11 @@ jobs:
           export ANDROID_SDK_ROOT=$ANDROID_HOME
           export ANDROID_NDK_ROOT=$ANDROID_HOME/ndk-bundle
           qmake OpenCLCapsViewer.pro
+          echo $BUILD_TARGET
+          echo $PWD
           echo $HOME
           make INSTALL_ROOT=$HOME
-          androiddeployqt.exe --input $HOME/android-libOpenCLCapsViewer.so-deployment-settings.json --output ./ --android-platform android-30 --gradle
+          androiddeployqt --input $HOME/android-libOpenCLCapsViewer.so-deployment-settings.json --output ./ --android-platform android-30 --gradle
 
       # - name: Upload
       #   if: github.ref == 'refs/heads/master'
