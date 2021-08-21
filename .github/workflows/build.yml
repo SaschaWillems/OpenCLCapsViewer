@@ -100,7 +100,7 @@ jobs:
           qmake OpenCLCapsViewer.pro
           make INSTALL_ROOT=$BUILD_TARGET
           mkdir ./bin
-          androiddeployqt --ouput ./bin
+          # androiddeployqt --ouput ./bin
 
       # - name: Upload
       #   if: github.ref == 'refs/heads/master'
