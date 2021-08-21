@@ -80,7 +80,7 @@ android {
         android/build.gradle \
         android/res/values/libs.xml
 
-    LIBS += $$PWD/libs/opencl/libOpenCL.so
+    LIBS += $$PWD/libs/android/arm-v8a/libOpenCL.so
 }
 
 # Default rules for deployment.
