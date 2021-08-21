@@ -102,5 +102,5 @@ jobs:
           androiddeployqt --input /home/runner/work/OpenCLCapsViewer/OpenCLCapsViewer/android-libOpenCLCapsViewer.so-deployment-settings.json --output . --android-platform android-30 --gradle
 
       - name: Upload
-        # if: github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/master'
         run: curl -T /home/runner/work/OpenCLCapsViewer/OpenCLCapsViewer//build/outputs/apk/debug/OpenCLCapsViewer-debug.apk ftp://${{ secrets.FTP_USER_NAME }}:${{ secrets.FTP_PASS }}@${{ secrets.FTP_SERVER_NAME }}
