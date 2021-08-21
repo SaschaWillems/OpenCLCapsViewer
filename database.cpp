@@ -58,11 +58,6 @@ QString Database::get(QString url)
 	}
 }
 
-QString Database::post(QString url, QString data)
-{
-    return QString();
-}
-
 QString Database::encodeUrl(QString url)
 {
 	// @todo: probably not required
