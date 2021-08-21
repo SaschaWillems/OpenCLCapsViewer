@@ -41,7 +41,6 @@ private:
 	QNetworkAccessManager* manager;
 	void setCredentials(QUrl& url);
 	QString get(QString url);
-	QString post(QString url, QString data);
 	QString encodeUrl(QString url);
 public:
 	static QString username;

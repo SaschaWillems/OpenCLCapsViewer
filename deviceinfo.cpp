@@ -842,7 +842,7 @@ void DeviceInfo::readSupportedImageFormats()
 	if (imageSupport) {
 		cl_int error;
 		cl_context context = clCreateContext(nullptr, 1, &this->deviceId, nullptr, nullptr, &error);
-		if (error == NULL) {
+		if (error == CL_SUCCESS) {
 			for (auto& imgType : imageTypeList) {
 				for (auto& memFlag : memFlagList) {
 					cl_uint numSupportedFormats;
