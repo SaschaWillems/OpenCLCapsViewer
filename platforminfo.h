@@ -39,7 +39,6 @@ struct PlatformInfoValue
     QVariant value;
     QString extension;
     qint32 enumValue;
-    // @todo: add display "translation" rule?
     PlatformInfoValue(cl_platform_info info, QVariant value, QString extension = "");
 };
 

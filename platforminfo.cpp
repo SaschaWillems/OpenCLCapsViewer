@@ -122,9 +122,7 @@ bool PlatformInfo::extensionSupported(const char* name)
 
 void PlatformInfo::read()
 {
-	// @todo: move to function
 	platformInfo.clear();
-
 	std::unordered_map<cl_device_info, clValueType> infoList = {
 		{ CL_PLATFORM_PROFILE, clValueType::cl_char },
 		{ CL_PLATFORM_VERSION, clValueType::cl_char },
@@ -136,16 +134,14 @@ void PlatformInfo::read()
 		readPlatformInfoValue(info.first, info.second);
 	}
 
-	// @todo: 2.1 and 2.2
-	// CL_PLATFORM_HOST_TIMER_RESOLUTION
-
-	// @todo: 3.0
-	// CL_PLATFORM_NUMERIC_VERSION
-	// CL_PLATFORM_EXTENSIONS_WITH_VERSION
-
 	readOpenCLVersion();
 	readExtensions();
 	readExtensionInfo();
+
+	// Version dependent information
+	if ((clVersionMajor == 2) && (clVersionMinor >= 1)) {
+		readPlatformInfoValue(CL_PLATFORM_HOST_TIMER_RESOLUTION, clValueType::cl_ulong);
+	}
 }
 
 void PlatformInfo::readExtensionInfo()
@@ -159,11 +155,6 @@ void PlatformInfo::readExtensionInfo()
 			readPlatformInfoValue(info.first, info.second, "cl_khr_icd");
 		}
 	}
-	// @todo
-	// cl_khr_extended_versioning
-	// CL_PLATFORM_NUMERIC_VERSION_KHR
-	// CL_PLATFORM_EXTENSIONS_WITH_VERSION_KHR
-
 }
 
 QJsonObject PlatformInfo::toJson()
