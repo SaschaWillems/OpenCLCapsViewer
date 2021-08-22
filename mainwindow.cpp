@@ -115,23 +115,19 @@ void MainWindow::getDevices()
 	cl_int status = clGetPlatformIDs(0, nullptr, &numPlatforms);
 	if (status != CL_SUCCESS)
 	{
-        QMessageBox::warning(this, tr("Error"), "Could not get platform count!");
-        // @todo: fatal error, app should close
-        return;
+        QMessageBox::critical(this, tr("Error"), "Could not get platform count!");
+        exit(EXIT_FAILURE);
     }
 
     std::vector<cl_platform_id> platformIds(numPlatforms);
     status = clGetPlatformIDs(numPlatforms, platformIds.data(), nullptr);
     if (status != CL_SUCCESS)
     {
-        QMessageBox::warning(this, tr("Error"), "Could not read platforms!");
-        return;
+        QMessageBox::critical(this, tr("Error"), "Could not read platforms!");
+        exit(EXIT_FAILURE);
     }
     for (cl_platform_id platformId : platformIds)
     {
-        // @todo: store platform information
-        
-        // @todo: Error checking
         cl_uint numDevices;
         status = clGetDeviceIDs(platformId, CL_DEVICE_TYPE_ALL, 0, nullptr, &numDevices);
         std::vector<cl_device_id> deviceIds(numDevices);
@@ -166,7 +162,8 @@ void MainWindow::getDevices()
     }
     else
     {
-        QMessageBox::warning(this, tr("Error"), "Could not find a device with OpenCL support!");
+        QMessageBox::critical(this, tr("Error"), "Could not find a device with OpenCL support!");
+        exit(EXIT_FAILURE);
     }
 
 }
