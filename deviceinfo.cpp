@@ -41,7 +41,6 @@ bool DeviceInfo::extensionSupported(const char* name)
 
 void DeviceInfo::readDeviceInfoValue(DeviceInfoValueDescriptor descriptor, QString extension)
 {
-	// @todo: return instead of add to map?
 	switch(descriptor.valueType)
 	{
 	case clValueType::cl_bool:
@@ -209,9 +208,8 @@ void DeviceInfo::readDeviceInfoValue(DeviceInfoValueDescriptor descriptor, QStri
 	case clValueType::cl_device_pci_bus_info_khr:
 	{
 		cl_device_pci_bus_info_khr value;
-		clGetDeviceInfo(this->deviceId, descriptor.name, sizeof(cl_device_type), &value, nullptr);
+		clGetDeviceInfo(this->deviceId, descriptor.name, sizeof(cl_device_pci_bus_info_khr), &value, nullptr);
 		DeviceInfoValue infoValue(descriptor.name, QVariant(), extension, descriptor.displayFunction);
-		// @todo: display functions
 		infoValue.addDetailValue("pci_domain", value.pci_domain);
 		infoValue.addDetailValue("pci_bus", value.pci_bus);
 		infoValue.addDetailValue("pci_device", value.pci_device);
