@@ -119,11 +119,39 @@ void DeviceInfo::readDeviceInfoValue(DeviceInfoValueDescriptor descriptor, QStri
 		deviceInfo.push_back(infoValue);
 		break;
 	}
+	case clValueType::cl_int_array:
+	{
+		size_t valueSize;
+		clGetDeviceInfo(this->deviceId, descriptor.name, 0, nullptr, &valueSize);
+		std::vector<cl_int> values;
+		values.resize(valueSize / sizeof(cl_int));
+		clGetDeviceInfo(this->deviceId, descriptor.name, valueSize, &values[0], nullptr);
+		QVariantList variantList;
+		for (auto value : values) {
+			variantList << QVariant::fromValue(value);
+		}
+		deviceInfo.push_back(DeviceInfoValue(descriptor.name, variantList, extension, descriptor.displayFunction));
+		break;
+	}
 	case clValueType::cl_uint:
 	{
 		cl_uint value;
 		clGetDeviceInfo(this->deviceId, descriptor.name, sizeof(cl_uint), &value, nullptr);
 		deviceInfo.push_back(DeviceInfoValue(descriptor.name, value, extension, descriptor.displayFunction));
+		break;
+	}
+	case clValueType::cl_uint_array:
+	{
+		size_t valueSize;
+		clGetDeviceInfo(this->deviceId, descriptor.name, 0, nullptr, &valueSize);
+		std::vector<cl_uint> values;
+		values.resize(valueSize / sizeof(cl_uint));
+		clGetDeviceInfo(this->deviceId, descriptor.name, valueSize, &values[0], nullptr);
+		QVariantList variantList;
+		for (auto value : values) {
+			variantList << QVariant::fromValue(value);
+		}
+		deviceInfo.push_back(DeviceInfoValue(descriptor.name, variantList, extension, descriptor.displayFunction));
 		break;
 	}
 	case clValueType::cl_ulong:
@@ -399,7 +427,7 @@ void DeviceInfo::readDeviceInfo()
 		{ CL_DEVICE_ENDIAN_LITTLE, clValueType::cl_bool, utils::displayBool },
 		{ CL_DEVICE_COMPILER_AVAILABLE, clValueType::cl_bool, utils::displayBool },
 		{ CL_DEVICE_EXECUTION_CAPABILITIES, clValueType::cl_device_exec_capabilities, utils::displayExecCapabilities },
-		// { CL_DEVICE_QUEUE_PROPERTIES, clValueType:: }, @todo
+		{ CL_DEVICE_QUEUE_PROPERTIES, clValueType::cl_command_queue_properties, utils::displayCommandQueueProperties }
 	};
 	for (auto info : infoList)
 	{
@@ -559,16 +587,6 @@ void DeviceInfo::readExtensionInfo()
 			readDeviceInfoValue(info, "cl_khr_image2D_from_buffer");
 		}
 	}
-	// @todo: values not defined in spec?
-	if (extensionSupported("cl_khr_terminate_context")) {
-		std::vector<DeviceInfoValueDescriptor> infoList = {
-			// @todo: bitfield
-			//{ CL_DEVICE_TERMINATE_CAPABILITY_KHR, clValueType::cl_device_terminate_capability_khr },
-		};
-		for (auto info : infoList) {
-			readDeviceInfoValue(info, "cl_khr_terminate_context");
-		}
-	}
 	if (extensionSupported("cl_khr_spir")) {
 		std::vector<DeviceInfoValueDescriptor> infoList = {
 			{ CL_DEVICE_SPIR_VERSIONS, clValueType::cl_char, utils::displayText },
@@ -619,19 +637,19 @@ void DeviceInfo::readExtensionInfo()
 	}
 	
 	// EXT
-	// @todo: types
-	if (extensionSupported("cl_ext_device_fission")) {
-		std::vector<DeviceInfoValueDescriptor> infoList = {
-			{ CL_DEVICE_PARENT_DEVICE_EXT, clValueType::cl_char },
-			{ CL_DEVICE_PARTITION_TYPES_EXT, clValueType::cl_char },
-			{ CL_DEVICE_AFFINITY_DOMAINS_EXT, clValueType::cl_char },
-			{ CL_DEVICE_REFERENCE_COUNT_EXT, clValueType::cl_char },
-			{ CL_DEVICE_PARTITION_STYLE_EXT, clValueType::cl_char },
-		};
-		for (auto info : infoList) {
-			readDeviceInfoValue(info, "cl_ext_device_fission");
-		}
-	}
+	// @todo: Disabled for now, doesn't seem to be well documented
+	//if (extensionSupported("cl_ext_device_fission")) {
+	//	std::vector<DeviceInfoValueDescriptor> infoList = {
+	//		{ CL_DEVICE_PARENT_DEVICE_EXT, clValueType::cl_char },
+	//		{ CL_DEVICE_PARTITION_TYPES_EXT, clValueType::cl_char },
+	//		{ CL_DEVICE_AFFINITY_DOMAINS_EXT, clValueType::cl_char },
+	//		{ CL_DEVICE_REFERENCE_COUNT_EXT, clValueType::cl_char },
+	//		{ CL_DEVICE_PARTITION_STYLE_EXT, clValueType::cl_char },
+	//	};
+	//	for (auto info : infoList) {
+	//		readDeviceInfoValue(info, "cl_ext_device_fission");
+	//	}
+	//}
 	if (extensionSupported("cl_ext_cxx_for_opencl")) {
 		std::vector<DeviceInfoValueDescriptor> infoList = {
 			{ CL_DEVICE_CXX_FOR_OPENCL_NUMERIC_VERSION_EXT, clValueType::cl_char, utils::displayText },
@@ -642,11 +660,6 @@ void DeviceInfo::readExtensionInfo()
 	}
 
 	// ARM
-	/*
-	* @todo: 
-	* cl_arm_job_slot_selection
-	*/
-
 	if (extensionSupported("cl_arm_shared_virtual_memory")) {
 		std::vector<DeviceInfoValueDescriptor> infoList = {
 			{ CL_DEVICE_SVM_CAPABILITIES_ARM, clValueType::cl_device_svm_capabilities, utils::displayDeviceSvmCapabilities },
@@ -674,8 +687,7 @@ void DeviceInfo::readExtensionInfo()
 	if (extensionSupported("cl_arm_scheduling_controls")) {
 		std::vector<DeviceInfoValueDescriptor> infoList = {
 			{ CL_DEVICE_SCHEDULING_CONTROLS_CAPABILITIES_ARM, clValueType::cl_device_scheduling_controls_capabilities_arm, utils::displaySchedulingControlsCapabilitiesARM },
-			//@todo: int[]
-			//{ CL_DEVICE_SUPPORTED_REGISTER_ALLOCATIONS_ARM, clValueType::cl_int[] },
+			{ CL_DEVICE_SUPPORTED_REGISTER_ALLOCATIONS_ARM, clValueType::cl_int_array, utils::displayNumberArray },
 		};
 		for (auto info : infoList) {
 			readDeviceInfoValue(info, "cl_arm_scheduling_controls");
@@ -683,10 +695,6 @@ void DeviceInfo::readExtensionInfo()
 	}
 
 	// INTEL
-	/*
-	* @todo:
-	* cl_intel_device_partition_by_names
-	*/
 	if (extensionSupported("cl_intel_advanced_motion_estimation")) {
 		std::vector<DeviceInfoValueDescriptor> infoList = {
 			{ CL_DEVICE_ME_VERSION_INTEL, clValueType::cl_uint },
@@ -697,8 +705,7 @@ void DeviceInfo::readExtensionInfo()
 	}
 	if (extensionSupported("cl_intel_simultaneous_sharing")) {
 		std::vector<DeviceInfoValueDescriptor> infoList = {
-			// @todo
-			// { CL_DEVICE_SIMULTANEOUS_INTEROPS_INTEL, clValueType::cl_uint[] }, 
+			{ CL_DEVICE_SIMULTANEOUS_INTEROPS_INTEL, clValueType::cl_uint_array, utils::displayNumberArray },
 			{ CL_DEVICE_NUM_SIMULTANEOUS_INTEROPS_INTEL, clValueType::cl_uint },
 		};
 		for (auto info : infoList) {
@@ -767,35 +774,35 @@ void DeviceInfo::readExtensionInfo()
 	}
 
 	// AMD
-	// @todo: types
-	if (extensionSupported("cl_amd_device_attribute_query")) {
-		std::vector<DeviceInfoValueDescriptor> infoList = {
-			{ CL_DEVICE_PROFILING_TIMER_OFFSET_AMD, clValueType::cl_char },
-			{ CL_DEVICE_TOPOLOGY_AMD, clValueType::cl_char },
-			{ CL_DEVICE_BOARD_NAME_AMD, clValueType::cl_char },
-			{ CL_DEVICE_GLOBAL_FREE_MEMORY_AMD, clValueType::cl_char },
-			{ CL_DEVICE_SIMD_PER_COMPUTE_UNIT_AMD, clValueType::cl_char },
-			{ CL_DEVICE_SIMD_WIDTH_AMD, clValueType::cl_char },
-			{ CL_DEVICE_SIMD_INSTRUCTION_WIDTH_AMD, clValueType::cl_char },
-			{ CL_DEVICE_WAVEFRONT_WIDTH_AMD, clValueType::cl_char },
-			{ CL_DEVICE_GLOBAL_MEM_CHANNELS_AMD, clValueType::cl_char },
-			{ CL_DEVICE_GLOBAL_MEM_CHANNEL_BANKS_AMD, clValueType::cl_char },
-			{ CL_DEVICE_GLOBAL_MEM_CHANNEL_BANK_WIDTH_AMD, clValueType::cl_char },
-			{ CL_DEVICE_LOCAL_MEM_SIZE_PER_COMPUTE_UNIT_AMD, clValueType::cl_char },
-			{ CL_DEVICE_LOCAL_MEM_BANKS_AMD, clValueType::cl_char },
-			{ CL_DEVICE_THREAD_TRACE_SUPPORTED_AMD, clValueType::cl_char },
-			{ CL_DEVICE_GFXIP_MAJOR_AMD, clValueType::cl_char },
-			{ CL_DEVICE_GFXIP_MINOR_AMD, clValueType::cl_char },
-			{ CL_DEVICE_AVAILABLE_ASYNC_QUEUES_AMD, clValueType::cl_char },
-			{ CL_DEVICE_PREFERRED_WORK_GROUP_SIZE_AMD, clValueType::cl_char },
-			{ CL_DEVICE_MAX_WORK_GROUP_SIZE_AMD, clValueType::cl_char },
-			{ CL_DEVICE_PREFERRED_CONSTANT_BUFFER_SIZE_AMD, clValueType::cl_char },
-			{ CL_DEVICE_PCIE_ID_AMD, clValueType::cl_char },
-		};
-		for (auto info : infoList) {
-			readDeviceInfoValue(info, "cl_amd_device_attribute_query");
-		}
-	}
+	// @todo: Disabled for now, doesn't seem to be well documented
+	//if (extensionSupported("cl_amd_device_attribute_query")) {
+	//	std::vector<DeviceInfoValueDescriptor> infoList = {
+	//		{ CL_DEVICE_PROFILING_TIMER_OFFSET_AMD, clValueType::cl_char },
+	//		{ CL_DEVICE_TOPOLOGY_AMD, clValueType::cl_char },
+	//		{ CL_DEVICE_BOARD_NAME_AMD, clValueType::cl_char },
+	//		{ CL_DEVICE_GLOBAL_FREE_MEMORY_AMD, clValueType::cl_char },
+	//		{ CL_DEVICE_SIMD_PER_COMPUTE_UNIT_AMD, clValueType::cl_char },
+	//		{ CL_DEVICE_SIMD_WIDTH_AMD, clValueType::cl_char },
+	//		{ CL_DEVICE_SIMD_INSTRUCTION_WIDTH_AMD, clValueType::cl_char },
+	//		{ CL_DEVICE_WAVEFRONT_WIDTH_AMD, clValueType::cl_char },
+	//		{ CL_DEVICE_GLOBAL_MEM_CHANNELS_AMD, clValueType::cl_char },
+	//		{ CL_DEVICE_GLOBAL_MEM_CHANNEL_BANKS_AMD, clValueType::cl_char },
+	//		{ CL_DEVICE_GLOBAL_MEM_CHANNEL_BANK_WIDTH_AMD, clValueType::cl_char },
+	//		{ CL_DEVICE_LOCAL_MEM_SIZE_PER_COMPUTE_UNIT_AMD, clValueType::cl_char },
+	//		{ CL_DEVICE_LOCAL_MEM_BANKS_AMD, clValueType::cl_char },
+	//		{ CL_DEVICE_THREAD_TRACE_SUPPORTED_AMD, clValueType::cl_char },
+	//		{ CL_DEVICE_GFXIP_MAJOR_AMD, clValueType::cl_char },
+	//		{ CL_DEVICE_GFXIP_MINOR_AMD, clValueType::cl_char },
+	//		{ CL_DEVICE_AVAILABLE_ASYNC_QUEUES_AMD, clValueType::cl_char },
+	//		{ CL_DEVICE_PREFERRED_WORK_GROUP_SIZE_AMD, clValueType::cl_char },
+	//		{ CL_DEVICE_MAX_WORK_GROUP_SIZE_AMD, clValueType::cl_char },
+	//		{ CL_DEVICE_PREFERRED_CONSTANT_BUFFER_SIZE_AMD, clValueType::cl_char },
+	//		{ CL_DEVICE_PCIE_ID_AMD, clValueType::cl_char },
+	//	};
+	//	for (auto info : infoList) {
+	//		readDeviceInfoValue(info, "cl_amd_device_attribute_query");
+	//	}
+	//}
 
 	// NV
 	if (extensionSupported("cl_nv_device_attribute_query")) {
@@ -816,7 +823,6 @@ void DeviceInfo::readExtensionInfo()
 
 void DeviceInfo::readSupportedImageFormats()
 {
-	// @todo: check version support
 	std::vector<cl_mem_object_type> imageTypeList = {
 		CL_MEM_OBJECT_IMAGE2D,
 		CL_MEM_OBJECT_IMAGE3D,
@@ -826,7 +832,7 @@ void DeviceInfo::readSupportedImageFormats()
 		CL_MEM_OBJECT_IMAGE1D_ARRAY,
 		CL_MEM_OBJECT_IMAGE1D_BUFFER,
 	};
-	// 
+
 	std::vector<cl_mem_flags> memFlagList = {
 		CL_MEM_READ_WRITE,
 		CL_MEM_READ_ONLY,

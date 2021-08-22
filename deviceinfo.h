@@ -76,7 +76,6 @@ struct DeviceInfoValue
     qint32 enumValue;
     DisplayFn displayFunction = nullptr;
     std::vector<DeviceInfoValueDetailValue> detailValues;
-    // @todo: add display "translation" rule?
     DeviceInfoValue(cl_device_info info, QVariant value, QString extension, DisplayFn displayFunction = nullptr);
     void addDetailValue(QString name, QVariant value, DisplayFn displayFunction = nullptr);
     void addDetailValue(QString name, QString detail, QVariant value, DisplayFn displayFunction = nullptr);
