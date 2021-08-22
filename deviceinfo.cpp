@@ -104,7 +104,6 @@ void DeviceInfo::readDeviceInfoValue(DeviceInfoValueDescriptor descriptor, QStri
 		clGetDeviceInfo(this->deviceId, descriptor.name, 0, nullptr, &valueSize);
 		std::vector<cl_device_partition_property> values;
 		DeviceInfoValue infoValue(descriptor.name, 0, extension, descriptor.displayFunction);
-		infoValue.value = QVariant();
 		if (valueSize > 0) {
 			values.resize(valueSize / sizeof(cl_device_partition_property));
 			// Instead of an empty array, an implementation may also return one element with a value of zero (as a terminator)
@@ -112,7 +111,7 @@ void DeviceInfo::readDeviceInfoValue(DeviceInfoValueDescriptor descriptor, QStri
 				infoValue.value = QVariant::fromValue(values.size());
 				clGetDeviceInfo(this->deviceId, descriptor.name, valueSize, &values[0], nullptr);
 				for (auto& value : values) {
-					infoValue.addDetailValue("", QVariant::fromValue(value) /*@todo*/);
+					infoValue.addDetailValue("", QVariant::fromValue(value), utils::displayDevicePartitionProperties);
 				}
 			}
 		}
@@ -464,11 +463,10 @@ void DeviceInfo::readDeviceInfo()
 			{ CL_DEVICE_BUILT_IN_KERNELS, clValueType::cl_char, utils::displayText },
 			{ CL_DEVICE_IMAGE_MAX_BUFFER_SIZE, clValueType::cl_size_t },
 			{ CL_DEVICE_IMAGE_MAX_ARRAY_SIZE, clValueType::cl_size_t },
-			// { CL_DEVICE_PARENT_DEVICE, clValueType::cl_device_id },
 			{ CL_DEVICE_PARTITION_MAX_SUB_DEVICES, clValueType::cl_uint },
-			{ CL_DEVICE_PARTITION_PROPERTIES, clValueType::cl_device_partition_property_array, utils::displayDevicePartitionProperties },
+			{ CL_DEVICE_PARTITION_PROPERTIES, clValueType::cl_device_partition_property_array, utils::displayDetailValueArraySize },
 			{ CL_DEVICE_PARTITION_AFFINITY_DOMAIN, clValueType::cl_device_affinity_domain, utils::displayDeviceAffinityDomains },
-			{ CL_DEVICE_PARTITION_TYPE, clValueType::cl_device_partition_property_array, utils::displayDevicePartitionProperties },
+			{ CL_DEVICE_PARTITION_TYPE, clValueType::cl_device_partition_property_array, utils::displayDetailValueArraySize },
 			{ CL_DEVICE_REFERENCE_COUNT, clValueType::cl_uint },
 			{ CL_DEVICE_PREFERRED_INTEROP_USER_SYNC, clValueType::cl_bool, utils::displayBool },
 			{ CL_DEVICE_PRINTF_BUFFER_SIZE, clValueType::cl_size_t, utils::displayByteSize },

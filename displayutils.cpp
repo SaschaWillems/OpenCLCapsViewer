@@ -203,10 +203,16 @@ namespace utils
 
     QString displayDevicePartitionProperties(QVariant value)
     {
-        if (value.isNull()) {
-            return "none";
+        switch (value.toInt())
+        {
+#define STR(r) case r: return #r
+            STR(CL_DEVICE_PARTITION_EQUALLY);
+            STR(CL_DEVICE_PARTITION_BY_COUNTS);
+            STR(CL_DEVICE_PARTITION_BY_COUNTS_LIST_END);
+            STR(CL_DEVICE_PARTITION_BY_AFFINITY_DOMAIN);
+#undef STR
+        default: return "unknown";
         }
-        return value.toString();
     }
 
     QString displayDeviceAffinityDomains(QVariant value)
@@ -274,6 +280,11 @@ namespace utils
             };
             return displayFlags(value.toInt(), flags);
         }
+    }
+
+    QString displayDetailValueArraySize(QVariant value)
+    {
+        return QString("[%1]").arg(value.toInt());
     }
 
 }
