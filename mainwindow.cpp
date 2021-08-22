@@ -444,10 +444,6 @@ void MainWindow::checkReportDatabaseState()
     {
         setReportState(state);
     }
-    else
-    {
-        // @todo
-    }
     QApplication::restoreOverrideCursor();
 }
 

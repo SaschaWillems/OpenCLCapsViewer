@@ -58,14 +58,6 @@ QString Database::get(QString url)
 	}
 }
 
-QString Database::encodeUrl(QString url)
-{
-	// @todo: probably not required
-	QString urlStr(url);
-	urlStr.replace("+", "%2B");
-	return urlStr;
-}
-
 bool Database::getReportId(QJsonObject json, int& id)
 {
 	manager = new QNetworkAccessManager(nullptr);
