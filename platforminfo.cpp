@@ -68,7 +68,7 @@ void PlatformInfo::readPlatformInfoValue(cl_platform_info info, clValueType valu
 		break;
 	}
 	default:
-		qDebug("Unknwon platform info type");
+		qDebug("Unknown platform info type");
 	}
 }
 
