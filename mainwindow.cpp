@@ -119,6 +119,7 @@ void MainWindow::getDevices()
         exit(EXIT_FAILURE);
     }
 
+    // Read platforms
     std::vector<cl_platform_id> platformIds(numPlatforms);
     status = clGetPlatformIDs(numPlatforms, platformIds.data(), nullptr);
     if (status != CL_SUCCESS)
@@ -128,17 +129,21 @@ void MainWindow::getDevices()
     }
     for (cl_platform_id platformId : platformIds)
     {
-        cl_uint numDevices;
-        status = clGetDeviceIDs(platformId, CL_DEVICE_TYPE_ALL, 0, nullptr, &numDevices);
-        std::vector<cl_device_id> deviceIds(numDevices);
-        status = clGetDeviceIDs(platformId, CL_DEVICE_TYPE_ALL, numDevices, deviceIds.data(), nullptr);
-
         PlatformInfo platformInfo{};
         platformInfo.platformId = platformId;
         platformInfo.read();
         platforms.push_back(platformInfo);
+    }
 
-        for (auto deviceId : deviceIds) 
+    // Read devices for platforms
+    for (auto& platform : platforms)
+    {
+        cl_uint numDevices;
+        status = clGetDeviceIDs(platform.platformId, CL_DEVICE_TYPE_ALL, 0, nullptr, &numDevices);
+        std::vector<cl_device_id> deviceIds(numDevices);
+        status = clGetDeviceIDs(platform.platformId, CL_DEVICE_TYPE_ALL, numDevices, deviceIds.data(), nullptr);
+
+        for (auto deviceId : deviceIds)
         {
             DeviceInfo deviceInfo{};
             deviceInfo.deviceId = deviceId;
@@ -146,7 +151,6 @@ void MainWindow::getDevices()
             deviceInfo.read();
             devices.push_back(deviceInfo);
         }
-
     }
 
     ui->comboBoxDevice->clear();
