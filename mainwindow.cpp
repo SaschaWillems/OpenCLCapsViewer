@@ -129,7 +129,7 @@ void MainWindow::getDevices()
         QMessageBox::critical(this, tr("Error"), "Could not read platforms!");
         exit(EXIT_FAILURE);
     }
-    qInfo() << "Found " << numPlatforms << " OpenCL platforms";
+    qInfo() << "Found" << numPlatforms << "OpenCL platforms";
     for (cl_platform_id platformId : platformIds)
     {
         PlatformInfo platformInfo{};
@@ -156,7 +156,7 @@ void MainWindow::getDevices()
             QMessageBox::critical(this, tr("Error"), "Could not read devices for the current platform!");
             exit(EXIT_FAILURE);
         }
-        qInfo() << "Found " << numDevices << " OpenCL devices for the current platform OpenCL platform";
+        qInfo() << "Found" << numDevices << "OpenCL device(s) for the current OpenCL platform";
         for (auto deviceId : deviceIds)
         {
             DeviceInfo deviceInfo{};
@@ -191,7 +191,7 @@ void MainWindow::displayDevice(uint32_t index)
 {
     selectedDeviceIndex = index;
     DeviceInfo& device = devices[index];
-    qDebug() << "Displaying device [" << index << "] " << device.identifier.name;
+    qDebug() << "Displaying device" << device.identifier.name;
     displayDeviceExtensions(device);
     displayDeviceInfo(device);
     displayDeviceImageFormats(device);
