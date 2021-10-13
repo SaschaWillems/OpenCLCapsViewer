@@ -867,6 +867,9 @@ void DeviceInfo::readSupportedImageFormats()
 			}
 			clReleaseContext(context);
 		}
+		else {
+			qWarning() << "Could not read supported image formats, error code :" << error;
+		}
 	}
 
 }

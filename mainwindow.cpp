@@ -115,6 +115,7 @@ void MainWindow::getDevices()
 	cl_int status = clGetPlatformIDs(0, nullptr, &numPlatforms);
 	if (status != CL_SUCCESS)
 	{
+        qCritical() << "Could not get platform count!";
         QMessageBox::critical(this, tr("Error"), "Could not get platform count!");
         exit(EXIT_FAILURE);
     }
@@ -124,9 +125,11 @@ void MainWindow::getDevices()
     status = clGetPlatformIDs(numPlatforms, platformIds.data(), nullptr);
     if (status != CL_SUCCESS)
     {
+        qCritical() << "Could not read platforms!";
         QMessageBox::critical(this, tr("Error"), "Could not read platforms!");
         exit(EXIT_FAILURE);
     }
+    qInfo() << "Found " << numPlatforms << " OpenCL platforms";
     for (cl_platform_id platformId : platformIds)
     {
         PlatformInfo platformInfo{};
@@ -138,11 +141,22 @@ void MainWindow::getDevices()
     // Read devices for platforms
     for (auto& platform : platforms)
     {
+        qInfo() << "Reading devices for platform id" << platform.platformId;
         cl_uint numDevices;
         status = clGetDeviceIDs(platform.platformId, CL_DEVICE_TYPE_ALL, 0, nullptr, &numDevices);
+        if (status != CL_SUCCESS) {
+            qCritical() << "Could not read devices for the platform";
+            QMessageBox::critical(this, tr("Error"), "Could not read devices for the current platform!");
+            exit(EXIT_FAILURE);
+        }
         std::vector<cl_device_id> deviceIds(numDevices);
         status = clGetDeviceIDs(platform.platformId, CL_DEVICE_TYPE_ALL, numDevices, deviceIds.data(), nullptr);
-
+        if (status != CL_SUCCESS) {
+            qCritical() << "Could not read devices for the platform";
+            QMessageBox::critical(this, tr("Error"), "Could not read devices for the current platform!");
+            exit(EXIT_FAILURE);
+        }
+        qInfo() << "Found " << numDevices << " OpenCL devices for the current platform OpenCL platform";
         for (auto deviceId : deviceIds)
         {
             DeviceInfo deviceInfo{};
@@ -166,6 +180,7 @@ void MainWindow::getDevices()
     }
     else
     {
+        qCritical() << "Could not find a device with OpenCL support!";
         QMessageBox::critical(this, tr("Error"), "Could not find a device with OpenCL support!");
         exit(EXIT_FAILURE);
     }
@@ -176,6 +191,7 @@ void MainWindow::displayDevice(uint32_t index)
 {
     selectedDeviceIndex = index;
     DeviceInfo& device = devices[index];
+    qDebug() << "Displaying device [" << index << "] " << device.identifier.name;
     displayDeviceExtensions(device);
     displayDeviceInfo(device);
     displayDeviceImageFormats(device);
