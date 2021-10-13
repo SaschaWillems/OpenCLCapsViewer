@@ -147,7 +147,7 @@ void MainWindow::getDevices()
         {
             DeviceInfo deviceInfo{};
             deviceInfo.deviceId = deviceId;
-            deviceInfo.platform = &platforms.back();
+            deviceInfo.platform = &platform;
             deviceInfo.read();
             devices.push_back(deviceInfo);
         }
