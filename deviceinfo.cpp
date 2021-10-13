@@ -26,7 +26,7 @@ QString DeviceInfo::getDeviceInfoString(cl_device_info info)
 	clGetDeviceInfo(this->deviceId, info, 0, nullptr, &valueSize);
 	char* value = new char[valueSize];
 	clGetDeviceInfo(this->deviceId, info, valueSize, &value[0], nullptr);
-	return QString::fromUtf8(value);
+	return QString::fromUtf8(value).trimmed();
 }
 
 bool DeviceInfo::extensionSupported(const char* name)
@@ -56,7 +56,7 @@ void DeviceInfo::readDeviceInfoValue(DeviceInfoValueDescriptor descriptor, QStri
 		clGetDeviceInfo(this->deviceId, descriptor.name, 0, nullptr, &valueSize);
 		char* value = new char[valueSize];
 		clGetDeviceInfo(this->deviceId, descriptor.name, valueSize, &value[0], nullptr);
-		deviceInfo.push_back(DeviceInfoValue(descriptor.name, QString::fromUtf8(value), extension, descriptor.displayFunction));
+		deviceInfo.push_back(DeviceInfoValue(descriptor.name, QString::fromUtf8(value).trimmed(), extension, descriptor.displayFunction));
 		delete[] value;
 		break;
 	}
@@ -293,6 +293,7 @@ void DeviceInfo::readDeviceInfoValue(DeviceInfoValueDescriptor descriptor, QStri
 	/* Special cases */
 	case clValueType::special:
 	{
+		bool knownValue = false;
 		switch (descriptor.name)
 		{
 		case CL_DEVICE_MAX_WORK_ITEM_SIZES:
@@ -306,6 +307,7 @@ void DeviceInfo::readDeviceInfoValue(DeviceInfoValueDescriptor descriptor, QStri
                 variantList << QVariant::fromValue(dimension);
 			}
 			deviceInfo.push_back(DeviceInfoValue(descriptor.name, variantList, extension, utils::displayNumberArray));
+			knownValue = true;
 			break;
 		}
 		case CL_DEVICE_UUID_KHR:
@@ -320,9 +322,11 @@ void DeviceInfo::readDeviceInfoValue(DeviceInfoValueDescriptor descriptor, QStri
 				if (i == 3 || i == 5 || i == 7 || i == 9) os << '-';
 			}
 			deviceInfo.push_back(DeviceInfoValue(descriptor.name, QString::fromStdString(os.str()), extension, descriptor.displayFunction));
+			knownValue = true;
 			break;
 		}
 		case CL_DEVICE_LUID_KHR:
+		{
 			cl_uchar uuid[CL_LUID_SIZE_KHR];
 			clGetDeviceInfo(this->deviceId, descriptor.name, sizeof(uuid), &uuid, nullptr);
 			std::ostringstream os;
@@ -331,6 +335,11 @@ void DeviceInfo::readDeviceInfoValue(DeviceInfoValueDescriptor descriptor, QStri
 				os << std::right << std::setw(2) << std::setfill('0') << static_cast<unsigned short>(uuid[i]);
 			}
 			deviceInfo.push_back(DeviceInfoValue(descriptor.name, QString::fromStdString(os.str()), extension, descriptor.displayFunction));
+			knownValue = true;
+			break;
+		}
+		}
+		if (knownValue) {
 			break;
 		}
 	}
