@@ -67,6 +67,12 @@ namespace utils
         return "[" + imploded + "]";
     }
 
+    QString displayHex(QVariant value)
+    {
+        QString hexPart = QString("%1").arg(value.toInt(), 4, 16, QLatin1Char('0'));
+        return QString("0x%1").arg(hexPart.toUpper());
+    }
+
     QString displayByteSize(QVariant value)
     {
         return QString("%L1 bytes").arg(value.toUInt());

@@ -394,6 +394,7 @@ void DeviceInfo::readDeviceInfo()
 		{ CL_DEVICE_NAME, clValueType::cl_char },
 		{ CL_DEVICE_TYPE, clValueType::cl_device_type, utils::displayDeviceType },
 		{ CL_DEVICE_VENDOR_ID, clValueType::cl_uint },
+		{ CL_DEVICE_VENDOR_ID, clValueType::cl_uint, utils::displayHex },
 		{ CL_DEVICE_VENDOR, clValueType::cl_char },
 		{ CL_DRIVER_VERSION, clValueType::cl_char },
 		{ CL_DEVICE_PROFILE, clValueType::cl_char },
