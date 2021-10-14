@@ -20,6 +20,7 @@
 
 #include "CL/cl.h"
 #include <QVariant>
+#include <QDebug>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>

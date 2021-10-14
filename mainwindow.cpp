@@ -159,6 +159,7 @@ void MainWindow::getDevices()
         qInfo() << "Found" << numDevices << "OpenCL device(s) for the current OpenCL platform";
         for (auto deviceId : deviceIds)
         {
+            qInfo() << "Reading properties for device" << deviceId;
             DeviceInfo deviceInfo{};
             deviceInfo.deviceId = deviceId;
             deviceInfo.platform = &platform;
@@ -447,12 +448,14 @@ void MainWindow::setReportState(ReportState state)
 
 void MainWindow::checkReportDatabaseState()
 {
+    qInfo() << "Checking report state against database for device" << devices[selectedDeviceIndex].identifier.name;
     ui->labelReportDatabaseState->setText("<font color='#000000'>Connecting to database...</font>");
     ui->toolButtonOnlineDevice->setEnabled(false);
     QApplication::setOverrideCursor(Qt::WaitCursor);
     QString message;
     if (!database.checkServerConnection(message))
     {
+        qInfo() << "Unable to reach server";
         ui->labelReportDatabaseState->setText("<font color='#FF0000'>Could not connect to the database!\n\nPlease check your internet connection and proxy settings!</font>");
         QApplication::restoreOverrideCursor();
         return;
@@ -462,6 +465,7 @@ void MainWindow::checkReportDatabaseState()
     ReportState state;
     if (database.getReportState(jsonReport, state))
     {
+        qInfo() << "Got valid state from database";
         setReportState(state);
     }
     QApplication::restoreOverrideCursor();

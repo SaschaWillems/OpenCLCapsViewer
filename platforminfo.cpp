@@ -41,6 +41,7 @@ void PlatformInfo::readOpenCLVersion()
 
 void PlatformInfo::readPlatformInfoValue(cl_platform_info info, clValueType valueType, QString extension)
 {
+	qInfo() << "Reading platform info value for" << utils::platformInfoString(info);
 	switch (valueType)
 	{
 	case clValueType::cl_char:
@@ -76,6 +77,7 @@ void PlatformInfo::readExtensions()
 {
 	extensions.clear();
 	if (clVersionMajor >= 3) {
+		qInfo() << "Reading platform extension list with versions (CL >=3.0) for platform" << platformId;
 		size_t extSize;
 		clGetPlatformInfo(this->platformId, CL_PLATFORM_EXTENSIONS_WITH_VERSION, 0, nullptr, &extSize);
 		cl_name_version* extensions = new cl_name_version[4096];
@@ -88,6 +90,7 @@ void PlatformInfo::readExtensions()
 		}
 		delete[] extensions;
 	} else {
+		qInfo() << "Reading platform extension list (CL <3.0) for platform" << platformId;
 		size_t extStrSize;
 		clGetPlatformInfo(this->platformId, CL_PLATFORM_EXTENSIONS, 0, nullptr, &extStrSize);
 		std::string extensionString;
@@ -146,6 +149,7 @@ void PlatformInfo::read()
 
 void PlatformInfo::readExtensionInfo()
 {
+	qInfo() << "Reading extension info values for platform" << platformId;
 	// KHR
 	if (extensionSupported("cl_khr_icd")) {
 		std::unordered_map<cl_device_info, clValueType> infoList = {

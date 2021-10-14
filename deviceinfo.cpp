@@ -41,6 +41,7 @@ bool DeviceInfo::extensionSupported(const char* name)
 
 void DeviceInfo::readDeviceInfoValue(DeviceInfoValueDescriptor descriptor, QString extension)
 {
+	qInfo() << "Reading device info value for" << utils::deviceInfoString(descriptor.name);
 	switch(descriptor.valueType)
 	{
 	case clValueType::cl_bool:
@@ -382,6 +383,7 @@ void DeviceInfo::readDeviceIdentifier()
 #endif
 	identifier.driverVersion = getDeviceInfoString(CL_DRIVER_VERSION);
 	identifier.deviceVersion = getDeviceInfoString(CL_DEVICE_VERSION);
+	qInfo() << "Device identifier is" << identifier.name;
 }
 
 void DeviceInfo::readDeviceInfo()
@@ -542,6 +544,7 @@ void DeviceInfo::readDeviceInfo()
 
 void DeviceInfo::readOpenCLVersion()
 {
+	qInfo() << "Reading OpenCL version for device" << deviceId;
 	size_t valueSize;
 	clGetDeviceInfo(this->deviceId, CL_DEVICE_VERSION, 0, nullptr, &valueSize);
 	std::string value;
@@ -560,6 +563,7 @@ void DeviceInfo::readOpenCLVersion()
 
 void DeviceInfo::readExtensionInfo()
 {
+	qInfo() << "Reading extension info values for device" << deviceId;
 	// KHR
 	if (extensionSupported("cl_khr_fp64")) {
 		std::vector<DeviceInfoValueDescriptor> infoList = {
@@ -830,6 +834,7 @@ void DeviceInfo::readExtensionInfo()
 
 void DeviceInfo::readSupportedImageFormats()
 {
+	qInfo() << "Reading supported image formats for device" << deviceId;
 	std::vector<cl_mem_object_type> imageTypeList = {
 		CL_MEM_OBJECT_IMAGE2D,
 		CL_MEM_OBJECT_IMAGE3D,
@@ -858,6 +863,7 @@ void DeviceInfo::readSupportedImageFormats()
 				for (auto& memFlag : memFlagList) {
 					cl_uint numSupportedFormats;
 					clGetSupportedImageFormats(context, memFlag, imgType, 0, nullptr, &numSupportedFormats);
+					qInfo() << "Found" << numSupportedFormats << "supported image formats for image type" << imgType << "and memory flag type" << memFlag;
 					std::vector<cl_image_format> imageFormats(numSupportedFormats);
 					clGetSupportedImageFormats(context, memFlag, imgType, numSupportedFormats, imageFormats.data(), nullptr);
 					for (auto& imageFormat : imageFormats) {
@@ -975,6 +981,7 @@ void DeviceInfo::readExtensions()
 {
 	extensions.clear();
 	if (clVersionMajor >= 3) {
+		qInfo() << "Reading device extension list with versions (CL >=3.0) for device" << deviceId;
 		size_t extSize;
 		clGetDeviceInfo(this->deviceId, CL_DEVICE_EXTENSIONS_WITH_VERSION, 0, nullptr, &extSize);
 		cl_name_version* extensions = new cl_name_version[4096];
@@ -987,6 +994,7 @@ void DeviceInfo::readExtensions()
 		}
 		delete[] extensions;
 	} else {
+		qInfo() << "Reading device extension list (CL <3.0) for device" << deviceId;
 		size_t extStrSize;
 		clGetDeviceInfo(this->deviceId, CL_DEVICE_EXTENSIONS, 0, nullptr, &extStrSize);
 		std::string extensionString;
