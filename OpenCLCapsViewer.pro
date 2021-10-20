@@ -19,6 +19,7 @@ SOURCES += \
     mainwindow.cpp \
     database.cpp \
     deviceinfo.cpp \
+    openclfunctions.cpp \
     platforminfo.cpp \
     treeproxyfilter.cpp \
     submitdialog.cpp \
@@ -30,6 +31,7 @@ HEADERS += \
     mainwindow.h \
     database.h \
     deviceinfo.h \
+    openclfunctions.h \
     platforminfo.h \
     treeproxyfilter.h \
     submitdialog.h \
@@ -47,7 +49,7 @@ win32 {
 }
 
 linux:!android {
-    LIBS += -lOpenCL
+    # LIBS += -lOpenCL
     contains(DEFINES, X11) {
         message("Building for X11")
         QT += x11extras
@@ -81,7 +83,7 @@ android {
         android/build.gradle \
         android/res/values/libs.xml
 
-    LIBS += $$PWD/libs/android/arm-v8a/libOpenCL.so
+#    LIBS += $$PWD/libs/android/arm-v8a/libOpenCL.so
 }
 
 # Default rules for deployment.

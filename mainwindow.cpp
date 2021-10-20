@@ -20,6 +20,10 @@
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "openclfunctions.h"
+#if defined(__ANDROID__)
+#include <dlfcn.h>
+#endif
 
 const QString MainWindow::version = "1.0";
 const QString MainWindow::reportVersion = "1.0";
@@ -36,6 +40,58 @@ MainWindow::MainWindow(QWidget *parent)
     qApp->setStyle(QStyleFactory::create("Fusion"));
 
     appSettings.restore();
+
+    // Check if OpenCL is supported
+    // @todo: wip
+    bool openCLFound = false;
+    QString reason = "";
+
+#if defined(__ANDROID__)
+    qDebug() << "Loading lib";
+    // @todo: only 64 bit?
+    static const char *opencl_library_paths[] = {
+      "/system/lib64/libOpenCL.so",
+      "/system/vendor/lib64/libOpenCL.so",
+      "/system/vendor/lib64/egl/libGLES_mali.so",
+      "/system/vendor/lib64/libPVROCL.so",
+      "/data/data/org.pocl.libs/files/lib64/libpocl.so",
+      "/system/lib/libOpenCL.so",
+      "/system/vendor/lib/libOpenCL.so",
+      "/system/vendor/lib/egl/libGLES_mali.so",
+      "/system/vendor/lib/libPVROCL.so",
+      "/data/data/org.pocl.libs/files/lib/libpocl.so",
+      "libOpenCL.so"
+    };
+    void *libOpenCL = nullptr;
+    for (auto lib_path : opencl_library_paths) {
+        qInfo() << "Trying to load library from" << lib_path;
+        libOpenCL = dlopen(lib_path, RTLD_LAZY);
+        if (libOpenCL) {
+            qInfo() << "Found library in " << lib_path;
+            break;
+        }
+    }
+    if (libOpenCL) {
+        openCLFound = true;
+        PFN_clGetPlatformIDs test_fn = (PFN_clGetPlatformIDs)dlsym(libOpenCL, "clGetPlatformIDs");
+        if (test_fn) {
+            openCLFound = true;
+            loadFunctionPointers(libOpenCL);
+        } else {
+            openCLFound = false;
+            reason = "Could not get function pointer";
+        }
+
+    } else {
+       reason = "No OpenCL library";
+    }
+    // @todo: func pointer
+#endif
+    if (!openCLFound)
+    {
+        QMessageBox::warning(this, "Error", "Could not get valid OpenCL function pointers. OpenCL does not seem to be supported by this device:\n" + reason);
+        exit(EXIT_FAILURE);
+    }
 
     // Models
     ui->treeViewDeviceInfo->setModel(&filterProxies.deviceinfo);
@@ -112,7 +168,7 @@ MainWindow::~MainWindow()
 void MainWindow::getDevices()
 {
 	cl_uint numPlatforms;
-	cl_int status = clGetPlatformIDs(0, nullptr, &numPlatforms);
+    cl_int status = _clGetPlatformIDs(0, nullptr, &numPlatforms);
 	if (status != CL_SUCCESS)
 	{
         qCritical() << "Could not get platform count!";
@@ -122,7 +178,7 @@ void MainWindow::getDevices()
 
     // Read platforms
     std::vector<cl_platform_id> platformIds(numPlatforms);
-    status = clGetPlatformIDs(numPlatforms, platformIds.data(), nullptr);
+    status = _clGetPlatformIDs(numPlatforms, platformIds.data(), nullptr);
     if (status != CL_SUCCESS)
     {
         qCritical() << "Could not read platforms!";
@@ -143,14 +199,14 @@ void MainWindow::getDevices()
     {
         qInfo() << "Reading devices for platform id" << platform.platformId;
         cl_uint numDevices;
-        status = clGetDeviceIDs(platform.platformId, CL_DEVICE_TYPE_ALL, 0, nullptr, &numDevices);
+        status = _clGetDeviceIDs(platform.platformId, CL_DEVICE_TYPE_ALL, 0, nullptr, &numDevices);
         if (status != CL_SUCCESS) {
             qCritical() << "Could not read devices for the platform";
             QMessageBox::critical(this, tr("Error"), "Could not read devices for the current platform!");
             exit(EXIT_FAILURE);
         }
         std::vector<cl_device_id> deviceIds(numDevices);
-        status = clGetDeviceIDs(platform.platformId, CL_DEVICE_TYPE_ALL, numDevices, deviceIds.data(), nullptr);
+        status = _clGetDeviceIDs(platform.platformId, CL_DEVICE_TYPE_ALL, numDevices, deviceIds.data(), nullptr);
         if (status != CL_SUCCESS) {
             qCritical() << "Could not read devices for the platform";
             QMessageBox::critical(this, tr("Error"), "Could not read devices for the current platform!");
