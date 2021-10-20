@@ -44,12 +44,9 @@ FORMS += \
 INCLUDEPATH += "external/OpenCL-Headers"
 
 win32 {
-# todo
-    LIBS += "$$PWD\libs\windows\x64\OpenCL.lib"
 }
 
 linux:!android {
-    # LIBS += -lOpenCL
     contains(DEFINES, X11) {
         message("Building for X11")
         QT += x11extras
@@ -82,8 +79,6 @@ android {
         android/AndroidManifest.xml \
         android/build.gradle \
         android/res/values/libs.xml
-
-#    LIBS += $$PWD/libs/android/arm-v8a/libOpenCL.so
 }
 
 # Default rules for deployment.
