@@ -7,6 +7,8 @@
 #include <QDebug>
 #if defined(__ANDROID__)
 #include <dlfcn.h>
+#elif defined(_WIN32)
+#include "windows.h"
 #endif
 
 typedef void (*F_PFN_notify)(const char *, const void *, size_t, void *);

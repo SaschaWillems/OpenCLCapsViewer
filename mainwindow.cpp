@@ -21,9 +21,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "openclfunctions.h"
-#if defined(__ANDROID__)
-#include <dlfcn.h>
-#endif
 
 const QString MainWindow::version = "1.0";
 const QString MainWindow::reportVersion = "1.0";
@@ -42,8 +39,7 @@ MainWindow::MainWindow(QWidget *parent)
     appSettings.restore();
 
     // Check if OpenCL is supported
-    // @todo: wip
-    bool openCLFound = false;
+    bool openCLAvailable = false;
     QString reason = "";
 
 #if defined(__ANDROID__)
@@ -72,22 +68,31 @@ MainWindow::MainWindow(QWidget *parent)
         }
     }
     if (libOpenCL) {
-        openCLFound = true;
         PFN_clGetPlatformIDs test_fn = (PFN_clGetPlatformIDs)dlsym(libOpenCL, "clGetPlatformIDs");
         if (test_fn) {
-            openCLFound = true;
+            openCLAvailable = true;
             loadFunctionPointers(libOpenCL);
         } else {
-            openCLFound = false;
             reason = "Could not get function pointer";
         }
-
     } else {
-       reason = "No OpenCL library";
+       reason = "Could not find a OpenCL library";
     }
-    // @todo: func pointer
+#elif defined(_WIN32)
+    HMODULE libOpenCL = LoadLibraryA("OpenCL.dll");
+    if (libOpenCL) {
+        PFN_clGetPlatformIDs test_fn = reinterpret_cast<PFN_clGetPlatformIDs>(GetProcAddress((HMODULE)libOpenCL, "clGetPlatformIDs"));
+        if (test_fn) {
+            openCLAvailable = true;
+            loadFunctionPointers(libOpenCL);
+        } else {
+            reason = "Could not get function pointer";
+        }
+    } else {
+        reason = "Could not find a OpenCL library";
+    }
 #endif
-    if (!openCLFound)
+    if (!openCLAvailable)
     {
         QMessageBox::warning(this, "Error", "Could not get valid OpenCL function pointers. OpenCL does not seem to be supported by this device:\n" + reason);
         exit(EXIT_FAILURE);

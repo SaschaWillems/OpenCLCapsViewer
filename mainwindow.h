@@ -21,6 +21,12 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#if defined(__ANDROID__)
+#include <dlfcn.h>
+#elif defined(_WIN32)
+#include <windows.h>
+#endif
+
 #include <QMainWindow>
 #include <QMessageBox>
 #include <QStandardItemModel>
