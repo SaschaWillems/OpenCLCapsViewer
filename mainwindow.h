@@ -106,6 +106,8 @@ private:
 
     Database database;
 
+    bool checkOpenCLAvailability(QString &error);
+
     void connectFilterAndModel(QStandardItemModel& model, TreeProxyFilter& filter);
 
     void displayDeviceInfo(DeviceInfo &device);

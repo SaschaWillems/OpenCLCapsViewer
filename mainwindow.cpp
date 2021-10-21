@@ -25,6 +25,100 @@
 const QString MainWindow::version = "1.0";
 const QString MainWindow::reportVersion = "1.0";
 
+bool MainWindow::checkOpenCLAvailability(QString &error)
+{
+    // Check if OpenCL is supported by trying to load the OpenCL library and getting a valid function pointer
+    bool openCLAvailable = false;
+    error = "";
+
+#if defined(__ANDROID__)
+    // Try to find the OepenCL library on one of the following paths
+    static const char *libraryPaths[] = {
+        // Generic
+        "/system/vendor/lib64/libOpenCL.so",
+        "/system/lib64/libOpenCL.so",
+        "/system/vendor/lib/libOpenCL.so",
+        "/system/lib/libOpenCL.so",
+        // ARM Mali
+        "/system/vendor/lib64/egl/libGLES_mali.so",
+        "/system/lib64/egl/libGLES_mali.so",
+        "/system/vendor/lib/egl/libGLES_mali.so",
+        "/system/lib/egl/libGLES_mali.so",
+        // PowerVR
+        "/system/vendor/lib64/libPVROCL.so",
+        "/system/lib64/libPVROCL.so",
+        "/system/vendor/lib/libPVROCL.so",
+        "/system/lib/libPVROCL.so"
+    };
+    void *libOpenCL = nullptr;
+    for (auto libraryPath : libraryPaths) {
+        qInfo() << "Trying to load library from" << libraryPath;
+        libOpenCL = dlopen(libraryPath, RTLD_LAZY);
+        if (libOpenCL) {
+            qInfo() << "Found library in " << libraryPath;
+            break;
+        }
+    }
+    if (libOpenCL) {
+        // OpenCl library loaded, now try to get a function pointer to check if it works
+        PFN_clGetPlatformIDs test_fn = reinterpret_cast<PFN_clGetPlatformIDs>(dlsym(libOpenCL, "clGetPlatformIDs"));
+        if (test_fn) {
+            openCLAvailable = true;
+            loadFunctionPointers(libOpenCL);
+        } else {
+            error = "Could not get function pointer";
+        }
+    } else {
+       error = "Could not find a OpenCL library";
+    }
+#elif defined(__linux__)
+    // Try to find the OepenCL library on one of the following paths
+    static const char *libraryPaths[] = {
+      "/usr/lib/libOpenCL.so",
+      "/usr/local/lib/libOpenCL.so",
+      "/usr/local/lib/libpocl.so",
+      "/usr/lib64/libOpenCL.so",
+      "/usr/lib32/libOpenCL.so",
+      "libOpenCL.so"
+    };
+    void *libOpenCL = nullptr;
+    for (auto libraryPath : libraryPaths) {
+        qInfo() << "Trying to load library from" << libraryPath;
+        libOpenCL = dlopen(libraryPath, RTLD_LAZY);
+        if (libOpenCL) {
+            qInfo() << "Found library in " << libraryPath;
+            break;
+        }
+    }
+    if (libOpenCL) {
+        // OpenCl library loaded, now try to get a function pointer to check if it works
+        PFN_clGetPlatformIDs test_fn = reinterpret_cast<PFN_clGetPlatformIDs>(dlsym(libOpenCL, "clGetPlatformIDs"));
+        if (test_fn) {
+            openCLAvailable = true;
+            loadFunctionPointers(libOpenCL);
+        } else {
+            error = "Could not get function pointer";
+        }
+    } else {
+       error = "Could not find a OpenCL library";
+    }
+#elif defined(_WIN32)
+    HMODULE libOpenCL = LoadLibraryA("OpenCL.dll");
+    if (libOpenCL) {
+        PFN_clGetPlatformIDs test_fn = reinterpret_cast<PFN_clGetPlatformIDs>(GetProcAddress((HMODULE)libOpenCL, "clGetPlatformIDsx"));
+        if (test_fn) {
+            openCLAvailable = true;
+            loadFunctionPointers(libOpenCL);
+        } else {
+            error = "Could not get function pointer";
+        }
+    } else {
+        error = "Could not find a OpenCL library";
+    }
+#endif
+    return openCLAvailable;
+}
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -38,63 +132,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     appSettings.restore();
 
-    // Check if OpenCL is supported
-    bool openCLAvailable = false;
-    QString reason = "";
-
-#if defined(__ANDROID__)
-    qDebug() << "Loading lib";
-    // @todo: only 64 bit?
-    static const char *opencl_library_paths[] = {
-      "/system/lib64/libOpenCL.so",
-      "/system/vendor/lib64/libOpenCL.so",
-      "/system/vendor/lib64/egl/libGLES_mali.so",
-      "/system/vendor/lib64/libPVROCL.so",
-      "/data/data/org.pocl.libs/files/lib64/libpocl.so",
-      "/system/lib/libOpenCL.so",
-      "/system/vendor/lib/libOpenCL.so",
-      "/system/vendor/lib/egl/libGLES_mali.so",
-      "/system/vendor/lib/libPVROCL.so",
-      "/data/data/org.pocl.libs/files/lib/libpocl.so",
-      "libOpenCL.so"
-    };
-    void *libOpenCL = nullptr;
-    for (auto lib_path : opencl_library_paths) {
-        qInfo() << "Trying to load library from" << lib_path;
-        libOpenCL = dlopen(lib_path, RTLD_LAZY);
-        if (libOpenCL) {
-            qInfo() << "Found library in " << lib_path;
-            break;
-        }
-    }
-    if (libOpenCL) {
-        PFN_clGetPlatformIDs test_fn = (PFN_clGetPlatformIDs)dlsym(libOpenCL, "clGetPlatformIDs");
-        if (test_fn) {
-            openCLAvailable = true;
-            loadFunctionPointers(libOpenCL);
-        } else {
-            reason = "Could not get function pointer";
-        }
-    } else {
-       reason = "Could not find a OpenCL library";
-    }
-#elif defined(_WIN32)
-    HMODULE libOpenCL = LoadLibraryA("OpenCL.dll");
-    if (libOpenCL) {
-        PFN_clGetPlatformIDs test_fn = reinterpret_cast<PFN_clGetPlatformIDs>(GetProcAddress((HMODULE)libOpenCL, "clGetPlatformIDs"));
-        if (test_fn) {
-            openCLAvailable = true;
-            loadFunctionPointers(libOpenCL);
-        } else {
-            reason = "Could not get function pointer";
-        }
-    } else {
-        reason = "Could not find a OpenCL library";
-    }
-#endif
-    if (!openCLAvailable)
+    QString error;
+    if (!checkOpenCLAvailability(error))
     {
-        QMessageBox::warning(this, "Error", "Could not get valid OpenCL function pointers. OpenCL does not seem to be supported by this device:\n" + reason);
+        QMessageBox::warning(this, "Error", "OpenCL does not seem to be supported on this platform:\n" + error);
         exit(EXIT_FAILURE);
     }
 
