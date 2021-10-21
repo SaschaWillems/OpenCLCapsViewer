@@ -55,7 +55,7 @@ bool MainWindow::checkOpenCLAvailability(QString &error)
         qInfo() << "Trying to load library from" << libraryPath;
         libOpenCL = dlopen(libraryPath, RTLD_LAZY);
         if (libOpenCL) {
-            qInfo() << "Found library in " << libraryPath;
+            qInfo() << "Found library in" << libraryPath;
             break;
         }
     }
@@ -74,19 +74,19 @@ bool MainWindow::checkOpenCLAvailability(QString &error)
 #elif defined(__linux__)
     // Try to find the OepenCL library on one of the following paths
     static const char *libraryPaths[] = {
-      "/usr/lib/libOpenCL.so",
-      "/usr/local/lib/libOpenCL.so",
-      "/usr/local/lib/libpocl.so",
-      "/usr/lib64/libOpenCL.so",
-      "/usr/lib32/libOpenCL.so",
-      "libOpenCL.so"
+        "libOpenCL.so",
+        "/usr/lib/libOpenCL.so",
+        "/usr/local/lib/libOpenCL.so",
+        "/usr/local/lib/libpocl.so",
+        "/usr/lib64/libOpenCL.so",
+        "/usr/lib32/libOpenCL.so"
     };
     void *libOpenCL = nullptr;
     for (auto libraryPath : libraryPaths) {
         qInfo() << "Trying to load library from" << libraryPath;
         libOpenCL = dlopen(libraryPath, RTLD_LAZY);
         if (libOpenCL) {
-            qInfo() << "Found library in " << libraryPath;
+            qInfo() << "Found library in" << libraryPath;
             break;
         }
     }

@@ -25,7 +25,7 @@
 
 #include <CL/cl.h>
 #include <QDebug>
-#if defined(__ANDROID__)
+#if defined(__linux__)
 #include <dlfcn.h>
 #elif defined(_WIN32)
 #include "windows.h"

@@ -58,6 +58,7 @@ linux:!android {
         DEFINES += VK_USE_PLATFORM_WAYLAND_KHR
     }
     target.path = /usr/bin
+    LIBS += -ldl
     INSTALLS += target
     desktop.files = OpenCLCapsViewer.desktop
     desktop.path = /usr/share/applications
