@@ -105,7 +105,7 @@ bool MainWindow::checkOpenCLAvailability(QString &error)
 #elif defined(_WIN32)
     HMODULE libOpenCL = LoadLibraryA("OpenCL.dll");
     if (libOpenCL) {
-        PFN_clGetPlatformIDs test_fn = reinterpret_cast<PFN_clGetPlatformIDs>(GetProcAddress((HMODULE)libOpenCL, "clGetPlatformIDsx"));
+        PFN_clGetPlatformIDs test_fn = reinterpret_cast<PFN_clGetPlatformIDs>(GetProcAddress((HMODULE)libOpenCL, "clGetPlatformIDs"));
         if (test_fn) {
             openCLAvailable = true;
             loadFunctionPointers(libOpenCL);
