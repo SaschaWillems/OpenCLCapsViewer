@@ -63,10 +63,11 @@ bool MainWindow::checkOpenCLAvailability(QString &error)
         // OpenCl library loaded, now try to get a function pointer to check if it works
         PFN_clGetPlatformIDs test_fn = reinterpret_cast<PFN_clGetPlatformIDs>(dlsym(libOpenCL, "clGetPlatformIDs"));
         if (test_fn) {
+            qInfo() << "Got valid function pointer for clGetPlatformIDs";
             openCLAvailable = true;
             loadFunctionPointers(libOpenCL);
         } else {
-            error = "Could not get function pointer";
+            error = "Could not get a valid function pointer";
         }
     } else {
        error = "Could not find a OpenCL library";
@@ -94,10 +95,11 @@ bool MainWindow::checkOpenCLAvailability(QString &error)
         // OpenCl library loaded, now try to get a function pointer to check if it works
         PFN_clGetPlatformIDs test_fn = reinterpret_cast<PFN_clGetPlatformIDs>(dlsym(libOpenCL, "clGetPlatformIDs"));
         if (test_fn) {
+            qInfo() << "Got valid function pointer for clGetPlatformIDs";
             openCLAvailable = true;
             loadFunctionPointers(libOpenCL);
         } else {
-            error = "Could not get function pointer";
+            error = "Could not get a valid function pointer";
         }
     } else {
        error = "Could not find a OpenCL library";
@@ -105,17 +107,24 @@ bool MainWindow::checkOpenCLAvailability(QString &error)
 #elif defined(_WIN32)
     HMODULE libOpenCL = LoadLibraryA("OpenCL.dll");
     if (libOpenCL) {
+        char libPath[MAX_PATH] = { 0 };
+        GetModuleFileNameA(libOpenCL, libPath, sizeof(libPath));
+        qInfo() << "Found library in" << libPath;
         PFN_clGetPlatformIDs test_fn = reinterpret_cast<PFN_clGetPlatformIDs>(GetProcAddress((HMODULE)libOpenCL, "clGetPlatformIDs"));
         if (test_fn) {
+            qInfo() << "Got valid function pointer for clGetPlatformIDs";
             openCLAvailable = true;
             loadFunctionPointers(libOpenCL);
         } else {
-            error = "Could not get function pointer";
+            error = "Could not get a valid function pointer";
         }
     } else {
         error = "Could not find a OpenCL library";
     }
 #endif
+    if (error != "") {
+        qCritical() << error;
+    }
     return openCLAvailable;
 }
 
