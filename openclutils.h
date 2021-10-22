@@ -54,6 +54,8 @@ enum class clValueType {
 	cl_device_controlled_termination_capabilities_arm,
 	cl_device_scheduling_controls_capabilities_arm,
 	cl_queue_family_properties_intel,
+	cl_device_integer_dot_product_capabilities_khr,
+	cl_device_integer_dot_product_acceleration_properties_khr,
 	special
 };
 
@@ -199,12 +201,16 @@ namespace utils
 			STR(CL_DEVICE_OPENCL_C_NUMERIC_VERSION_KHR);
 			// cl_khr_fp16
 			STR(CL_DEVICE_HALF_FP_CONFIG);
-			// cl_lhr_spir
+			// cl_khr_spir
 			STR(CL_DEVICE_SPIR_VERSIONS);
 			// STR(DEVICE_EXTENSIONS_WITH_VERSION_KHR);
 			// STR(DEVICE_BUILT_IN_KERNELS_WITH_VERSION_KHR);
 			// cl_khr_pci_bus_info
 			STR(CL_DEVICE_PCI_BUS_INFO_KHR);
+			// cl_khr_integer_dot_product
+			STR(CL_DEVICE_INTEGER_DOT_PRODUCT_CAPABILITIES_KHR);
+			STR(CL_DEVICE_INTEGER_DOT_PRODUCT_ACCELERATION_PROPERTIES_8BIT_KHR);
+			STR(CL_DEVICE_INTEGER_DOT_PRODUCT_ACCELERATION_PROPERTIES_4x8BIT_PACKED_KHR);
 			// cl_ext_device_fission
 			STR(CL_DEVICE_PARENT_DEVICE_EXT);
 			STR(CL_DEVICE_PARTITION_TYPES_EXT);

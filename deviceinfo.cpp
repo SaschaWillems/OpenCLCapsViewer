@@ -252,6 +252,27 @@ void DeviceInfo::readDeviceInfoValue(DeviceInfoValueDescriptor descriptor, QStri
 		deviceInfo.push_back(DeviceInfoValue(descriptor.name, QVariant::fromValue(value), extension, descriptor.displayFunction));
 		break;
 	}
+	case clValueType::cl_device_integer_dot_product_capabilities_khr:
+	{
+		cl_device_integer_dot_product_capabilities_khr value;
+		_clGetDeviceInfo(this->deviceId, descriptor.name, sizeof(cl_device_integer_dot_product_capabilities_khr), &value, nullptr);
+		deviceInfo.push_back(DeviceInfoValue(descriptor.name, QVariant::fromValue(value), extension, descriptor.displayFunction));
+		break;
+	}
+	case clValueType::cl_device_integer_dot_product_acceleration_properties_khr:
+	{
+		cl_device_integer_dot_product_acceleration_properties_khr value{};
+		_clGetDeviceInfo(this->deviceId, descriptor.name, sizeof(cl_device_integer_dot_product_acceleration_properties_khr), &value, nullptr);
+		DeviceInfoValue infoValue(descriptor.name, QVariant(), extension, descriptor.displayFunction);
+		infoValue.addDetailValue("signed_accelerated", value.signed_accelerated, utils::displayBool);
+		infoValue.addDetailValue("unsigned_accelerated", value.unsigned_accelerated, utils::displayBool);
+		infoValue.addDetailValue("mixed_signedness_accelerated", value.mixed_signedness_accelerated, utils::displayBool);
+		infoValue.addDetailValue("accumulating_saturating_signed_accelerated", value.accumulating_saturating_signed_accelerated, utils::displayBool);
+		infoValue.addDetailValue("accumulating_saturating_unsigned_accelerated", value.accumulating_saturating_unsigned_accelerated, utils::displayBool);
+		infoValue.addDetailValue("accumulating_saturating_mixed_signedness_accelerated", value.accumulating_saturating_mixed_signedness_accelerated, utils::displayBool);
+		deviceInfo.push_back(infoValue);
+		break;
+	}
 	/* ARM */
 	case clValueType::cl_device_controlled_termination_capabilities_arm:
 	{
@@ -647,14 +668,13 @@ void DeviceInfo::readExtensionInfo()
 		}
 	}
 	if (extensionSupported("cl_khr_integer_dot_product")) {
-		// @todo
 		std::vector<DeviceInfoValueDescriptor> infoList = {
-			{ CL_DEVICE_INTEGER_DOT_PRODUCT_CAPABILITIES_KHR, clValueType::cl_device_pci_bus_info_khr }, // cl_device_integer_dot_product_capabilities_khr
-			{ CL_DEVICE_INTEGER_DOT_PRODUCT_ACCELERATION_PROPERTIES_8BIT_KHR, clValueType::cl_device_pci_bus_info_khr }, // cl_device_integer_dot_product_acceleration_properties_khr
-			{ CL_DEVICE_INTEGER_DOT_PRODUCT_ACCELERATION_PROPERTIES_4x8BIT_PACKED_KHR, clValueType::cl_device_pci_bus_info_khr }, // cl_device_integer_dot_product_acceleration_properties_khr
+			{ CL_DEVICE_INTEGER_DOT_PRODUCT_CAPABILITIES_KHR, clValueType::cl_device_integer_dot_product_capabilities_khr, utils::displayItegerDotProductCapabilities },
+			{ CL_DEVICE_INTEGER_DOT_PRODUCT_ACCELERATION_PROPERTIES_8BIT_KHR, clValueType::cl_device_integer_dot_product_acceleration_properties_khr },
+			{ CL_DEVICE_INTEGER_DOT_PRODUCT_ACCELERATION_PROPERTIES_4x8BIT_PACKED_KHR, clValueType::cl_device_integer_dot_product_acceleration_properties_khr },
 		};
 		for (auto info : infoList) {
-			readDeviceInfoValue(info, "cl_khr_pci_bus_info");
+			readDeviceInfoValue(info, "cl_khr_integer_dot_product");
 		}
 	}
 	

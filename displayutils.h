@@ -55,5 +55,6 @@ namespace utils
 	QString displayQueueFamilyPropertiesIntel(QVariant value);
 	QString displayCommandQueueCapabilitiesIntel(QVariant value);
 	QString displayDetailValueArraySize(QVariant value);
+	QString displayItegerDotProductCapabilities(QVariant value);
 }
 
