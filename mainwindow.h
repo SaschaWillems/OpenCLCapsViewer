@@ -21,6 +21,12 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#if defined(__linux__)
+#include <dlfcn.h>
+#elif defined(_WIN32)
+#include <windows.h>
+#endif
+
 #include <QMainWindow>
 #include <QMessageBox>
 #include <QStandardItemModel>
@@ -99,6 +105,8 @@ private:
     } models;
 
     Database database;
+
+    bool checkOpenCLAvailability(QString &error);
 
     void connectFilterAndModel(QStandardItemModel& model, TreeProxyFilter& filter);
 

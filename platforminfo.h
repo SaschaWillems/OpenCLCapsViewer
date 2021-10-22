@@ -25,6 +25,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include "openclutils.h"
+#include "openclfunctions.h"
 
 #pragma once
 

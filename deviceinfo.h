@@ -26,6 +26,7 @@
 #include "openclutils.h"
 #include "displayutils.h"
 #include "platforminfo.h"
+#include "openclfunctions.h"
 #include <unordered_map>
 #include <string>
 #include <sstream>

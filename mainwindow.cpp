@@ -20,9 +20,113 @@
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "openclfunctions.h"
 
 const QString MainWindow::version = "1.0";
 const QString MainWindow::reportVersion = "1.0";
+
+bool MainWindow::checkOpenCLAvailability(QString &error)
+{
+    // Check if OpenCL is supported by trying to load the OpenCL library and getting a valid function pointer
+    bool openCLAvailable = false;
+    error = "";
+
+#if defined(__ANDROID__)
+    // Try to find the OepenCL library on one of the following paths
+    static const char *libraryPaths[] = {
+        // Generic
+        "/system/vendor/lib64/libOpenCL.so",
+        "/system/lib64/libOpenCL.so",
+        "/system/vendor/lib/libOpenCL.so",
+        "/system/lib/libOpenCL.so",
+        // ARM Mali
+        "/system/vendor/lib64/egl/libGLES_mali.so",
+        "/system/lib64/egl/libGLES_mali.so",
+        "/system/vendor/lib/egl/libGLES_mali.so",
+        "/system/lib/egl/libGLES_mali.so",
+        // PowerVR
+        "/system/vendor/lib64/libPVROCL.so",
+        "/system/lib64/libPVROCL.so",
+        "/system/vendor/lib/libPVROCL.so",
+        "/system/lib/libPVROCL.so"
+    };
+    void *libOpenCL = nullptr;
+    for (auto libraryPath : libraryPaths) {
+        qInfo() << "Trying to load library from" << libraryPath;
+        libOpenCL = dlopen(libraryPath, RTLD_LAZY);
+        if (libOpenCL) {
+            qInfo() << "Found library in" << libraryPath;
+            break;
+        }
+    }
+    if (libOpenCL) {
+        // OpenCl library loaded, now try to get a function pointer to check if it works
+        PFN_clGetPlatformIDs test_fn = reinterpret_cast<PFN_clGetPlatformIDs>(dlsym(libOpenCL, "clGetPlatformIDs"));
+        if (test_fn) {
+            qInfo() << "Got valid function pointer for clGetPlatformIDs";
+            openCLAvailable = true;
+            loadFunctionPointers(libOpenCL);
+        } else {
+            error = "Could not get a valid function pointer";
+        }
+    } else {
+       error = "Could not find a OpenCL library";
+    }
+#elif defined(__linux__)
+    // Try to find the OepenCL library on one of the following paths
+    static const char *libraryPaths[] = {
+        "libOpenCL.so",
+        "/usr/lib/libOpenCL.so",
+        "/usr/local/lib/libOpenCL.so",
+        "/usr/local/lib/libpocl.so",
+        "/usr/lib64/libOpenCL.so",
+        "/usr/lib32/libOpenCL.so"
+    };
+    void *libOpenCL = nullptr;
+    for (auto libraryPath : libraryPaths) {
+        qInfo() << "Trying to load library from" << libraryPath;
+        libOpenCL = dlopen(libraryPath, RTLD_LAZY);
+        if (libOpenCL) {
+            qInfo() << "Found library in" << libraryPath;
+            break;
+        }
+    }
+    if (libOpenCL) {
+        // OpenCl library loaded, now try to get a function pointer to check if it works
+        PFN_clGetPlatformIDs test_fn = reinterpret_cast<PFN_clGetPlatformIDs>(dlsym(libOpenCL, "clGetPlatformIDs"));
+        if (test_fn) {
+            qInfo() << "Got valid function pointer for clGetPlatformIDs";
+            openCLAvailable = true;
+            loadFunctionPointers(libOpenCL);
+        } else {
+            error = "Could not get a valid function pointer";
+        }
+    } else {
+       error = "Could not find a OpenCL library";
+    }
+#elif defined(_WIN32)
+    HMODULE libOpenCL = LoadLibraryA("OpenCL.dll");
+    if (libOpenCL) {
+        char libPath[MAX_PATH] = { 0 };
+        GetModuleFileNameA(libOpenCL, libPath, sizeof(libPath));
+        qInfo() << "Found library in" << libPath;
+        PFN_clGetPlatformIDs test_fn = reinterpret_cast<PFN_clGetPlatformIDs>(GetProcAddress((HMODULE)libOpenCL, "clGetPlatformIDs"));
+        if (test_fn) {
+            qInfo() << "Got valid function pointer for clGetPlatformIDs";
+            openCLAvailable = true;
+            loadFunctionPointers(libOpenCL);
+        } else {
+            error = "Could not get a valid function pointer";
+        }
+    } else {
+        error = "Could not find a OpenCL library";
+    }
+#endif
+    if (error != "") {
+        qCritical() << error;
+    }
+    return openCLAvailable;
+}
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -36,6 +140,13 @@ MainWindow::MainWindow(QWidget *parent)
     qApp->setStyle(QStyleFactory::create("Fusion"));
 
     appSettings.restore();
+
+    QString error;
+    if (!checkOpenCLAvailability(error))
+    {
+        QMessageBox::warning(this, "Error", "OpenCL does not seem to be supported on this platform:\n" + error);
+        exit(EXIT_FAILURE);
+    }
 
     // Models
     ui->treeViewDeviceInfo->setModel(&filterProxies.deviceinfo);
@@ -112,7 +223,7 @@ MainWindow::~MainWindow()
 void MainWindow::getDevices()
 {
 	cl_uint numPlatforms;
-	cl_int status = clGetPlatformIDs(0, nullptr, &numPlatforms);
+    cl_int status = _clGetPlatformIDs(0, nullptr, &numPlatforms);
 	if (status != CL_SUCCESS)
 	{
         qCritical() << "Could not get platform count!";
@@ -122,7 +233,7 @@ void MainWindow::getDevices()
 
     // Read platforms
     std::vector<cl_platform_id> platformIds(numPlatforms);
-    status = clGetPlatformIDs(numPlatforms, platformIds.data(), nullptr);
+    status = _clGetPlatformIDs(numPlatforms, platformIds.data(), nullptr);
     if (status != CL_SUCCESS)
     {
         qCritical() << "Could not read platforms!";
@@ -143,14 +254,14 @@ void MainWindow::getDevices()
     {
         qInfo() << "Reading devices for platform id" << platform.platformId;
         cl_uint numDevices;
-        status = clGetDeviceIDs(platform.platformId, CL_DEVICE_TYPE_ALL, 0, nullptr, &numDevices);
+        status = _clGetDeviceIDs(platform.platformId, CL_DEVICE_TYPE_ALL, 0, nullptr, &numDevices);
         if (status != CL_SUCCESS) {
             qCritical() << "Could not read devices for the platform";
             QMessageBox::critical(this, tr("Error"), "Could not read devices for the current platform!");
             exit(EXIT_FAILURE);
         }
         std::vector<cl_device_id> deviceIds(numDevices);
-        status = clGetDeviceIDs(platform.platformId, CL_DEVICE_TYPE_ALL, numDevices, deviceIds.data(), nullptr);
+        status = _clGetDeviceIDs(platform.platformId, CL_DEVICE_TYPE_ALL, numDevices, deviceIds.data(), nullptr);
         if (status != CL_SUCCESS) {
             qCritical() << "Could not read devices for the platform";
             QMessageBox::critical(this, tr("Error"), "Could not read devices for the current platform!");

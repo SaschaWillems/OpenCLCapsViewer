@@ -19,6 +19,7 @@ SOURCES += \
     mainwindow.cpp \
     database.cpp \
     deviceinfo.cpp \
+    openclfunctions.cpp \
     platforminfo.cpp \
     treeproxyfilter.cpp \
     submitdialog.cpp \
@@ -30,6 +31,7 @@ HEADERS += \
     mainwindow.h \
     database.h \
     deviceinfo.h \
+    openclfunctions.h \
     platforminfo.h \
     treeproxyfilter.h \
     submitdialog.h \
@@ -42,12 +44,9 @@ FORMS += \
 INCLUDEPATH += "external/OpenCL-Headers"
 
 win32 {
-# todo
-    LIBS += "$$PWD\libs\windows\x64\OpenCL.lib"
 }
 
 linux:!android {
-    LIBS += -lOpenCL
     contains(DEFINES, X11) {
         message("Building for X11")
         QT += x11extras
@@ -59,6 +58,7 @@ linux:!android {
         DEFINES += VK_USE_PLATFORM_WAYLAND_KHR
     }
     target.path = /usr/bin
+    LIBS += -ldl
     INSTALLS += target
     desktop.files = OpenCLCapsViewer.desktop
     desktop.path = /usr/share/applications
@@ -80,8 +80,6 @@ android {
         android/AndroidManifest.xml \
         android/build.gradle \
         android/res/values/libs.xml
-
-    LIBS += $$PWD/libs/android/arm-v8a/libOpenCL.so
 }
 
 # Default rules for deployment.

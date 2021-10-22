@@ -24,10 +24,10 @@
 void PlatformInfo::readOpenCLVersion()
 {
 	size_t valueSize;
-	clGetPlatformInfo(this->platformId, CL_PLATFORM_VERSION, 0, nullptr, &valueSize);
+    _clGetPlatformInfo(this->platformId, CL_PLATFORM_VERSION, 0, nullptr, &valueSize);
 	std::string value;
 	value.resize(valueSize);
-	clGetPlatformInfo(this->platformId, CL_PLATFORM_VERSION, valueSize, &value[0], nullptr);
+    _clGetPlatformInfo(this->platformId, CL_PLATFORM_VERSION, valueSize, &value[0], nullptr);
 	// OpenCL<space><major_version.minor_version><space>
 	size_t versStart = value.find(' ', 0);
 	size_t versSplit = value.find('.', versStart + 1);
@@ -47,9 +47,9 @@ void PlatformInfo::readPlatformInfoValue(cl_platform_info info, clValueType valu
 	case clValueType::cl_char:
 	{
 		size_t valueSize;
-		clGetPlatformInfo(this->platformId, info, 0, nullptr, &valueSize);
+        _clGetPlatformInfo(this->platformId, info, 0, nullptr, &valueSize);
 		char* value = new char[valueSize];
-		clGetPlatformInfo(this->platformId, info, valueSize, &value[0], nullptr);
+        _clGetPlatformInfo(this->platformId, info, valueSize, &value[0], nullptr);
 		platformInfo.push_back(PlatformInfoValue(info, QString::fromUtf8(value), extension));
 		delete[] value;
 		break;
@@ -57,14 +57,14 @@ void PlatformInfo::readPlatformInfoValue(cl_platform_info info, clValueType valu
 	case clValueType::cl_ulong:
 	{
 		cl_ulong value;
-		clGetPlatformInfo(this->platformId, info, sizeof(cl_ulong), &value, nullptr);
+        _clGetPlatformInfo(this->platformId, info, sizeof(cl_ulong), &value, nullptr);
         platformInfo.push_back(PlatformInfoValue(info, QVariant::fromValue(value), extension));
 		break;
 	}
 	case clValueType::cl_version:
 	{
 		cl_version value;
-		clGetPlatformInfo(this->platformId, info, sizeof(cl_version), &value, nullptr);
+        _clGetPlatformInfo(this->platformId, info, sizeof(cl_version), &value, nullptr);
 		platformInfo.push_back(PlatformInfoValue(info, value, extension));
 		break;
 	}
@@ -79,9 +79,9 @@ void PlatformInfo::readExtensions()
 	if (clVersionMajor >= 3) {
 		qInfo() << "Reading platform extension list with versions (CL >=3.0) for platform" << platformId;
 		size_t extSize;
-		clGetPlatformInfo(this->platformId, CL_PLATFORM_EXTENSIONS_WITH_VERSION, 0, nullptr, &extSize);
+        _clGetPlatformInfo(this->platformId, CL_PLATFORM_EXTENSIONS_WITH_VERSION, 0, nullptr, &extSize);
 		cl_name_version* extensions = new cl_name_version[4096];
-		clGetPlatformInfo(this->platformId, CL_PLATFORM_EXTENSIONS_WITH_VERSION, extSize, extensions, nullptr);
+        _clGetPlatformInfo(this->platformId, CL_PLATFORM_EXTENSIONS_WITH_VERSION, extSize, extensions, nullptr);
 		for (size_t i = 0; i < extSize / sizeof(cl_name_version); i++) {
 			PlatformExtension extension{};
 			extension.name = extensions[i].name;
@@ -92,10 +92,10 @@ void PlatformInfo::readExtensions()
 	} else {
 		qInfo() << "Reading platform extension list (CL <3.0) for platform" << platformId;
 		size_t extStrSize;
-		clGetPlatformInfo(this->platformId, CL_PLATFORM_EXTENSIONS, 0, nullptr, &extStrSize);
+        _clGetPlatformInfo(this->platformId, CL_PLATFORM_EXTENSIONS, 0, nullptr, &extStrSize);
 		std::string extensionString;
 		extensionString.resize(extStrSize);
-		clGetPlatformInfo(this->platformId, CL_PLATFORM_EXTENSIONS, extStrSize, &extensionString[0], nullptr);
+        _clGetPlatformInfo(this->platformId, CL_PLATFORM_EXTENSIONS, extStrSize, &extensionString[0], nullptr);
 		std::vector<std::string> extensions;
 		extensions = utils::explode(extensionString, ' ');
 		for (size_t i = 0; i < extensions.size(); i++) {
