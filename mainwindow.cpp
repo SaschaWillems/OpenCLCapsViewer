@@ -337,6 +337,22 @@ void MainWindow::connectFilterAndModel(QStandardItemModel& model, TreeProxyFilte
     filter.setRecursiveFilteringEnabled(true);
 }
 
+void colorizeItem(QString& displayValue, QStandardItem *item)
+{
+    if (displayValue == "true") {
+        item->setForeground(QColor::fromRgb(0, 128, 0));
+        return;
+    }
+    if (displayValue == "false") {
+        item->setForeground(QColor::fromRgb(255, 0, 0));
+        return;
+    }
+    if (displayValue == "none") {
+        item->setForeground(QColor::fromRgb(128, 128, 128));
+        return;
+    }
+}
+
 void MainWindow::displayDeviceInfo(DeviceInfo& device)
 {
     models.deviceinfo.clear();
@@ -347,15 +363,7 @@ void MainWindow::displayDeviceInfo(DeviceInfo& device)
             QString displayValue = info.getDisplayValue();
             extItem << new QStandardItem(info.name);
             extItem << new QStandardItem(displayValue);
-            if (displayValue == "true") {
-                extItem[1]->setForeground(QColor::fromRgb(0, 128, 0));
-            }
-            if (displayValue == "false") {
-                extItem[1]->setForeground(QColor::fromRgb(255, 0, 0));
-            }
-            if (displayValue == "none") {
-                extItem[1]->setForeground(QColor::fromRgb(128, 128, 128));
-            }
+            colorizeItem(displayValue, extItem[1]);
             // Append additional device info detail values
             if (info.detailValues.size() > 0) {
                 for (auto& detailItem : info.detailValues) {
@@ -364,8 +372,10 @@ void MainWindow::displayDeviceInfo(DeviceInfo& device)
                     if (!detailItem.detail.isEmpty()) {
                         caption += " - " + detailItem.detail;
                     }
+                    QString detailDisplayValue = detailItem.getDisplayValue();
                     additionalInfoItem << new QStandardItem(caption);
-                    additionalInfoItem << new QStandardItem(detailItem.getDisplayValue());
+                    additionalInfoItem << new QStandardItem(detailDisplayValue);
+                    colorizeItem(detailDisplayValue, additionalInfoItem[1]);
                     extItem.first()->appendRow(additionalInfoItem);
                 }
             }
@@ -391,12 +401,7 @@ void MainWindow::displayDeviceExtensions(DeviceInfo& device)
                 QString displayValue = info.getDisplayValue();
                 extInfoItem << new QStandardItem(info.name);
                 extInfoItem << new QStandardItem(displayValue);
-                if (displayValue == "true") {
-                    extInfoItem[1]->setForeground(QColor::fromRgb(0, 128, 0));
-                }
-                if (displayValue == "false") {
-                    extInfoItem[1]->setForeground(QColor::fromRgb(255, 0, 0));
-                }
+                colorizeItem(displayValue, extInfoItem[1]);
                 // Append additional device info detail values
                 if (info.detailValues.size() > 0) {
                     for (auto& detailItem : info.detailValues) {
