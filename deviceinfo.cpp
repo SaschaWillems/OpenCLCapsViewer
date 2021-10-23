@@ -284,7 +284,24 @@ void DeviceInfo::readDeviceInfoValue(DeviceInfoValueDescriptor descriptor, QStri
 			infoValue.value = QVariant::fromValue(values.size());
 			_clGetDeviceInfo(this->deviceId, descriptor.name, valueSize, &values[0], nullptr);
 			for (auto& value : values) {
-				infoValue.addDetailValue("Handle Type", QVariant::fromValue(value), utils::displayExternalMemoryHandleTypes);
+				infoValue.addDetailValue("Handle type", QVariant::fromValue(value), utils::displayExternalMemoryHandleTypes);
+			}
+		}
+		deviceInfo.push_back(infoValue);
+		break;
+	}
+	case clValueType::cl_external_semaphore_handle_type_khr:
+	{
+		size_t valueSize{ 0 };
+		_clGetDeviceInfo(this->deviceId, descriptor.name, 0, nullptr, &valueSize);
+		DeviceInfoValue infoValue(descriptor.name, 0, extension, descriptor.displayFunction);
+		if (valueSize > 0) {
+			std::vector<cl_external_semaphore_handle_type_khr> values;
+			values.resize(valueSize / sizeof(cl_external_semaphore_handle_type_khr));
+			infoValue.value = QVariant::fromValue(values.size());
+			_clGetDeviceInfo(this->deviceId, descriptor.name, valueSize, &values[0], nullptr);
+			for (auto& value : values) {
+				infoValue.addDetailValue("Handle type", QVariant::fromValue(value), utils::displayExternalSemaphoreHandleTypes);
 			}
 		}
 		deviceInfo.push_back(infoValue);
@@ -702,7 +719,16 @@ void DeviceInfo::readExtensionInfo()
 			readDeviceInfoValue(info, "cl_khr_external_memory");
 		}
 	}
-	
+	if (extensionSupported("cl_khr_external_semaphore")) {
+		std::vector<DeviceInfoValueDescriptor> infoList = {
+			{ CL_DEVICE_SEMAPHORE_IMPORT_HANDLE_TYPES_KHR, clValueType::cl_external_semaphore_handle_type_khr, utils::displayDetailValueArraySize },
+			{ CL_DEVICE_SEMAPHORE_EXPORT_HANDLE_TYPES_KHR, clValueType::cl_external_semaphore_handle_type_khr, utils::displayDetailValueArraySize },
+		};
+		for (auto &info : infoList) {
+			readDeviceInfoValue(info, "cl_khr_external_memory");
+		}
+	}
+
 	// EXT
 	// @todo: Disabled for now, doesn't seem to be well documented
 	//if (extensionSupported("cl_ext_device_fission")) {
