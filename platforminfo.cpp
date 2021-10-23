@@ -21,6 +21,20 @@
 #include <unordered_map>
 #include "platforminfo.h"
 
+PlatformInfoValueDescriptor::PlatformInfoValueDescriptor()
+{
+	this->name = 0;
+	this->valueType = clValueType::cl_char;
+	this->displayFunction = nullptr;
+}
+
+PlatformInfoValueDescriptor::PlatformInfoValueDescriptor(cl_platform_info name, clValueType valueType, PlatformInfoDisplayFn displayFunction)
+{
+	this->name = name;
+	this->valueType = valueType;
+	this->displayFunction = displayFunction;
+}
+
 void PlatformInfo::readOpenCLVersion()
 {
 	size_t valueSize;
@@ -39,33 +53,35 @@ void PlatformInfo::readOpenCLVersion()
 	clVersionMinor = std::stoi(minor);
 }
 
-void PlatformInfo::readPlatformInfoValue(cl_platform_info info, clValueType valueType, QString extension)
+void PlatformInfo::readPlatformInfoValue(PlatformInfoValueDescriptor descriptor, QString extension)
 {
-	qInfo() << "Reading platform info value for" << utils::platformInfoString(info);
-	switch (valueType)
+	qInfo() << "Reading platform info value for" << utils::platformInfoString(descriptor.name);
+	switch (descriptor.valueType)
 	{
 	case clValueType::cl_char:
 	{
 		size_t valueSize;
-        _clGetPlatformInfo(this->platformId, info, 0, nullptr, &valueSize);
+        _clGetPlatformInfo(this->platformId, descriptor.name, 0, nullptr, &valueSize);
 		char* value = new char[valueSize];
-        _clGetPlatformInfo(this->platformId, info, valueSize, &value[0], nullptr);
-		platformInfo.push_back(PlatformInfoValue(info, QString::fromUtf8(value), extension));
+        _clGetPlatformInfo(this->platformId, descriptor.name, valueSize, &value[0], nullptr);
+		platformInfo.push_back(PlatformInfoValue(descriptor.name, QString::fromUtf8(value), extension));
 		delete[] value;
 		break;
 	}
 	case clValueType::cl_ulong:
 	{
 		cl_ulong value;
-        _clGetPlatformInfo(this->platformId, info, sizeof(cl_ulong), &value, nullptr);
-        platformInfo.push_back(PlatformInfoValue(info, QVariant::fromValue(value), extension));
+        _clGetPlatformInfo(this->platformId, descriptor.name, sizeof(cl_ulong), &value, nullptr);
+        platformInfo.push_back(PlatformInfoValue(descriptor.name, QVariant::fromValue(value), extension));
 		break;
 	}
 	case clValueType::cl_version:
 	{
 		cl_version value;
-        _clGetPlatformInfo(this->platformId, info, sizeof(cl_version), &value, nullptr);
-		platformInfo.push_back(PlatformInfoValue(info, value, extension));
+        _clGetPlatformInfo(this->platformId, descriptor.name, sizeof(cl_version), &value, nullptr);
+		platformInfo.push_back(PlatformInfoValue(descriptor.name, value, extension));
+		break;
+	}
 		break;
 	}
 	default:
@@ -126,15 +142,15 @@ bool PlatformInfo::extensionSupported(const char* name)
 void PlatformInfo::read()
 {
 	platformInfo.clear();
-	std::unordered_map<cl_device_info, clValueType> infoList = {
+	std::vector<PlatformInfoValueDescriptor> infoList = {
 		{ CL_PLATFORM_PROFILE, clValueType::cl_char },
 		{ CL_PLATFORM_VERSION, clValueType::cl_char },
 		{ CL_PLATFORM_NAME, clValueType::cl_char },
 		{ CL_PLATFORM_VENDOR, clValueType::cl_char },
 	};
-	for (auto info : infoList)
+	for (auto &info : infoList)
 	{
-		readPlatformInfoValue(info.first, info.second);
+		readPlatformInfoValue(info);
 	}
 
 	readOpenCLVersion();
@@ -143,7 +159,7 @@ void PlatformInfo::read()
 
 	// Version dependent information
 	if ((clVersionMajor == 2) && (clVersionMinor >= 1)) {
-		readPlatformInfoValue(CL_PLATFORM_HOST_TIMER_RESOLUTION, clValueType::cl_ulong);
+		readPlatformInfoValue(PlatformInfoValueDescriptor(CL_PLATFORM_HOST_TIMER_RESOLUTION, clValueType::cl_ulong));
 	}
 }
 
@@ -152,11 +168,11 @@ void PlatformInfo::readExtensionInfo()
 	qInfo() << "Reading extension info values for platform" << platformId;
 	// KHR
 	if (extensionSupported("cl_khr_icd")) {
-		std::unordered_map<cl_device_info, clValueType> infoList = {
+		std::vector<PlatformInfoValueDescriptor> infoList = {
 			{ CL_PLATFORM_ICD_SUFFIX_KHR, clValueType::cl_char },
 		};
-		for (auto info : infoList) {
-			readPlatformInfoValue(info.first, info.second, "cl_khr_icd");
+		for (auto &info : infoList) {
+			readPlatformInfoValue(info, "cl_khr_icd");
 		}
 	}
 }

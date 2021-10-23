@@ -35,6 +35,17 @@ struct PlatformExtension
     cl_version version;
 };
 
+typedef std::function<QString(QVariant)> PlatformInfoDisplayFn;
+
+struct PlatformInfoValueDescriptor
+{
+    cl_device_info name;
+    clValueType valueType;
+    PlatformInfoDisplayFn displayFunction = nullptr;
+    PlatformInfoValueDescriptor();
+    PlatformInfoValueDescriptor(cl_platform_info name, clValueType valueType, PlatformInfoDisplayFn displayFunction = nullptr);
+};
+
 struct PlatformInfoValue
 {
     QString name;
@@ -48,7 +59,7 @@ class PlatformInfo
 {
 private:
     void readOpenCLVersion();
-	void readPlatformInfoValue(cl_platform_info info, clValueType valueType, QString extension = "");
+	void readPlatformInfoValue(PlatformInfoValueDescriptor descriptor, QString extension = "");
     void readExtensions();
     bool extensionSupported(const char* name);
 public:
