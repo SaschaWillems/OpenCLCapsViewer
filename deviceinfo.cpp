@@ -146,7 +146,7 @@ void DeviceInfo::readDeviceInfoValue(DeviceInfoValueDescriptor descriptor, QStri
         _clGetDeviceInfo(this->deviceId, descriptor.name, 0, nullptr, &valueSize);
 		std::vector<cl_uint> values;
 		values.resize(valueSize / sizeof(cl_uint));
-        _clGetDeviceInfo(this->deviceId, descriptor.name, valueSize, &values[0], nullptr);
+		_clGetDeviceInfo(this->deviceId, descriptor.name, valueSize, &values[0], nullptr);
 		QVariantList variantList;
 		for (auto value : values) {
 			variantList << QVariant::fromValue(value);
@@ -270,6 +270,23 @@ void DeviceInfo::readDeviceInfoValue(DeviceInfoValueDescriptor descriptor, QStri
 		infoValue.addDetailValue("accumulating_saturating_signed_accelerated", value.accumulating_saturating_signed_accelerated, utils::displayBool);
 		infoValue.addDetailValue("accumulating_saturating_unsigned_accelerated", value.accumulating_saturating_unsigned_accelerated, utils::displayBool);
 		infoValue.addDetailValue("accumulating_saturating_mixed_signedness_accelerated", value.accumulating_saturating_mixed_signedness_accelerated, utils::displayBool);
+		deviceInfo.push_back(infoValue);
+		break;
+	}
+	case clValueType::cl_external_memory_handle_type_khr_array:
+	{
+		size_t valueSize{ 0 };
+		_clGetDeviceInfo(this->deviceId, descriptor.name, 0, nullptr, &valueSize);
+		DeviceInfoValue infoValue(descriptor.name, 0, extension, descriptor.displayFunction);
+		if (valueSize > 0) {
+			std::vector<cl_external_memory_handle_type_khr> values;
+			values.resize(valueSize / sizeof(cl_external_memory_handle_type_khr));
+			infoValue.value = QVariant::fromValue(values.size());
+			_clGetDeviceInfo(this->deviceId, descriptor.name, valueSize, &values[0], nullptr);
+			for (auto& value : values) {
+				infoValue.addDetailValue("Handle Type", QVariant::fromValue(value), utils::displayExternalMemoryHandleTypes);
+			}
+		}
 		deviceInfo.push_back(infoValue);
 		break;
 	}
@@ -675,6 +692,14 @@ void DeviceInfo::readExtensionInfo()
 		};
 		for (auto info : infoList) {
 			readDeviceInfoValue(info, "cl_khr_integer_dot_product");
+		}
+	}
+	if (extensionSupported("cl_khr_external_memory")) {
+		std::vector<DeviceInfoValueDescriptor> infoList = {
+			{ CL_DEVICE_EXTERNAL_MEMORY_IMPORT_HANDLE_TYPES_KHR, clValueType::cl_external_memory_handle_type_khr_array, utils::displayDetailValueArraySize },
+		};
+		for (auto info : infoList) {
+			readDeviceInfoValue(info, "cl_khr_external_memory");
 		}
 	}
 	
