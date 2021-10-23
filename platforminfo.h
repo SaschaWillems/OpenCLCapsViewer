@@ -26,6 +26,7 @@
 #include <QJsonArray>
 #include "openclutils.h"
 #include "openclfunctions.h"
+#include "displayutils.h"
 
 #pragma once
 
@@ -46,13 +47,28 @@ struct PlatformInfoValueDescriptor
     PlatformInfoValueDescriptor(cl_platform_info name, clValueType valueType, PlatformInfoDisplayFn displayFunction = nullptr);
 };
 
+struct PlatformInfoValueDetailValue
+{
+    QString name;
+    QString detail;
+    QVariant value;
+    PlatformInfoDisplayFn displayFunction = nullptr;
+    PlatformInfoValueDetailValue(QString name, QVariant value, PlatformInfoDisplayFn displayFunction = nullptr);
+    PlatformInfoValueDetailValue(QString name, QString detail, QVariant value, PlatformInfoDisplayFn displayFunction = nullptr);
+    QString getDisplayValue();
+};
+
 struct PlatformInfoValue
 {
     QString name;
     QVariant value;
     QString extension;
     qint32 enumValue;
-    PlatformInfoValue(cl_platform_info info, QVariant value, QString extension = "");
+    std::vector<PlatformInfoValueDetailValue> detailValues;
+    PlatformInfoValue(cl_platform_info info, QVariant value, QString extension = "", PlatformInfoDisplayFn displayFunction = nullptr);
+    void addDetailValue(QString name, QVariant value, PlatformInfoDisplayFn displayFunction = nullptr);
+    void addDetailValue(QString name, QString detail, QVariant value, PlatformInfoDisplayFn displayFunction = nullptr);
+    QString getDisplayValue();
 };
 
 class PlatformInfo

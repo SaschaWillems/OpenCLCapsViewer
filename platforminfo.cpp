@@ -35,6 +35,50 @@ PlatformInfoValueDescriptor::PlatformInfoValueDescriptor(cl_platform_info name, 
 	this->displayFunction = displayFunction;
 }
 
+PlatformInfoValueDetailValue::PlatformInfoValueDetailValue(QString name, QVariant value, PlatformInfoDisplayFn displayFunction)
+{
+	this->name = name;
+	this->detail = "";
+	this->value = value;
+	this->displayFunction = displayFunction;
+}
+
+PlatformInfoValueDetailValue::PlatformInfoValueDetailValue(QString name, QString detail, QVariant value, PlatformInfoDisplayFn displayFunction)
+{
+	this->name = name;
+	this->detail = detail;
+	this->value = value;
+	this->displayFunction = displayFunction;
+}
+
+QString PlatformInfoValueDetailValue::getDisplayValue()
+{
+	if (displayFunction) {
+		return displayFunction(value);
+	}
+	else {
+		return value.toString();
+	}
+}
+
+PlatformInfoValue::PlatformInfoValue(cl_platform_info info, QVariant value, QString extension, PlatformInfoDisplayFn displayFunction)
+{
+	this->name = utils::platformInfoString(info);
+	this->value = value;
+	this->extension = extension;
+	this->enumValue = info;
+}
+
+void PlatformInfoValue::addDetailValue(QString name, QVariant value, PlatformInfoDisplayFn displayFunction)
+{
+	detailValues.push_back(PlatformInfoValueDetailValue(name, value, displayFunction));
+}
+
+void PlatformInfoValue::addDetailValue(QString name, QString detail, QVariant value, PlatformInfoDisplayFn displayFunction)
+{
+	detailValues.push_back(PlatformInfoValueDetailValue(name, detail, value, displayFunction));
+}
+
 void PlatformInfo::readOpenCLVersion()
 {
 	size_t valueSize;
@@ -206,12 +250,4 @@ QJsonObject PlatformInfo::toJson()
 	jsonRoot["info"] = jsonDeviceInfos;
 
 	return jsonRoot;
-}
-
-PlatformInfoValue::PlatformInfoValue(cl_platform_info info, QVariant value, QString extension)
-{
-	this->name = utils::platformInfoString(info);
-	this->value = value;
-	this->extension = extension;
-	this->enumValue = info;
 }
