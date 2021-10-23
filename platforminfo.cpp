@@ -255,6 +255,23 @@ QJsonObject PlatformInfo::toJson()
 		jsonNode["extension"] = info.extension;
 		jsonNode["enumvalue"] = info.enumValue;
 		jsonNode["value"] = info.value.toJsonValue();
+		// Optional details for the platform info
+		if (info.detailValues.size() > 0) {
+			QJsonArray jsonDetails;
+			for (auto& detail : info.detailValues) {
+				QJsonObject jsonNodeDetail;
+				jsonNodeDetail["name"] = detail.name;
+				if (detail.detail.isEmpty()) {
+					jsonNodeDetail["detail"] = QJsonValue::Null;
+				}
+				else {
+					jsonNodeDetail["detail"] = detail.detail;
+				}
+				jsonNodeDetail["value"] = detail.value.toJsonValue();
+				jsonDetails.append(jsonNodeDetail);
+			}
+			jsonNode["details"] = jsonDetails;
+		}
 		jsonDeviceInfos.append(jsonNode);
 	}
 	jsonRoot["info"] = jsonDeviceInfos;
