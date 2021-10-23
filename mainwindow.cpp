@@ -479,11 +479,28 @@ void MainWindow::displayPlatformInfo(PlatformInfo& platform)
 {
     models.platformInfo.clear();
     QStandardItem* rootItem = models.platformInfo.invisibleRootItem();
-    for (auto info : platform.platformInfo) {
+    for (auto &info : platform.platformInfo) {
         if (info.extension.isEmpty()) {
             QList<QStandardItem*> extItem;
+            QString displayValue = info.getDisplayValue();
             extItem << new QStandardItem(info.name);
-            extItem << new QStandardItem(info.value.toString());
+            extItem << new QStandardItem(displayValue);
+            colorizeItem(displayValue, extItem[1]);
+            // Append additional device info detail values
+            if (info.detailValues.size() > 0) {
+                for (auto& detailItem : info.detailValues) {
+                    QList<QStandardItem*> additionalInfoItem;
+                    QString caption = detailItem.name;
+                    if (!detailItem.detail.isEmpty()) {
+                        caption += " - " + detailItem.detail;
+                    }
+                    QString detailDisplayValue = detailItem.getDisplayValue();
+                    additionalInfoItem << new QStandardItem(caption);
+                    additionalInfoItem << new QStandardItem(detailDisplayValue);
+                    colorizeItem(detailDisplayValue, additionalInfoItem[1]);
+                    extItem.first()->appendRow(additionalInfoItem);
+                }
+            }
             rootItem->appendRow(extItem);
         }
     }
@@ -500,11 +517,26 @@ void MainWindow::displayPlatformExtensions(PlatformInfo& platform)
         extItem << new QStandardItem(extension.name);
         extItem << new QStandardItem(extension.version > 0 ? utils::clVersionString(extension.version) : "");
         // Append extension related device info
-        for (auto info : platform.platformInfo) {
+        for (auto &info : platform.platformInfo) {
             if (extension.name == info.extension) {
                 QList<QStandardItem*> extInfoItem;
+                QString displayValue = info.getDisplayValue();
                 extInfoItem << new QStandardItem(info.name);
-                extInfoItem << new QStandardItem(info.value.toString());
+                extInfoItem << new QStandardItem(displayValue);
+                colorizeItem(displayValue, extInfoItem[1]);
+                // Append additional device info detail values
+                if (info.detailValues.size() > 0) {
+                    for (auto& detailItem : info.detailValues) {
+                        QList<QStandardItem*> additionalInfoItem;
+                        QString caption = detailItem.name;
+                        if (!detailItem.detail.isEmpty()) {
+                            caption += " - " + detailItem.detail;
+                        }
+                        additionalInfoItem << new QStandardItem(caption);
+                        additionalInfoItem << new QStandardItem(detailItem.getDisplayValue());
+                        extInfoItem.first()->appendRow(additionalInfoItem);
+                    }
+                }
                 extItem.first()->appendRow(extInfoItem);
             }
         }

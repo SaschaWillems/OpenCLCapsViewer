@@ -64,6 +64,7 @@ struct PlatformInfoValue
     QVariant value;
     QString extension;
     qint32 enumValue;
+    PlatformInfoDisplayFn displayFunction = nullptr;
     std::vector<PlatformInfoValueDetailValue> detailValues;
     PlatformInfoValue(cl_platform_info info, QVariant value, QString extension = "", PlatformInfoDisplayFn displayFunction = nullptr);
     void addDetailValue(QString name, QVariant value, PlatformInfoDisplayFn displayFunction = nullptr);

@@ -67,6 +67,7 @@ PlatformInfoValue::PlatformInfoValue(cl_platform_info info, QVariant value, QStr
 	this->value = value;
 	this->extension = extension;
 	this->enumValue = info;
+	this->displayFunction = displayFunction;
 }
 
 void PlatformInfoValue::addDetailValue(QString name, QVariant value, PlatformInfoDisplayFn displayFunction)
@@ -77,6 +78,15 @@ void PlatformInfoValue::addDetailValue(QString name, QVariant value, PlatformInf
 void PlatformInfoValue::addDetailValue(QString name, QString detail, QVariant value, PlatformInfoDisplayFn displayFunction)
 {
 	detailValues.push_back(PlatformInfoValueDetailValue(name, detail, value, displayFunction));
+}
+
+QString PlatformInfoValue::getDisplayValue()
+{
+	if (displayFunction) {
+		return displayFunction(value);
+	} else {
+		return value.toString();
+	}
 }
 
 void PlatformInfo::readOpenCLVersion()
