@@ -136,8 +136,41 @@ void PlatformInfo::readPlatformInfoValue(PlatformInfoValueDescriptor descriptor,
 		platformInfo.push_back(PlatformInfoValue(descriptor.name, value, extension));
 		break;
 	}
+	case clValueType::cl_external_memory_handle_type_khr_array:
+	{
+		size_t valueSize{ 0 };
+		_clGetPlatformInfo(this->platformId, descriptor.name, 0, nullptr, &valueSize);
+		PlatformInfoValue infoValue(descriptor.name, 0, extension, descriptor.displayFunction);
+		if (valueSize > 0) {
+			std::vector<cl_external_memory_handle_type_khr> values;
+			values.resize(valueSize / sizeof(cl_external_memory_handle_type_khr));
+			infoValue.value = QVariant::fromValue(values.size());
+			_clGetPlatformInfo(this->platformId, descriptor.name, valueSize, &values[0], nullptr);
+			for (auto& value : values) {
+				infoValue.addDetailValue("Handle Type", QVariant::fromValue(value), utils::displayExternalMemoryHandleTypes);
+			}
+		}
+		platformInfo.push_back(infoValue);
 		break;
 	}
+	case clValueType::cl_external_semaphore_handle_type_khr:
+	{
+		size_t valueSize{ 0 };
+		_clGetPlatformInfo(this->platformId, descriptor.name, 0, nullptr, &valueSize);
+		PlatformInfoValue infoValue(descriptor.name, 0, extension, descriptor.displayFunction);
+		if (valueSize > 0) {
+			std::vector<cl_external_semaphore_handle_type_khr> values;
+			values.resize(valueSize / sizeof(cl_external_semaphore_handle_type_khr));
+			infoValue.value = QVariant::fromValue(values.size());
+			_clGetPlatformInfo(this->platformId, descriptor.name, valueSize, &values[0], nullptr);
+			for (auto& value : values) {
+				infoValue.addDetailValue("Handle type", QVariant::fromValue(value), utils::displayExternalSemaphoreHandleTypes);
+			}
+		}
+		platformInfo.push_back(infoValue);
+		break;
+	}
+
 	default:
 		qDebug("Unknown platform info type");
 	}
@@ -227,6 +260,23 @@ void PlatformInfo::readExtensionInfo()
 		};
 		for (auto &info : infoList) {
 			readPlatformInfoValue(info, "cl_khr_icd");
+		}
+	}
+	if (extensionSupported("cl_khr_external_memory")) {
+		std::vector<PlatformInfoValueDescriptor> infoList = {
+			{ CL_PLATFORM_EXTERNAL_MEMORY_IMPORT_HANDLE_TYPES_KHR, clValueType::cl_external_memory_handle_type_khr_array, utils::displayDetailValueArraySize },
+		};
+		for (auto &info : infoList) {
+			readPlatformInfoValue(info, "cl_khr_external_memory");
+		}
+	}
+	if (extensionSupported("cl_khr_external_semaphore")) {
+		std::vector<PlatformInfoValueDescriptor> infoList = {
+			{ CL_PLATFORM_SEMAPHORE_IMPORT_HANDLE_TYPES_KHR, clValueType::cl_external_semaphore_handle_type_khr, utils::displayDetailValueArraySize },
+			{ CL_PLATFORM_SEMAPHORE_EXPORT_HANDLE_TYPES_KHR, clValueType::cl_external_semaphore_handle_type_khr, utils::displayDetailValueArraySize },
+		};
+		for (auto& info : infoList) {
+			readPlatformInfoValue(info, "cl_khr_external_semaphore");
 		}
 	}
 }

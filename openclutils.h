@@ -303,6 +303,11 @@ namespace utils
 			STR(CL_PLATFORM_EXTENSIONS_WITH_VERSION);
 			// cl_khr_icd
 			STR(CL_PLATFORM_ICD_SUFFIX_KHR);
+			// cl_khr_external_memory
+			STR(CL_PLATFORM_EXTERNAL_MEMORY_IMPORT_HANDLE_TYPES_KHR);
+			// cl_khr_external_semaphore
+			STR(CL_PLATFORM_SEMAPHORE_IMPORT_HANDLE_TYPES_KHR);
+			STR(CL_PLATFORM_SEMAPHORE_EXPORT_HANDLE_TYPES_KHR);
 #undef STR
 		default: return "?";
 		}
