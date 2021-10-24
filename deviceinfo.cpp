@@ -725,7 +725,7 @@ void DeviceInfo::readExtensionInfo()
 			{ CL_DEVICE_SEMAPHORE_EXPORT_HANDLE_TYPES_KHR, clValueType::cl_external_semaphore_handle_type_khr, utils::displayDetailValueArraySize },
 		};
 		for (auto &info : infoList) {
-			readDeviceInfoValue(info, "cl_khr_external_memory");
+			readDeviceInfoValue(info, "cl_khr_external_semaphore");
 		}
 	}
 
