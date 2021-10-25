@@ -80,7 +80,13 @@ bool MainWindow::checkOpenCLAvailability(QString &error)
         "/usr/local/lib/libOpenCL.so",
         "/usr/local/lib/libpocl.so",
         "/usr/lib64/libOpenCL.so",
-        "/usr/lib32/libOpenCL.so"
+        "/usr/lib32/libOpenCL.so",
+        "libOpenCL.so.1",
+        "/usr/lib/libOpenCL.so.1",
+        "/usr/local/lib/libOpenCL.so.1",
+        "/usr/local/lib/libpocl.so.1",
+        "/usr/lib64/libOpenCL.so.1",
+        "/usr/lib32/libOpenCL.so.1"
     };
     void *libOpenCL = nullptr;
     for (auto libraryPath : libraryPaths) {
