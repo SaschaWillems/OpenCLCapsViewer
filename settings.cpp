@@ -43,7 +43,7 @@ void Settings::restore()
 	// Apply proxy settings
 	if (proxyEnabled) {
 		QNetworkProxy proxy;
-		proxy.setType(QNetworkProxy::Socks5Proxy);
+		proxy.setType(QNetworkProxy::HttpProxy);
 		proxy.setHostName(proxyDns);
 		if (!proxyPort.isEmpty()) {
 			proxy.setPort(proxyPort.toInt());
