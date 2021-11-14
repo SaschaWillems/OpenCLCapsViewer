@@ -145,8 +145,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->labelTitle->setText(title);
     qApp->setStyle(QStyleFactory::create("Fusion"));
 
-    appSettings.restore();
-
     QString error;
     if (!checkOpenCLAvailability(error))
     {
@@ -635,10 +633,11 @@ void MainWindow::slotAbout()
 
 void MainWindow::slotSettings()
 {
-    SettingsDialog dialog(appSettings);
+    SettingsDialog dialog(settings);
     dialog.setModal(true);
     dialog.exec();
-    appSettings.restore();
+    settings.restore();
+    checkReportDatabaseState();
 }
 
 void MainWindow::slotDisplayOnlineReport()
@@ -698,7 +697,7 @@ void MainWindow::slotUploadReport()
     }
     // Upload new report
     if (reportState == ReportState::not_present) {
-        SubmitDialog dialog(appSettings.submitterName,  "Submit new report");
+        SubmitDialog dialog(settings.submitterName,  "Submit new report");
 
         if (dialog.exec() == QDialog::Accepted) {
             QString message;

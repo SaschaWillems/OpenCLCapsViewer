@@ -61,15 +61,22 @@ int main(int argc, char *argv[])
     QApplication application(argc, argv);
     QCommandLineParser parser;
     QCommandLineOption optionLogFile("log", "Write log messages to a text file for debugging (log.txt)");
+    QCommandLineOption optionDisableProxy("noproxy", "Run withouth proxy (overrides setting)");
     parser.setApplicationDescription("OpenCL Hardware Capability Viewer");
     parser.addHelpOption();
     parser.addVersionOption();
     parser.addOption(optionLogFile);
+    parser.addOption(optionDisableProxy);
     parser.process(application);
     if (parser.isSet(optionLogFile)) {
         qInstallMessageHandler(logMessageHandler);
     }
     qInfo() << "Application start";
+    settings.restore();
+    if (parser.isSet(optionDisableProxy)) {
+        settings.proxyEnabled = false;
+        settings.applyProxySettings();
+    }
     MainWindow w;
     w.show();
     return application.exec();

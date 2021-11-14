@@ -21,14 +21,7 @@
 #include "settings.h"
 #include "QNetworkProxy"
 
-Settings::Settings()
-{
-}
-
-
-Settings::~Settings()
-{
-}
+Settings settings;
 
 void Settings::restore()
 {
@@ -39,8 +32,11 @@ void Settings::restore()
 	proxyUserName = settings.value("proxy/user", "").toString();
 	proxyUserPassword = settings.value("proxy/password", "").toString();
 	proxyEnabled = settings.value("proxy/enabled", "").toBool();
+	applyProxySettings();
+}
 
-	// Apply proxy settings
+void Settings::applyProxySettings()
+{
 	if (proxyEnabled) {
 		QNetworkProxy proxy;
 		proxy.setType(QNetworkProxy::HttpProxy);
@@ -54,9 +50,9 @@ void Settings::restore()
 		proxy.setUser(proxyUserName);
 		proxy.setPassword(proxyUserPassword);
 		QNetworkProxy::setApplicationProxy(proxy);
-	} else {
+	}
+	else {
 		QNetworkProxy::setApplicationProxy(QNetworkProxy::NoProxy);
 	}
-
 }
 

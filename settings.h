@@ -26,8 +26,6 @@
 class Settings
 {
 public:
-	Settings();
-	~Settings();
 	QString submitterName;
 	QString proxyDns;
 	QString proxyPort;
@@ -35,5 +33,9 @@ public:
 	QString proxyUserPassword;
 	bool proxyEnabled;
 	void restore();
+	void applyProxySettings();
 };
+
+extern Settings settings;
+
 

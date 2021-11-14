@@ -85,7 +85,6 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    Settings appSettings;
 
     int selectedDeviceIndex = 0;
 
