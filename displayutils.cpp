@@ -302,4 +302,45 @@ namespace utils
         return displayFlags(value.toInt(), flags);
     }
 
+    QString displayExternalMemoryHandleTypes(QVariant value)
+    {
+        switch (value.toInt())
+        {
+#define STR(r) case r: return #r
+            // cl_khr_external_memory_dma_buf
+            STR(CL_EXTERNAL_MEMORY_HANDLE_DMA_BUF_KHR);
+            // cl_khr_external_memory_dx
+            STR(CL_EXTERNAL_MEMORY_HANDLE_D3D11_TEXTURE_KHR);
+            STR(CL_EXTERNAL_MEMORY_HANDLE_D3D11_TEXTURE_KMT_KHR);
+            STR(CL_EXTERNAL_MEMORY_HANDLE_D3D12_HEAP_KHR);
+            STR(CL_EXTERNAL_MEMORY_HANDLE_D3D12_RESOURCE_KHR);
+            // cl_khr_external_memory_opaque_fd
+            STR(CL_EXTERNAL_MEMORY_HANDLE_OPAQUE_FD_KHR);
+            // cl_khr_external_memory_win32
+            STR(CL_EXTERNAL_MEMORY_HANDLE_OPAQUE_WIN32_KHR);
+            STR(CL_EXTERNAL_MEMORY_HANDLE_OPAQUE_WIN32_KMT_KHR);
+#undef STR
+        default: return "unknown";
+        }
+    }
+
+    QString displayExternalSemaphoreHandleTypes(QVariant value)
+    {
+        switch (value.toInt())
+        {
+#define STR(r) case r: return #r
+            // cl_khr_external_semaphore_dx_fence
+            STR(CL_SEMAPHORE_HANDLE_D3D12_FENCE_KHR);
+            // cl_khr_external_semaphore_opaque_fd
+            STR(CL_SEMAPHORE_HANDLE_OPAQUE_FD_KHR);
+            // cl_khr_external_semaphore_sync_fd
+            STR(CL_SEMAPHORE_HANDLE_SYNC_FD_KHR);
+            // cl_khr_external_semaphore_win32
+            STR(CL_SEMAPHORE_HANDLE_OPAQUE_WIN32_KHR);
+            STR(CL_SEMAPHORE_HANDLE_OPAQUE_WIN32_KMT_KHR);
+#undef STR
+        default: return "unknown";
+        }
+    }
+
 }

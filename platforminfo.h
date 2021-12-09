@@ -26,6 +26,7 @@
 #include <QJsonArray>
 #include "openclutils.h"
 #include "openclfunctions.h"
+#include "displayutils.h"
 
 #pragma once
 
@@ -35,20 +36,47 @@ struct PlatformExtension
     cl_version version;
 };
 
+typedef std::function<QString(QVariant)> PlatformInfoDisplayFn;
+
+struct PlatformInfoValueDescriptor
+{
+    cl_device_info name;
+    clValueType valueType;
+    PlatformInfoDisplayFn displayFunction = nullptr;
+    PlatformInfoValueDescriptor();
+    PlatformInfoValueDescriptor(cl_platform_info name, clValueType valueType, PlatformInfoDisplayFn displayFunction = nullptr);
+};
+
+struct PlatformInfoValueDetailValue
+{
+    QString name;
+    QString detail;
+    QVariant value;
+    PlatformInfoDisplayFn displayFunction = nullptr;
+    PlatformInfoValueDetailValue(QString name, QVariant value, PlatformInfoDisplayFn displayFunction = nullptr);
+    PlatformInfoValueDetailValue(QString name, QString detail, QVariant value, PlatformInfoDisplayFn displayFunction = nullptr);
+    QString getDisplayValue();
+};
+
 struct PlatformInfoValue
 {
     QString name;
     QVariant value;
     QString extension;
     qint32 enumValue;
-    PlatformInfoValue(cl_platform_info info, QVariant value, QString extension = "");
+    PlatformInfoDisplayFn displayFunction = nullptr;
+    std::vector<PlatformInfoValueDetailValue> detailValues;
+    PlatformInfoValue(cl_platform_info info, QVariant value, QString extension = "", PlatformInfoDisplayFn displayFunction = nullptr);
+    void addDetailValue(QString name, QVariant value, PlatformInfoDisplayFn displayFunction = nullptr);
+    void addDetailValue(QString name, QString detail, QVariant value, PlatformInfoDisplayFn displayFunction = nullptr);
+    QString getDisplayValue();
 };
 
 class PlatformInfo
 {
 private:
     void readOpenCLVersion();
-	void readPlatformInfoValue(cl_platform_info info, clValueType valueType, QString extension = "");
+	void readPlatformInfoValue(PlatformInfoValueDescriptor descriptor, QString extension = "");
     void readExtensions();
     bool extensionSupported(const char* name);
 public:

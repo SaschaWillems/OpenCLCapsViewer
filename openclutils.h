@@ -56,6 +56,8 @@ enum class clValueType {
 	cl_queue_family_properties_intel,
 	cl_device_integer_dot_product_capabilities_khr,
 	cl_device_integer_dot_product_acceleration_properties_khr,
+	cl_external_memory_handle_type_khr_array,
+	cl_external_semaphore_handle_type_khr,
 	special
 };
 
@@ -211,6 +213,11 @@ namespace utils
 			STR(CL_DEVICE_INTEGER_DOT_PRODUCT_CAPABILITIES_KHR);
 			STR(CL_DEVICE_INTEGER_DOT_PRODUCT_ACCELERATION_PROPERTIES_8BIT_KHR);
 			STR(CL_DEVICE_INTEGER_DOT_PRODUCT_ACCELERATION_PROPERTIES_4x8BIT_PACKED_KHR);
+			// cl_khr_external_memory
+			STR(CL_DEVICE_EXTERNAL_MEMORY_IMPORT_HANDLE_TYPES_KHR);
+			// cl_khr_external_semaphore
+			STR(CL_DEVICE_SEMAPHORE_IMPORT_HANDLE_TYPES_KHR);
+			STR(CL_DEVICE_SEMAPHORE_EXPORT_HANDLE_TYPES_KHR);
 			// cl_ext_device_fission
 			STR(CL_DEVICE_PARENT_DEVICE_EXT);
 			STR(CL_DEVICE_PARTITION_TYPES_EXT);
@@ -296,6 +303,11 @@ namespace utils
 			STR(CL_PLATFORM_EXTENSIONS_WITH_VERSION);
 			// cl_khr_icd
 			STR(CL_PLATFORM_ICD_SUFFIX_KHR);
+			// cl_khr_external_memory
+			STR(CL_PLATFORM_EXTERNAL_MEMORY_IMPORT_HANDLE_TYPES_KHR);
+			// cl_khr_external_semaphore
+			STR(CL_PLATFORM_SEMAPHORE_IMPORT_HANDLE_TYPES_KHR);
+			STR(CL_PLATFORM_SEMAPHORE_EXPORT_HANDLE_TYPES_KHR);
 #undef STR
 		default: return "?";
 		}
