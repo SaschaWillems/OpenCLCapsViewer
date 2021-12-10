@@ -31,6 +31,8 @@ jobs:
           windeployqt.exe release --no-opengl-sw --no-angle --no-webkit2 --no-translations --no-system-d3d-compiler
           Remove-Item release\*.obj
           Remove-Item release\*.res
+          Remove-Item release\*.cpp
+          Remove-Item release\*.h
           Compress-Archive -Path release\ -DestinationPath OpenCL_Caps_Viewer-windows.zip
 
       - name: Upload
