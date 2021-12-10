@@ -730,19 +730,6 @@ void DeviceInfo::readExtensionInfo()
 	}
 
 	// EXT
-	// @todo: Disabled for now, doesn't seem to be well documented
-	//if (extensionSupported("cl_ext_device_fission")) {
-	//	std::vector<DeviceInfoValueDescriptor> infoList = {
-	//		{ CL_DEVICE_PARENT_DEVICE_EXT, clValueType::cl_char },
-	//		{ CL_DEVICE_PARTITION_TYPES_EXT, clValueType::cl_char },
-	//		{ CL_DEVICE_AFFINITY_DOMAINS_EXT, clValueType::cl_char },
-	//		{ CL_DEVICE_REFERENCE_COUNT_EXT, clValueType::cl_char },
-	//		{ CL_DEVICE_PARTITION_STYLE_EXT, clValueType::cl_char },
-	//	};
-	//	for (auto info : infoList) {
-	//		readDeviceInfoValue(info, "cl_ext_device_fission");
-	//	}
-	//}
 	if (extensionSupported("cl_ext_cxx_for_opencl")) {
 		std::vector<DeviceInfoValueDescriptor> infoList = {
 			{ CL_DEVICE_CXX_FOR_OPENCL_NUMERIC_VERSION_EXT, clValueType::cl_char, utils::displayText },
@@ -832,20 +819,6 @@ void DeviceInfo::readExtensionInfo()
 			readDeviceInfoValue(info, "cl_intel_device_side_avc_motion_estimation");
 		}
 	}
-	/* @todo: Extension is still in draft and not yet released
-	if (extensionSupported("cl_intel_unified_shared_memory")) {
-		std::vector<DeviceInfoValueDescriptor> infoList = {
-			{ CL_DEVICE_HOST_MEM_CAPABILITIES_INTEL, clValueType::cl_char },
-			{ CL_DEVICE_DEVICE_MEM_CAPABILITIES_INTEL, clValueType::cl_char },
-			{ CL_DEVICE_SINGLE_DEVICE_SHARED_MEM_CAPABILITIES_INTEL, clValueType::cl_char },
-			{ CL_DEVICE_CROSS_DEVICE_SHARED_MEM_CAPABILITIES_INTEL, clValueType::cl_char },
-			{ CL_DEVICE_SHARED_SYSTEM_MEM_CAPABILITIES_INTEL, clValueType::cl_char },
-		};
-		for (auto info : infoList) {
-			readDeviceInfoValue(info, "cl_intel_unified_shared_memory");
-		}
-	}
-	*/
 	if (extensionSupported("cl_intel_command_queue_families")) {
 		std::vector<DeviceInfoValueDescriptor> infoList = {
 			{ CL_DEVICE_QUEUE_FAMILY_PROPERTIES_INTEL, clValueType::cl_queue_family_properties_intel, utils::displayQueueFamilyPropertiesIntel },
@@ -865,37 +838,6 @@ void DeviceInfo::readExtensionInfo()
 			readDeviceInfoValue(info, "cl_qcom_ext_host_ptr");
 		}
 	}
-
-	// AMD
-	// @todo: Disabled for now, doesn't seem to be well documented
-	//if (extensionSupported("cl_amd_device_attribute_query")) {
-	//	std::vector<DeviceInfoValueDescriptor> infoList = {
-	//		{ CL_DEVICE_PROFILING_TIMER_OFFSET_AMD, clValueType::cl_char },
-	//		{ CL_DEVICE_TOPOLOGY_AMD, clValueType::cl_char },
-	//		{ CL_DEVICE_BOARD_NAME_AMD, clValueType::cl_char },
-	//		{ CL_DEVICE_GLOBAL_FREE_MEMORY_AMD, clValueType::cl_char },
-	//		{ CL_DEVICE_SIMD_PER_COMPUTE_UNIT_AMD, clValueType::cl_char },
-	//		{ CL_DEVICE_SIMD_WIDTH_AMD, clValueType::cl_char },
-	//		{ CL_DEVICE_SIMD_INSTRUCTION_WIDTH_AMD, clValueType::cl_char },
-	//		{ CL_DEVICE_WAVEFRONT_WIDTH_AMD, clValueType::cl_char },
-	//		{ CL_DEVICE_GLOBAL_MEM_CHANNELS_AMD, clValueType::cl_char },
-	//		{ CL_DEVICE_GLOBAL_MEM_CHANNEL_BANKS_AMD, clValueType::cl_char },
-	//		{ CL_DEVICE_GLOBAL_MEM_CHANNEL_BANK_WIDTH_AMD, clValueType::cl_char },
-	//		{ CL_DEVICE_LOCAL_MEM_SIZE_PER_COMPUTE_UNIT_AMD, clValueType::cl_char },
-	//		{ CL_DEVICE_LOCAL_MEM_BANKS_AMD, clValueType::cl_char },
-	//		{ CL_DEVICE_THREAD_TRACE_SUPPORTED_AMD, clValueType::cl_char },
-	//		{ CL_DEVICE_GFXIP_MAJOR_AMD, clValueType::cl_char },
-	//		{ CL_DEVICE_GFXIP_MINOR_AMD, clValueType::cl_char },
-	//		{ CL_DEVICE_AVAILABLE_ASYNC_QUEUES_AMD, clValueType::cl_char },
-	//		{ CL_DEVICE_PREFERRED_WORK_GROUP_SIZE_AMD, clValueType::cl_char },
-	//		{ CL_DEVICE_MAX_WORK_GROUP_SIZE_AMD, clValueType::cl_char },
-	//		{ CL_DEVICE_PREFERRED_CONSTANT_BUFFER_SIZE_AMD, clValueType::cl_char },
-	//		{ CL_DEVICE_PCIE_ID_AMD, clValueType::cl_char },
-	//	};
-	//	for (auto info : infoList) {
-	//		readDeviceInfoValue(info, "cl_amd_device_attribute_query");
-	//	}
-	//}
 
 	// NV
 	if (extensionSupported("cl_nv_device_attribute_query")) {
