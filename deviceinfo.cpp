@@ -307,6 +307,13 @@ void DeviceInfo::readDeviceInfoValue(DeviceInfoValueDescriptor descriptor, QStri
 		deviceInfo.push_back(infoValue);
 		break;
 	}
+	case clValueType::cl_device_command_buffer_capabilities_khr:
+	{
+		cl_device_command_buffer_capabilities_khr value;
+		_clGetDeviceInfo(this->deviceId, descriptor.name, sizeof(cl_device_command_buffer_capabilities_khr), &value, nullptr);
+		deviceInfo.push_back(DeviceInfoValue(descriptor.name, QVariant::fromValue(value), extension, descriptor.displayFunction));
+		break;
+	}
 	/* ARM */
 	case clValueType::cl_device_controlled_termination_capabilities_arm:
 	{
@@ -726,6 +733,15 @@ void DeviceInfo::readExtensionInfo()
 		};
 		for (auto &info : infoList) {
 			readDeviceInfoValue(info, "cl_khr_external_semaphore");
+		}
+	}
+
+	if (extensionSupported("cl_khr_command_buffer ")) {
+		std::vector<DeviceInfoValueDescriptor> infoList = {
+			{ CL_DEVICE_COMMAND_BUFFER_CAPABILITIES_KHR, clValueType::cl_device_command_buffer_capabilities_khr, utils::displayCommandBufferCapabilities },
+		};
+		for (auto &info : infoList) {
+			readDeviceInfoValue(info, "cl_khr_command_buffer");
 		}
 	}
 

@@ -58,6 +58,7 @@ enum class clValueType {
 	cl_device_integer_dot_product_acceleration_properties_khr,
 	cl_external_memory_handle_type_khr_array,
 	cl_external_semaphore_handle_type_khr,
+	cl_device_command_buffer_capabilities_khr,
 	special
 };
 
@@ -282,6 +283,8 @@ namespace utils
 			STR(CL_DEVICE_MAX_WORK_GROUP_SIZE_AMD);
 			STR(CL_DEVICE_PREFERRED_CONSTANT_BUFFER_SIZE_AMD);
 			STR(CL_DEVICE_PCIE_ID_AMD);
+			// cl_khr_command_buffer 
+			STR(CL_DEVICE_COMMAND_BUFFER_CAPABILITIES_KHR);
 
 #undef STR
 		default: return "?";

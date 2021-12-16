@@ -58,5 +58,6 @@ namespace utils
 	QString displayItegerDotProductCapabilities(QVariant value);
 	QString displayExternalMemoryHandleTypes(QVariant value);
 	QString displayExternalSemaphoreHandleTypes(QVariant value);
+	QString displayCommandBufferCapabilities(QVariant value);
 }
 

@@ -343,4 +343,15 @@ namespace utils
         }
     }
 
+    QString displayCommandBufferCapabilities(QVariant value)
+    {
+        std::unordered_map<uint32_t, QString> flags = {
+            { CL_COMMAND_BUFFER_CAPABILITY_KERNEL_PRINTF_KHR, "KERNEL_PRINTF_KHR"},
+            { CL_COMMAND_BUFFER_CAPABILITY_DEVICE_SIDE_ENQUEUE_KHR, "DEVICE_SIDE_ENQUEUE_KHR"},
+            { CL_COMMAND_BUFFER_CAPABILITY_SIMULTANEOUS_USE_KHR, "SIMULTANEOUS_USE_KHR"},
+            { CL_COMMAND_BUFFER_CAPABILITY_OUT_OF_ORDER_KHR, "OUT_OF_ORDER_KHR"}
+        };
+        return displayFlags(value.toInt(), flags);
+    }
+
 }
