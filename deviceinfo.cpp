@@ -441,6 +441,12 @@ void DeviceInfo::readDeviceIdentifier()
 	identifier.gpuName = getDeviceInfoString(CL_DEVICE_NAME);
 #else
 	identifier.name = getDeviceInfoString(CL_DEVICE_NAME);
+	// Some AMD devices may only report internal names (like gfx906) so we use an AMD extension to add the proper device name
+	if (extensionSupported("cl_amd_device_attribute_query")) {
+		qInfo() << "Device supports cl_amd_device_attribute_query, using AMD specific board name";
+		QString identifierAmd = getDeviceInfoString(CL_DEVICE_BOARD_NAME_AMD);
+		identifier.name = identifierAmd + " (" + identifier.name + ")";
+	}
 	identifier.gpuName = identifier.name;
 #endif
 	identifier.driverVersion = getDeviceInfoString(CL_DRIVER_VERSION);
