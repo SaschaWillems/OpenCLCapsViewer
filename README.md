@@ -22,7 +22,7 @@ The repository includes a project file for the [Qt Creator IDE](https://www.qt.i
 Alternatively, you can simply run `qmake` followed by `make` in the source directory.
 
 # Releases
-Current releases for all platforms will be provided on a regular basis at [https://opencl.gpuinfo.org/download.php](https://opencl.gpuinfo.org/download.php).
+Current releases for all platforms will be provided on a regular basis at [this link](https://opencl.gpuinfo.org/download.php).
 
 # Dependencies
 - [Qt 5.12](https://www.qt.io/developers/) - Older versions may not work due to missing functionality
