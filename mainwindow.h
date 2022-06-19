@@ -2,7 +2,7 @@
 *
 * OpenCL hardware capability viewer
 *
-* Copyright (C) 2021 by Sascha Willems (www.saschawillems.de)
+* Copyright (C) 2021-2022 by Sascha Willems (www.saschawillems.de)
 *
 * This code is free software, you can redistribute it and/or
 * modify it under the terms of the GNU Lesser General Public
@@ -82,6 +82,8 @@ public:
     void getDevices();
     void displayDevice(uint32_t index);
     void getOperatingSystem();
+    void saveReport(QString fileName, QString submitter, QString comment);
+    int uploadReportNonVisual(int deviceIndex, QString submitter, QString comment);
 
 private:
     Ui::MainWindow *ui;
@@ -120,7 +122,6 @@ private:
     void checkReportDatabaseState();
 
     void reportToJson(DeviceInfo& device, QString submitter, QString comment, QJsonObject& jsonObject);
-    void saveReport(QString fileName, QString submitter, QString comment);
 
 #if defined(ANDROID)
     void setTouchProps(QWidget *widget);

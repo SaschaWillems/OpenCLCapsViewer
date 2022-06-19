@@ -2,7 +2,7 @@
 *
 * OpenCL hardware capability viewer
 *
-* Copyright (C) 2021 by Sascha Willems (www.saschawillems.de)
+* Copyright (C) 2021-2022 by Sascha Willems (www.saschawillems.de)
 *
 * This code is free software, you can redistribute it and/or
 * modify it under the terms of the GNU Lesser General Public
@@ -22,7 +22,7 @@
 #include "ui_mainwindow.h"
 #include "openclfunctions.h"
 
-const QString MainWindow::version = "1.0";
+const QString MainWindow::version = "1.1";
 const QString MainWindow::reportVersion = "1.0";
 
 bool MainWindow::checkOpenCLAvailability(QString &error)
@@ -652,11 +652,49 @@ void MainWindow::saveReport(QString fileName, QString submitter, QString comment
     jsonFile.write(doc.toJson(QJsonDocument::Indented));
 }
 
+int MainWindow::uploadReportNonVisual(int deviceIndex, QString submitter, QString comment)
+{
+    DeviceInfo device = devices[deviceIndex];
+
+    QString message;
+    bool dbstatus = database.checkServerConnection(message);
+    if (!dbstatus)
+    {
+        qWarning() << "Database unreachable";
+        return -1;
+    }
+
+    QJsonObject reportJson;
+    reportToJson(device, submitter, comment, reportJson);
+    int reportId;
+    if (!database.getReportId(reportJson, reportId)) {
+        qWarning() << "Could not get report id from database";
+        return -2;
+    }
+
+    if (reportId > -1)
+    {
+        qWarning() << "Device already present in database";
+        return -3;
+    }
+
+    if (database.uploadReport(reportJson, message))
+    {
+        qInfo() << "Report successfully submitted. Thanks for your contribution!";
+        return 0;
+    }
+    else
+    {
+        qInfo() << "The report could not be uploaded : \n" << message;
+        return -4;
+    }
+}
+
 void MainWindow::slotAbout()
 {
     std::stringstream aboutText;
     aboutText << "<p>OpenCL Hardware Capability Viewer " << version.toStdString() << "<br/><br/>"
-        "Copyright (c) 2021 by <a href='https://www.saschawillems.de'>Sascha Willems</a><br/><br/>"
+        "Copyright (c) 2021-2022 by <a href='https://www.saschawillems.de'>Sascha Willems</a><br/><br/>"
         "This tool is <b>Free Open Source Software</b><br/><br/>"
         "For usage and distribution details refer to the readme<br/><br/>"
         "<a href='https://www.gpuinfo.org'>https://www.gpuinfo.org</a></p>";

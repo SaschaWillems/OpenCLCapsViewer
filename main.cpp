@@ -2,7 +2,7 @@
 *
 * OpenCL hardware capability viewer
 *
-* Copyright (C) 2021 by Sascha Willems (www.saschawillems.de)
+* Copyright (C) 2021-2022 by Sascha Willems (www.saschawillems.de)
 *
 * This code is free software, you can redistribute it and/or
 * modify it under the terms of the GNU Lesser General Public
@@ -62,11 +62,22 @@ int main(int argc, char *argv[])
     QCommandLineParser parser;
     QCommandLineOption optionLogFile("log", "Write log messages to a text file for debugging (log.txt)");
     QCommandLineOption optionDisableProxy("noproxy", "Run withouth proxy (overrides setting)");
+    QCommandLineOption optionSaveReport("save", "Save report to file without starting the GUI", "savereport", "");
+    QCommandLineOption optionUploadReport("upload", "Upload report for device with given index to the database without visual interaction");
+    QCommandLineOption optionUploadReportDeviceIndex("deviceindex", "Set device index for report upload", "0");
+    QCommandLineOption optionUploadReportSubmitter("submitter", "Set optional submitter name for report upload", "submitter", "");
+    QCommandLineOption optionUploadReportComment("comment", "Set optional comment for report upload", "comment", "");
+
     parser.setApplicationDescription("OpenCL Hardware Capability Viewer");
     parser.addHelpOption();
     parser.addVersionOption();
     parser.addOption(optionLogFile);
     parser.addOption(optionDisableProxy);
+    parser.addOption(optionSaveReport);
+    parser.addOption(optionUploadReport);
+    parser.addOption(optionUploadReportDeviceIndex);
+    parser.addOption(optionUploadReportSubmitter);
+    parser.addOption(optionUploadReportComment);
     parser.process(application);
     if (parser.isSet(optionLogFile)) {
         qInstallMessageHandler(logMessageHandler);
@@ -78,6 +89,31 @@ int main(int argc, char *argv[])
         settings.applyProxySettings();
     }
     MainWindow w;
+
+    if (parser.isSet(optionSaveReport))
+    {
+        w.saveReport(parser.value(optionSaveReport), "", "");
+        return 0;
+    }
+
+    if (parser.isSet(optionUploadReport))
+    {
+        int deviceIndex = 0;
+        QString submitter = "";
+        QString comment = "";
+        if (parser.isSet(optionUploadReportDeviceIndex)) {
+            deviceIndex = parser.value(optionUploadReportDeviceIndex).toInt();
+        }
+        if (parser.isSet(optionUploadReportSubmitter)) {
+            submitter = parser.value(optionUploadReportSubmitter);
+        }
+        if (parser.isSet(optionUploadReportComment)) {
+            comment = parser.value(optionUploadReportComment);
+        }
+        int res = w.uploadReportNonVisual(deviceIndex, submitter, comment);
+        return res;
+    }
+
     w.show();
     return application.exec();
 }
