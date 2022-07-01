@@ -415,7 +415,8 @@ void MainWindow::checkReportDatabaseState()
         return;
     }
     QJsonObject jsonReport;
-    reportToJson(devices[selectedDeviceIndex], "", "", jsonReport);
+    Report report;
+    report.toJson(devices[selectedDeviceIndex], "", "", jsonReport);
     ReportState state;
     if (database.getReportState(jsonReport, state))
     {
@@ -423,25 +424,6 @@ void MainWindow::checkReportDatabaseState()
         setReportState(state);
     }
     QApplication::restoreOverrideCursor();
-}
-
-void MainWindow::reportToJson(DeviceInfo& device, QString submitter, QString comment, QJsonObject& jsonObject)
-{
-    // Environment
-    QJsonObject jsonEnv;
-    jsonEnv["name"] = operatingSystem.name;
-    jsonEnv["version"] = operatingSystem.version;
-    jsonEnv["architecture"] = operatingSystem.architecture;
-    jsonEnv["type"] = operatingSystem.type;
-    jsonEnv["submitter"] = submitter;
-    jsonEnv["comment"] = comment;
-    jsonEnv["reportversion"] = reportVersion;
-    jsonEnv["appversion"] = appVersion;
-    jsonObject["environment"] = jsonEnv;
-    // Platform
-    jsonObject["platform"] = device.platform->toJson();
-    // Device
-    jsonObject["device"] = device.toJson();
 }
 
 void MainWindow::slotAbout()
@@ -467,7 +449,8 @@ void MainWindow::slotSettings()
 void MainWindow::slotDisplayOnlineReport()
 {
     QJsonObject jsonReport;
-    reportToJson(devices[selectedDeviceIndex], "", "", jsonReport);
+    Report report;
+    report.toJson(devices[selectedDeviceIndex], "", "", jsonReport);
     int reportId;
     if (database.getReportId(jsonReport, reportId)) {
         QUrl url(database.databaseUrl + "displayreport.php?id=" + QString::number(reportId));
@@ -503,7 +486,7 @@ void MainWindow::slotSaveReport()
     fileName += ".json";
 
     QMessageBox msgBox;
-    if (-1 != saveReport(fileName.toStdString(), "", ""))
+    if (-1 != report.saveToFile(devices[selectedDeviceIndex], fileName.toStdString(), "", ""))
         msgBox.setText("Report saved to the iTunes file sharing folder.");
     else
         msgBox.setText("Error writing to iTunes file sharing folder.");
@@ -526,9 +509,10 @@ void MainWindow::slotUploadReport()
 
         if (dialog.exec() == QDialog::Accepted) {
             QString message;
-            QJsonObject reportJson;
-            reportToJson(devices[selectedDeviceIndex], dialog.getSubmitter(), dialog.getComment(), reportJson);
-            if (database.uploadReport(reportJson, message))
+            QJsonObject jsonReport;
+            Report report;
+            report.toJson(devices[selectedDeviceIndex], dialog.getSubmitter(), dialog.getComment(), jsonReport);
+            if (database.uploadReport(jsonReport, message))
             {
                 QMessageBox::information(this, "Report submitted", "Your report has been uploaded to the database!\n\nThank you for your contribution!");
                 checkReportDatabaseState();

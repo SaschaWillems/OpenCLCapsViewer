@@ -105,8 +105,6 @@ private:
     void setReportState(ReportState state);
     void checkReportDatabaseState();
 
-    void reportToJson(DeviceInfo& device, QString submitter, QString comment, QJsonObject& jsonObject);
-
 #if defined(ANDROID)
     void setTouchProps(QWidget *widget);
 #endif
