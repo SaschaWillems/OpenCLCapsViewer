@@ -19,7 +19,13 @@
 */
 
 #include "mainwindow.h"
-
+#include "database.h"
+#include "openclinfo.h"
+#include "openclfunctions.h"
+#include "operatingsystem.h"
+#include "report.h"
+#include <stdio.h>
+#include <iostream>
 #include <QApplication>
 #include <QCommandLineParser>
 
@@ -65,6 +71,7 @@ int main(int argc, char *argv[])
     QCommandLineOption optionSaveReport("save", "Save report to file without starting the GUI", "savereport", "");
     QCommandLineOption optionUploadReport("upload", "Upload report for device with given index to the database without visual interaction");
     QCommandLineOption optionUploadReportDeviceIndex("deviceindex", "Set device index for report upload", "0");
+    QCommandLineOption optionListDevices("devices", "List available devices");
     QCommandLineOption optionUploadReportSubmitter("submitter", "Set optional submitter name for report upload", "submitter", "");
     QCommandLineOption optionUploadReportComment("comment", "Set optional comment for report upload", "comment", "");
 
@@ -78,6 +85,7 @@ int main(int argc, char *argv[])
     parser.addOption(optionUploadReportDeviceIndex);
     parser.addOption(optionUploadReportSubmitter);
     parser.addOption(optionUploadReportComment);
+    parser.addOption(optionListDevices);
     parser.process(application);
     if (parser.isSet(optionLogFile)) {
         qInstallMessageHandler(logMessageHandler);
@@ -88,11 +96,45 @@ int main(int argc, char *argv[])
         settings.proxyEnabled = false;
         settings.applyProxySettings();
     }
+
+    // @todo: decouple
     MainWindow w;
+
+    QString error;
+    if (!checkOpenCLAvailability(error))
+    {
+        QMessageBox::warning(&w, "Error", "OpenCL does not seem to be supported on this platform:\n" + error);
+        exit(EXIT_FAILURE);
+    }
+    if (!getOpenCLDevices(error)) {
+        QMessageBox::critical(&w, "Error", error);
+        exit(EXIT_FAILURE);
+    }
+    getOperatingSystem();
+
+    if (parser.isSet(optionListDevices))
+    {
+        for (size_t i = 0; i < devices.size(); i++) {
+            std::cout << "[" << i << "] " << devices[i].identifier.name.toStdString() << "\n";
+        }
+        return 0;
+    }
 
     if (parser.isSet(optionSaveReport))
     {
-        w.saveReport(parser.value(optionSaveReport), "", "");
+        int deviceIndex = 0;
+        QString submitter = "";
+        QString comment = "";
+        QString filename = parser.value(optionSaveReport);
+        if (parser.isSet(optionUploadReportDeviceIndex)) {
+            deviceIndex = parser.value(optionUploadReportDeviceIndex).toInt();
+        }
+        if (deviceIndex > devices.size()) {
+            std::cerr << "Device index out of range\n";
+        } else {
+            Report report;
+            report.saveToFile(devices[deviceIndex], filename, submitter, comment);
+        }
         return 0;
     }
 
@@ -110,10 +152,17 @@ int main(int argc, char *argv[])
         if (parser.isSet(optionUploadReportComment)) {
             comment = parser.value(optionUploadReportComment);
         }
-        int res = w.uploadReportNonVisual(deviceIndex, submitter, comment);
-        return res;
+        if (deviceIndex > devices.size()) {
+            std::cerr << "Device index out of range\n";
+            return 0;
+        } else {
+            Report report;
+            int res = report.uploadNonVisual(devices[deviceIndex], submitter, comment);
+            return res;
+        }
     }
-
+    
+    w.updateDeviceList();
     w.show();
     return application.exec();
 }

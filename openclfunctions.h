@@ -49,5 +49,6 @@ extern PFN_clReleaseContext _clReleaseContext;
 extern PFN_clGetSupportedImageFormats _clGetSupportedImageFormats;
 
 void loadFunctionPointers(void *library);
+bool checkOpenCLAvailability(QString& error);
 
 #endif

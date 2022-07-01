@@ -49,6 +49,11 @@
 #include "platforminfo.h"
 #include "database.h"
 #include "submitdialog.h"
+#include "openclfunctions.h"
+#include "operatingsystem.h"
+#include "openclinfo.h"
+#include "appinfo.h"
+#include "report.h"
 #include "CL/cl.h"
 
 QT_BEGIN_NAMESPACE
@@ -62,28 +67,11 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-
-    static const QString version;
-    static const QString reportVersion;
-    
-    struct OperatingSystem
-    {
-        QString name;
-        QString version;
-        QString architecture;
-        int type;
-    } operatingSystem;
-
-    std::vector<PlatformInfo> platforms;
-    std::vector<DeviceInfo> devices;
-
+   
     ReportState reportState = ReportState::unknown;
     
-    void getDevices();
+    void updateDeviceList();
     void displayDevice(uint32_t index);
-    void getOperatingSystem();
-    void saveReport(QString fileName, QString submitter, QString comment);
-    int uploadReportNonVisual(int deviceIndex, QString submitter, QString comment);
 
 private:
     Ui::MainWindow *ui;
@@ -103,11 +91,7 @@ private:
         QStandardItemModel deviceImageFormats;
         QStandardItemModel platformInfo;
         QStandardItemModel platformExtensions;
-    } models;
-
-    Database database;
-
-    bool checkOpenCLAvailability(QString &error);
+    } models;    
 
     void connectFilterAndModel(QStandardItemModel& model, TreeProxyFilter& filter);
 

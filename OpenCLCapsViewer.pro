@@ -20,11 +20,15 @@ SOURCES += \
     database.cpp \
     deviceinfo.cpp \
     openclfunctions.cpp \
+    openclinfo.cpp \
     platforminfo.cpp \
     treeproxyfilter.cpp \
     submitdialog.cpp \
     settings.cpp \
-    settingsdialog.cpp 
+    settingsdialog.cpp \
+    appinfo.cpp \
+    report.cpp \
+    operatingsystem.cpp
 
 HEADERS += \
     displayutils.h \
@@ -32,11 +36,15 @@ HEADERS += \
     database.h \
     deviceinfo.h \
     openclfunctions.h \
+    openclinfo.h \
     platforminfo.h \
     treeproxyfilter.h \
     submitdialog.h \
     settings.h \
-    settingsdialog.h
+    settingsdialog.h \
+    appinfo.h \
+    report.h \
+    operatingsystem.h
 
 FORMS += \
     mainwindow.ui

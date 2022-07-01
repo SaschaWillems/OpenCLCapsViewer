@@ -20,119 +20,6 @@
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "openclfunctions.h"
-
-const QString MainWindow::version = "1.1";
-const QString MainWindow::reportVersion = "1.0";
-
-bool MainWindow::checkOpenCLAvailability(QString &error)
-{
-    // Check if OpenCL is supported by trying to load the OpenCL library and getting a valid function pointer
-    bool openCLAvailable = false;
-    error = "";
-
-#if defined(__ANDROID__)
-    // Try to find the OepenCL library on one of the following paths
-    static const char *libraryPaths[] = {
-        // Generic
-        "/system/vendor/lib64/libOpenCL.so",
-        "/system/lib64/libOpenCL.so",
-        "/system/vendor/lib/libOpenCL.so",
-        "/system/lib/libOpenCL.so",
-        // ARM Mali
-        "/system/vendor/lib64/egl/libGLES_mali.so",
-        "/system/lib64/egl/libGLES_mali.so",
-        "/system/vendor/lib/egl/libGLES_mali.so",
-        "/system/lib/egl/libGLES_mali.so",
-        // PowerVR
-        "/system/vendor/lib64/libPVROCL.so",
-        "/system/lib64/libPVROCL.so",
-        "/system/vendor/lib/libPVROCL.so",
-        "/system/lib/libPVROCL.so"
-    };
-    void *libOpenCL = nullptr;
-    for (auto libraryPath : libraryPaths) {
-        qInfo() << "Trying to load library from" << libraryPath;
-        libOpenCL = dlopen(libraryPath, RTLD_LAZY);
-        if (libOpenCL) {
-            qInfo() << "Found library in" << libraryPath;
-            break;
-        }
-    }
-    if (libOpenCL) {
-        // OpenCl library loaded, now try to get a function pointer to check if it works
-        PFN_clGetPlatformIDs test_fn = reinterpret_cast<PFN_clGetPlatformIDs>(dlsym(libOpenCL, "clGetPlatformIDs"));
-        if (test_fn) {
-            qInfo() << "Got valid function pointer for clGetPlatformIDs";
-            openCLAvailable = true;
-            loadFunctionPointers(libOpenCL);
-        } else {
-            error = "Could not get a valid function pointer";
-        }
-    } else {
-       error = "Could not find a OpenCL library";
-    }
-#elif defined(__linux__)
-    // Try to find the OepenCL library on one of the following paths
-    static const char *libraryPaths[] = {
-        "libOpenCL.so",
-        "/usr/lib/libOpenCL.so",
-        "/usr/local/lib/libOpenCL.so",
-        "/usr/local/lib/libpocl.so",
-        "/usr/lib64/libOpenCL.so",
-        "/usr/lib32/libOpenCL.so",
-        "libOpenCL.so.1",
-        "/usr/lib/libOpenCL.so.1",
-        "/usr/local/lib/libOpenCL.so.1",
-        "/usr/local/lib/libpocl.so.1",
-        "/usr/lib64/libOpenCL.so.1",
-        "/usr/lib32/libOpenCL.so.1"
-    };
-    void *libOpenCL = nullptr;
-    for (auto libraryPath : libraryPaths) {
-        qInfo() << "Trying to load library from" << libraryPath;
-        libOpenCL = dlopen(libraryPath, RTLD_LAZY);
-        if (libOpenCL) {
-            qInfo() << "Found library in" << libraryPath;
-            break;
-        }
-    }
-    if (libOpenCL) {
-        // OpenCl library loaded, now try to get a function pointer to check if it works
-        PFN_clGetPlatformIDs test_fn = reinterpret_cast<PFN_clGetPlatformIDs>(dlsym(libOpenCL, "clGetPlatformIDs"));
-        if (test_fn) {
-            qInfo() << "Got valid function pointer for clGetPlatformIDs";
-            openCLAvailable = true;
-            loadFunctionPointers(libOpenCL);
-        } else {
-            error = "Could not get a valid function pointer";
-        }
-    } else {
-       error = "Could not find a OpenCL library";
-    }
-#elif defined(_WIN32)
-    HMODULE libOpenCL = LoadLibraryA("OpenCL.dll");
-    if (libOpenCL) {
-        char libPath[MAX_PATH] = { 0 };
-        GetModuleFileNameA(libOpenCL, libPath, sizeof(libPath));
-        qInfo() << "Found library in" << libPath;
-        PFN_clGetPlatformIDs test_fn = reinterpret_cast<PFN_clGetPlatformIDs>(GetProcAddress((HMODULE)libOpenCL, "clGetPlatformIDs"));
-        if (test_fn) {
-            qInfo() << "Got valid function pointer for clGetPlatformIDs";
-            openCLAvailable = true;
-            loadFunctionPointers(libOpenCL);
-        } else {
-            error = "Could not get a valid function pointer";
-        }
-    } else {
-        error = "Could not find a OpenCL library";
-    }
-#endif
-    if (error != "") {
-        qCritical() << error;
-    }
-    return openCLAvailable;
-}
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -140,17 +27,10 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    const QString title = "OpenCL Hardware Capability Viewer " + version;
+    const QString title = "OpenCL Hardware Capability Viewer " + appVersion;
     setWindowTitle(title);
     ui->labelTitle->setText(title);
     qApp->setStyle(QStyleFactory::create("Fusion"));
-
-    QString error;
-    if (!checkOpenCLAvailability(error))
-    {
-        QMessageBox::warning(this, "Error", "OpenCL does not seem to be supported on this platform:\n" + error);
-        exit(EXIT_FAILURE);
-    }
 
     // Models
     ui->treeViewDeviceInfo->setModel(&filterProxies.deviceinfo);
@@ -214,9 +94,6 @@ MainWindow::MainWindow(QWidget *parent)
         ui->tabWidgetDevice->widget(i)->layout()->setMargin(0);
     }
 #endif
-
-    getOperatingSystem();
-    getDevices();
 }
 
 MainWindow::~MainWindow()
@@ -224,72 +101,14 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::getDevices()
+void MainWindow::updateDeviceList()
 {
-	cl_uint numPlatforms;
-    cl_int status = _clGetPlatformIDs(0, nullptr, &numPlatforms);
-	if (status != CL_SUCCESS)
-	{
-        qCritical() << "Could not get platform count!";
-        QMessageBox::critical(this, tr("Error"), "Could not get platform count!");
-        exit(EXIT_FAILURE);
-    }
-
-    // Read platforms
-    std::vector<cl_platform_id> platformIds(numPlatforms);
-    status = _clGetPlatformIDs(numPlatforms, platformIds.data(), nullptr);
-    if (status != CL_SUCCESS)
-    {
-        qCritical() << "Could not read platforms!";
-        QMessageBox::critical(this, tr("Error"), "Could not read platforms!");
-        exit(EXIT_FAILURE);
-    }
-    qInfo() << "Found" << numPlatforms << "OpenCL platforms";
-    for (cl_platform_id platformId : platformIds)
-    {
-        PlatformInfo platformInfo{};
-        platformInfo.platformId = platformId;
-        platformInfo.read();
-        platforms.push_back(platformInfo);
-    }
-
-    // Read devices for platforms
-    for (auto& platform : platforms)
-    {
-        qInfo() << "Reading devices for platform id" << platform.platformId;
-        cl_uint numDevices;
-        status = _clGetDeviceIDs(platform.platformId, CL_DEVICE_TYPE_ALL, 0, nullptr, &numDevices);
-        if (status != CL_SUCCESS) {
-            qCritical() << "Could not read devices for the platform";
-            QMessageBox::critical(this, tr("Error"), "Could not read devices for the current platform!");
-            exit(EXIT_FAILURE);
-        }
-        std::vector<cl_device_id> deviceIds(numDevices);
-        status = _clGetDeviceIDs(platform.platformId, CL_DEVICE_TYPE_ALL, numDevices, deviceIds.data(), nullptr);
-        if (status != CL_SUCCESS) {
-            qCritical() << "Could not read devices for the platform";
-            QMessageBox::critical(this, tr("Error"), "Could not read devices for the current platform!");
-            exit(EXIT_FAILURE);
-        }
-        qInfo() << "Found" << numDevices << "OpenCL device(s) for the current OpenCL platform";
-        for (auto deviceId : deviceIds)
-        {
-            qInfo() << "Reading properties for device" << deviceId;
-            DeviceInfo deviceInfo{};
-            deviceInfo.deviceId = deviceId;
-            deviceInfo.platform = &platform;
-            deviceInfo.read();
-            devices.push_back(deviceInfo);
-        }
-    }
-
     ui->comboBoxDevice->clear();
     for (DeviceInfo device : devices)
     {
         QString deviceName = device.identifier.name;
         ui->comboBoxDevice->addItem(deviceName);
     }
-
     if (devices.size() > 0)
     {
         displayDevice(0);
@@ -300,8 +119,8 @@ void MainWindow::getDevices()
         QMessageBox::critical(this, tr("Error"), "Could not find a device with OpenCL support!");
         exit(EXIT_FAILURE);
     }
-
 }
+
 
 void MainWindow::displayDevice(uint32_t index)
 {
@@ -315,23 +134,6 @@ void MainWindow::displayDevice(uint32_t index)
     displayPlatformInfo(*device.platform);
     displayOperatingSystem();
     checkReportDatabaseState();
-}
-
-void MainWindow::getOperatingSystem()
-{
-    operatingSystem.name = QSysInfo::productType();
-    operatingSystem.architecture = QSysInfo::buildCpuArchitecture();
-    operatingSystem.version = QSysInfo::productVersion();
-    operatingSystem.type = -1;
-#if defined(_WIN32)
-    operatingSystem.type = 0;
-#elif defined(__ANDROID__)
-    operatingSystem.type = 2;
-#elif defined(__linux__)
-    operatingSystem.type = 1;
-#elif __APPLE__
-    // @todo: dinstinguish between macos and ios
-#endif
 }
 
 void MainWindow::connectFilterAndModel(QStandardItemModel& model, TreeProxyFilter& filter)
@@ -634,7 +436,7 @@ void MainWindow::reportToJson(DeviceInfo& device, QString submitter, QString com
     jsonEnv["submitter"] = submitter;
     jsonEnv["comment"] = comment;
     jsonEnv["reportversion"] = reportVersion;
-    jsonEnv["appversion"] = version;
+    jsonEnv["appversion"] = appVersion;
     jsonObject["environment"] = jsonEnv;
     // Platform
     jsonObject["platform"] = device.platform->toJson();
@@ -642,58 +444,10 @@ void MainWindow::reportToJson(DeviceInfo& device, QString submitter, QString com
     jsonObject["device"] = device.toJson();
 }
 
-void MainWindow::saveReport(QString fileName, QString submitter, QString comment)
-{
-    QJsonObject jsonReport;
-    reportToJson(devices[selectedDeviceIndex], submitter, comment, jsonReport);
-    QJsonDocument doc(jsonReport);
-    QFile jsonFile(fileName);
-    jsonFile.open(QFile::WriteOnly);
-    jsonFile.write(doc.toJson(QJsonDocument::Indented));
-}
-
-int MainWindow::uploadReportNonVisual(int deviceIndex, QString submitter, QString comment)
-{
-    DeviceInfo device = devices[deviceIndex];
-
-    QString message;
-    bool dbstatus = database.checkServerConnection(message);
-    if (!dbstatus)
-    {
-        qWarning() << "Database unreachable";
-        return -1;
-    }
-
-    QJsonObject reportJson;
-    reportToJson(device, submitter, comment, reportJson);
-    int reportId;
-    if (!database.getReportId(reportJson, reportId)) {
-        qWarning() << "Could not get report id from database";
-        return -2;
-    }
-
-    if (reportId > -1)
-    {
-        qWarning() << "Device already present in database";
-        return -3;
-    }
-
-    if (database.uploadReport(reportJson, message))
-    {
-        qInfo() << "Report successfully submitted. Thanks for your contribution!";
-        return 0;
-    }
-    else
-    {
-        qInfo() << "The report could not be uploaded : \n" << message;
-        return -4;
-    }
-}
-
 void MainWindow::slotAbout()
 {
     std::stringstream aboutText;
-    aboutText << "<p>OpenCL Hardware Capability Viewer " << version.toStdString() << "<br/><br/>"
+    aboutText << "<p>OpenCL Hardware Capability Viewer " << appVersion.toStdString() << "<br/><br/>"
         "Copyright (c) 2021-2022 by <a href='https://www.saschawillems.de'>Sascha Willems</a><br/><br/>"
         "This tool is <b>Free Open Source Software</b><br/><br/>"
         "For usage and distribution details refer to the readme<br/><br/>"
@@ -735,7 +489,8 @@ void MainWindow::slotSaveReport()
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save Report to disk"), device.identifier.name + ".json", tr("json (*.json)"));
 
     if (!fileName.isEmpty()) {
-        saveReport(fileName, "", "");
+        Report report;
+        report.saveToFile(devices[selectedDeviceIndex], fileName, "", "");
     }
 
 #else
