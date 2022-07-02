@@ -189,6 +189,8 @@ int main(int argc, char *argv[])
 #ifdef GUI_BUILD
     w.updateDeviceList();
     w.show();
-#endif
     return application.exec();
+#else
+    return 0;
+#endif
 }
