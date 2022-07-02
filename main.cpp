@@ -18,15 +18,21 @@
 *
 */
 
+#ifdef GUI_BUILD
+#include <QApplication>
 #include "mainwindow.h"
+#else
+#include <QCoreApplication>
+#endif
+
 #include "database.h"
 #include "openclinfo.h"
 #include "openclfunctions.h"
 #include "operatingsystem.h"
 #include "report.h"
+#include "settings.h"
 #include <stdio.h>
 #include <iostream>
-#include <QApplication>
 #include <QCommandLineParser>
 
 void logMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString& msg)
@@ -55,16 +61,28 @@ void logMessageHandler(QtMsgType type, const QMessageLogContext& context, const 
     if (logFile.open(QIODevice::WriteOnly | QIODevice::Append)) {
         QTextStream textStream(&logFile);
         textStream << logMessage << endl;
-    };
+    }
 }
 
-int main(int argc, char *argv[])
+#ifndef GUI
+void logMessageHandlerCli(QtMsgType type, const QMessageLogContext& context, const QString& msg)
 {
+    return;
+}
+#endif
+
+int main(int argc, char *argv[])
+{    
+
+#ifdef GUI_BUILD
 #if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
-
     QApplication application(argc, argv);
+#else
+    QCoreApplication application(argc, argv);
+    qInstallMessageHandler(logMessageHandlerCli);
+#endif
     QCommandLineParser parser;
     QCommandLineOption optionLogFile("log", "Write log messages to a text file for debugging (log.txt)");
     QCommandLineOption optionDisableProxy("noproxy", "Run withouth proxy (overrides setting)");
@@ -89,25 +107,31 @@ int main(int argc, char *argv[])
     parser.process(application);
     if (parser.isSet(optionLogFile)) {
         qInstallMessageHandler(logMessageHandler);
-    }
+    }       
     qInfo() << "Application start";
     settings.restore();
     if (parser.isSet(optionDisableProxy)) {
         settings.proxyEnabled = false;
         settings.applyProxySettings();
     }
-
-    // @todo: decouple
+#ifdef GUI_BUILD
     MainWindow w;
+#endif
 
     QString error;
     if (!checkOpenCLAvailability(error))
     {
+#ifdef GUI_BUILD
         QMessageBox::warning(&w, "Error", "OpenCL does not seem to be supported on this platform:\n" + error);
+#else
+#endif
         exit(EXIT_FAILURE);
     }
     if (!getOpenCLDevices(error)) {
+#ifdef GUI_BUILD
         QMessageBox::critical(&w, "Error", error);
+#else
+#endif
         exit(EXIT_FAILURE);
     }
     getOperatingSystem();
@@ -162,7 +186,9 @@ int main(int argc, char *argv[])
         }
     }
     
+#ifdef GUI_BUILD
     w.updateDeviceList();
     w.show();
+#endif
     return application.exec();
 }

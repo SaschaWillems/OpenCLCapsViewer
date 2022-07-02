@@ -78,8 +78,8 @@ jobs:
         if: github.ref == 'refs/heads/master'
         run: curl -T OpenCL_Caps_Viewer-X11-x86_64.AppImage ftp://${{ secrets.FTP_USER_NAME }}:${{ secrets.FTP_PASS }}@${{ secrets.FTP_SERVER_NAME }}
 
-  build_android:
-    name: Build Android
+  build_ubuntu_cli:
+    name: Build CLI version on Ubuntu (X11)
     runs-on: ubuntu-18.04
 
     steps:
@@ -90,19 +90,58 @@ jobs:
       - uses: jurplel/install-qt-action@v2
         with:
           version: 5.12.9
-          target: android
-          arch: android_arm64_v8a 
+          host: linux
+
+      - name: Install OpenCL ICD loader
+        run: |
+          sudo apt update
+          sudo apt install ocl-icd-opencl-dev
 
       - name: Build
         env:
-          TARGET_PLATFORM: ANDROID
+          TARGET_PLATFORM: X11
         run: |
-          export ANDROID_SDK_ROOT=$ANDROID_HOME
-          export ANDROID_NDK_ROOT=$ANDROID_HOME/ndk-bundle
-          qmake OpenCLCapsViewer.pro
-          make install INSTALL_ROOT=/home/runner/work/OpenCLCapsViewer/OpenCLCapsViewer/
-          androiddeployqt --input /home/runner/work/OpenCLCapsViewer/OpenCLCapsViewer/android-libOpenCLCapsViewer.so-deployment-settings.json --output . --android-platform android-30 --gradle
+          echo ${TARGET_PLATFORM}
+          PATH="/opt/qt512/bin:$PATH"
+          CXX="clang++"
+          qmake DEFINES+=X11 CONFIG+=release PREFIX=/usr
+          make INSTALL_ROOT=appdir install ; find appdir/
+          wget -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
+          chmod a+x linuxdeployqt-continuous-x86_64.AppImage
+          export VERSION=${TARGET_PLATFORM}
+          cp openclCapsViewer.png appdir/usr/share/icons/hicolor/256x256/apps/openclCapsViewer.png
+          mv appdir/opt/OpenCLCapsViewer appdir/usr/share/OpenCLCapsViewer
+          ./linuxdeployqt-continuous-x86_64.AppImage appdir/usr/share/applications/* -appimage
 
       - name: Upload
         if: github.ref == 'refs/heads/master'
-        run: curl -T /home/runner/work/OpenCLCapsViewer/OpenCLCapsViewer//build/outputs/apk/debug/OpenCLCapsViewer-debug.apk ftp://${{ secrets.FTP_USER_NAME }}:${{ secrets.FTP_PASS }}@${{ secrets.FTP_SERVER_NAME }}
+        run: curl -T OpenCL_Caps_Viewer-CLI-x86_64.AppImage ftp://${{ secrets.FTP_USER_NAME }}:${{ secrets.FTP_PASS }}@${{ secrets.FTP_SERVER_NAME }}        
+
+  # build_android:
+  #   name: Build Android
+  #   runs-on: ubuntu-18.04
+
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #       with:
+  #         submodules: "recursive"
+
+  #     - uses: jurplel/install-qt-action@v2
+  #       with:
+  #         version: 5.12.9
+  #         target: android
+  #         arch: android_arm64_v8a 
+
+  #     - name: Build
+  #       env:
+  #         TARGET_PLATFORM: ANDROID
+  #       run: |
+  #         export ANDROID_SDK_ROOT=$ANDROID_HOME
+  #         export ANDROID_NDK_ROOT=$ANDROID_HOME/ndk-bundle
+  #         qmake OpenCLCapsViewer.pro
+  #         make install INSTALL_ROOT=/home/runner/work/OpenCLCapsViewer/OpenCLCapsViewer/
+  #         androiddeployqt --input /home/runner/work/OpenCLCapsViewer/OpenCLCapsViewer/android-libOpenCLCapsViewer.so-deployment-settings.json --output . --android-platform android-30 --gradle
+
+  #     - name: Upload
+  #       if: github.ref == 'refs/heads/master'
+  #       run: curl -T /home/runner/work/OpenCLCapsViewer/OpenCLCapsViewer//build/outputs/apk/debug/OpenCLCapsViewer-debug.apk ftp://${{ secrets.FTP_USER_NAME }}:${{ secrets.FTP_PASS }}@${{ secrets.FTP_SERVER_NAME }}

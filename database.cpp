@@ -123,7 +123,9 @@ bool Database::getReportState(QJsonObject json, ReportState& state)
 		result = true;
     } else {
         QString message = reply->errorString();
+#ifdef GUI_BUILD
         QMessageBox::warning(nullptr, tr("Error"), "Could not get report state: " + message);
+#endif
     }
 	delete(manager);
 	return result;
