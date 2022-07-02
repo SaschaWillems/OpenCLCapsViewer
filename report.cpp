@@ -56,6 +56,9 @@ int Report::uploadNonVisual(DeviceInfo& device, QString submitter, QString comme
     bool dbstatus = database.checkServerConnection(message);
     if (!dbstatus)
     {
+#ifndef GUI_BUILD
+        std::cout << "Database unreachable\n";
+#endif
         qWarning() << "Database unreachable";
         return -1;
     }
@@ -64,23 +67,35 @@ int Report::uploadNonVisual(DeviceInfo& device, QString submitter, QString comme
     toJson(device, submitter, comment, reportJson);
     int reportId;
     if (!database.getReportId(reportJson, reportId)) {
+#ifndef GUI_BUILD
+        std::cout << "Database unreachable\n";
+#endif
         qWarning() << "Could not get report id from database";
         return -2;
     }
 
     if (reportId > -1)
     {
+#ifndef GUI_BUILD
+        std::cout << "Device already present in database\n";
+#endif
         qWarning() << "Device already present in database";
         return -3;
     }
 
     if (database.uploadReport(reportJson, message))
     {
+#ifndef GUI_BUILD
+        std::cout << "Report successfully submitted. Thanks for your contribution!\n";
+#endif
         qInfo() << "Report successfully submitted. Thanks for your contribution!";
         return 0;
     }
     else
     {
+#ifndef GUI_BUILD
+        std::cout << "The report could not be uploaded\n";
+#endif
         qInfo() << "The report could not be uploaded : \n" << message;
         return -4;
     }

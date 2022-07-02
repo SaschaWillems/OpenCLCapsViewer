@@ -22,6 +22,7 @@
 #define REPORT_H
 
 #include <QFile>
+#include <iostream>
 #include "deviceinfo.h"
 #include "operatingsystem.h"
 #include "appinfo.h"

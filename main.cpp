@@ -78,11 +78,14 @@ int main(int argc, char *argv[])
 #if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
+    QApplication::setApplicationVersion(appVersion);
     QApplication application(argc, argv);
 #else
     QCoreApplication application(argc, argv);
+    QCoreApplication::setApplicationVersion(appVersion);
     qInstallMessageHandler(logMessageHandlerCli);
 #endif
+
     QCommandLineParser parser;
     QCommandLineOption optionLogFile("log", "Write log messages to a text file for debugging (log.txt)");
     QCommandLineOption optionDisableProxy("noproxy", "Run withouth proxy (overrides setting)");
