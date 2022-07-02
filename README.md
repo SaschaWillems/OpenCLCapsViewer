@@ -21,6 +21,14 @@ The hardware reports can be submitted to a public [online database](https://open
 The repository includes a project file for the [Qt Creator IDE](https://www.qt.io/ide/) that has been tested to work with Windows, Linux and Android. This is the preferred (and easiest) way of building the application if you want to build it yourself. Using the [Qt Visual Studio Tools](https://marketplace.visualstudio.com/items?itemName=TheQtCompany.QtVisualStudioTools2019), it's also possible to use a current Visual Studio version.
 Alternatively, you can simply run `qmake` followed by `make` in the source directory.
 
+## GUI config
+
+The default config from the `OpenCLCapsViewer.pro` project file will build a version with a graphical user interface. This is the recommended way of using the application.
+
+## CLI config
+
+For systems without a graphical user interface, the `OpenCLCapsViewerCLI.pro` project file can be used to build a command line only version of the application. It does not require any UI libraries and reports can be uploaded using command line arguments. Running the application with the `--help` argument will display a list of available arguments and how to use the application.
+
 # Releases
 Current releases for all platforms will be provided on a regular basis at [this link](https://opencl.gpuinfo.org/download.php).
 
