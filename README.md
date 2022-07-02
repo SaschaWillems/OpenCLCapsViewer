@@ -27,7 +27,7 @@ The default config from the `OpenCLCapsViewer.pro` project file will build a ver
 
 ## CLI config
 
-For systems without a graphical user interface, the `OpenCLCapsViewerCLI.pro` project file can be used to build a command line only version of the application. It does not require any UI libraries and reports can be uploaded using command line arguments. Running the application with the `--help` argument will display a list of available arguments and how to use the application.
+For systems without a graphical user interface, the `OpenCLCapsViewerCLI.pro` project file can be used to build a command line only version of the application. It does not require any UI libraries and reports can be uploaded using command line arguments. Available command line arguments can be find in [this document](./docs/commandline_arguments.md).
 
 # Releases
 Current releases for all platforms will be provided on a regular basis at [this link](https://opencl.gpuinfo.org/download.php).
