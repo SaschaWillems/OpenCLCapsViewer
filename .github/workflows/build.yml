@@ -112,6 +112,7 @@ jobs:
           cp openclCapsViewer.png appdir/usr/share/icons/hicolor/256x256/apps/openclCapsViewer.png
           mv appdir/opt/OpenCLCapsViewer appdir/usr/share/OpenCLCapsViewer
           ./linuxdeployqt-continuous-x86_64.AppImage appdir/usr/share/applications/* -appimage
+          mv OpenCL_Caps_Viewer-X11-x86_64.AppImage OpenCL_Caps_Viewer-CLI-x86_64.AppImage
 
       - name: Upload
         if: github.ref == 'refs/heads/master'
