@@ -245,7 +245,7 @@ void PlatformInfo::read()
 	readExtensionInfo();
 
 	// Version dependent information
-	if ((clVersionMajor == 2) && (clVersionMinor >= 1)) {
+	if ((clVersionMajor == 2) && (clVersionMinor >= 1) || (clVersionMajor >= 3)) {
 		readPlatformInfoValue(PlatformInfoValueDescriptor(CL_PLATFORM_HOST_TIMER_RESOLUTION, clValueType::cl_ulong));
 	}
 }
