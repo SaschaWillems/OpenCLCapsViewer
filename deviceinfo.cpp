@@ -513,7 +513,7 @@ void DeviceInfo::readDeviceInfo()
 	}
 
 	// OpenCL 1.1
-	if (((clVersionMajor >= 1) && (clVersionMinor >= 1)) || (clVersionMajor > 2))
+	if (((clVersionMajor == 1) && (clVersionMinor >= 1)) || (clVersionMajor >= 2))
 	{
 		std::vector<DeviceInfoValueDescriptor> infoListCL11 = {
 			{ CL_DEVICE_PREFERRED_VECTOR_WIDTH_HALF, clValueType::cl_uint },
@@ -535,7 +535,7 @@ void DeviceInfo::readDeviceInfo()
 	}
 
 	// OpenCL 1.2
-	if (((clVersionMajor >= 1) && (clVersionMinor >= 2)) || (clVersionMajor > 2))
+	if (((clVersionMajor == 1) && (clVersionMinor >= 2)) || (clVersionMajor >= 2))
 	{
 		std::vector<DeviceInfoValueDescriptor> infoListCL12 = {
 			{ CL_DEVICE_LINKER_AVAILABLE, clValueType::cl_bool, utils::displayBool },
@@ -557,7 +557,7 @@ void DeviceInfo::readDeviceInfo()
 	}
 
 	// OpenCL 2.0
-	if (clVersionMajor == 2)
+	if (clVersionMajor >= 2)
 	{
 		std::vector<DeviceInfoValueDescriptor> infoListCL20 = {
 			{ CL_DEVICE_IMAGE_PITCH_ALIGNMENT, clValueType::cl_uint },
@@ -585,7 +585,7 @@ void DeviceInfo::readDeviceInfo()
 	}
 
 	// OpenCL 3.0
-	if (clVersionMajor == 3) 
+	if (clVersionMajor >= 3)
 	{
 		std::vector<DeviceInfoValueDescriptor> infoListCL30 = {
 			{ CL_DEVICE_NUMERIC_VERSION, clValueType::cl_version, utils::displayVersion },
