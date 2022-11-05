@@ -20,5 +20,5 @@
 
 #include "appinfo.h"
 
-const QString appVersion = "1.1";
+const QString appVersion = "1.2";
 const QString reportVersion = "1.0";
