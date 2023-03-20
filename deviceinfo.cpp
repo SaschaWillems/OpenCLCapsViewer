@@ -353,6 +353,13 @@ void DeviceInfo::readDeviceInfoValue(DeviceInfoValueDescriptor descriptor, QStri
 		deviceInfo.push_back(infoValue);
 		break;
 	}
+	case clValueType::cl_device_unified_shared_memory_capabilities_intel:
+	{
+		cl_device_unified_shared_memory_capabilities_intel value;
+        _clGetDeviceInfo(this->deviceId, descriptor.name, sizeof(cl_device_unified_shared_memory_capabilities_intel), &value, nullptr);
+        deviceInfo.push_back(DeviceInfoValue(descriptor.name, QVariant::fromValue(value), extension, descriptor.displayFunction));
+		break;
+	}
 	/* Special cases */
 	case clValueType::special:
 	{
@@ -847,6 +854,18 @@ void DeviceInfo::readExtensionInfo()
 		};
 		for (auto info : infoList) {
 			readDeviceInfoValue(info, "cl_intel_command_queue_families");
+		}
+	}
+	if (extensionSupported("cl_intel_unified_shared_memory")) {
+		std::vector<DeviceInfoValueDescriptor> infoList = {
+			{ CL_DEVICE_HOST_MEM_CAPABILITIES_INTEL, clValueType::cl_device_unified_shared_memory_capabilities_intel, utils::displayDeviceUsmCapabilitiesIntel },
+			{ CL_DEVICE_DEVICE_MEM_CAPABILITIES_INTEL, clValueType::cl_device_unified_shared_memory_capabilities_intel, utils::displayDeviceUsmCapabilitiesIntel },
+			{ CL_DEVICE_SINGLE_DEVICE_SHARED_MEM_CAPABILITIES_INTEL, clValueType::cl_device_unified_shared_memory_capabilities_intel, utils::displayDeviceUsmCapabilitiesIntel },
+			{ CL_DEVICE_CROSS_DEVICE_SHARED_MEM_CAPABILITIES_INTEL, clValueType::cl_device_unified_shared_memory_capabilities_intel, utils::displayDeviceUsmCapabilitiesIntel },
+			{ CL_DEVICE_SHARED_SYSTEM_MEM_CAPABILITIES_INTEL, clValueType::cl_device_unified_shared_memory_capabilities_intel, utils::displayDeviceUsmCapabilitiesIntel },
+		};
+		for (auto info : infoList) {
+			readDeviceInfoValue(info, "cl_intel_unified_shared_memory");
 		}
 	}
 

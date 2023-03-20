@@ -54,6 +54,7 @@ namespace utils
 	QString displaySchedulingControlsCapabilitiesARM(QVariant value);
 	QString displayQueueFamilyPropertiesIntel(QVariant value);
 	QString displayCommandQueueCapabilitiesIntel(QVariant value);
+	QString displayDeviceUsmCapabilitiesIntel(QVariant value);
 	QString displayDetailValueArraySize(QVariant value);
 	QString displayItegerDotProductCapabilities(QVariant value);
 	QString displayExternalMemoryHandleTypes(QVariant value);

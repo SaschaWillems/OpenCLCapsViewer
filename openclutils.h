@@ -59,6 +59,7 @@ enum class clValueType {
 	cl_external_memory_handle_type_khr_array,
 	cl_external_semaphore_handle_type_khr,
 	cl_device_command_buffer_capabilities_khr,
+	cl_device_unified_shared_memory_capabilities_intel,
 	special
 };
 
