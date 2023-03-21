@@ -288,6 +288,17 @@ namespace utils
         }
     }
 
+    QString displayDeviceUsmCapabilitiesIntel(QVariant value)
+    {
+        std::unordered_map<uint32_t, QString> flags = {
+            { CL_UNIFIED_SHARED_MEMORY_ACCESS_INTEL, "USM_ACCESS"},
+            { CL_UNIFIED_SHARED_MEMORY_ATOMIC_ACCESS_INTEL, "USM_ATOMIC_ACCESS" },
+            { CL_UNIFIED_SHARED_MEMORY_CONCURRENT_ACCESS_INTEL, "USM_CONCURRENT_ACCESS" },
+            { CL_UNIFIED_SHARED_MEMORY_CONCURRENT_ATOMIC_ACCESS_INTEL, "USM_CONCURRENT_ATOMIC_ACCESS" }
+        };
+        return displayFlags(value.toInt(), flags);
+    }
+
     QString displayDetailValueArraySize(QVariant value)
     {
         return QString("[%1]").arg(value.toInt());
