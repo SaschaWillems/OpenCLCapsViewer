@@ -2,7 +2,7 @@
 *
 * OpenCL hardware capability viewer
 *
-* Copyright (C) 2021 by Sascha Willems (www.saschawillems.de)
+* Copyright (C) 2021-2023 by Sascha Willems (www.saschawillems.de)
 *
 * This code is free software, you can redistribute it and/or
 * modify it under the terms of the GNU Lesser General Public
@@ -31,6 +31,22 @@ void getOperatingSystem()
     operatingSystem.type = -1;
 #if defined(_WIN32)
     operatingSystem.type = 0;
+    // Windows 11 can only be detected by the build version
+    HMODULE hModule = LoadLibrary(TEXT("ntdll.dll"));
+    if (hModule) {
+        typedef NTSTATUS(WINAPI* RtlGetVersionFN)(PRTL_OSVERSIONINFOW);
+        RtlGetVersionFN RtlGetVersion = reinterpret_cast<RtlGetVersionFN>(GetProcAddress(hModule, "RtlGetVersion"));
+        if (RtlGetVersion) {
+            RTL_OSVERSIONINFOW osVersionInfo = { 0 };
+            osVersionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEXW);
+            if (RtlGetVersion(&osVersionInfo) == S_OK) {
+                if (osVersionInfo.dwBuildNumber >= 22000) {
+                    operatingSystem.version = "11";
+                }
+            }
+}
+        FreeLibrary(hModule);
+    }
 #elif defined(__ANDROID__)
     operatingSystem.type = 2;
 #elif defined(__linux__)

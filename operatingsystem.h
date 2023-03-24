@@ -2,7 +2,7 @@
 *
 * OpenCL hardware capability viewer
 *
-* Copyright (C) 2021 by Sascha Willems (www.saschawillems.de)
+* Copyright (C) 2021-2023 by Sascha Willems (www.saschawillems.de)
 *
 * This code is free software, you can redistribute it and/or
 * modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,9 @@
 
 #include <QString>
 #include <QSysInfo>
+#ifdef _WIN32
+#include <windows.h>
+#endif
 
 struct OperatingSystem
 {
