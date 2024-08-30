@@ -16,11 +16,11 @@ jobs:
     steps:
       - uses: ilammy/msvc-dev-cmd@v1
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: "recursive"
 
-      - uses: jurplel/install-qt-action@v2
+      - uses: jurplel/install-qt-action@v4
 
       - name: Build
         env:
@@ -41,14 +41,14 @@ jobs:
 
   build_ubuntu:
     name: Build Ubuntu (X11)
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: "recursive"
 
-      - uses: jurplel/install-qt-action@v2
+      - uses: jurplel/install-qt-action@v4
         with:
           version: 5.12.9
           host: linux
@@ -80,14 +80,14 @@ jobs:
 
   build_ubuntu_cli:
     name: Build CLI version on Ubuntu (X11)
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: "recursive"
 
-      - uses: jurplel/install-qt-action@v2
+      - uses: jurplel/install-qt-action@v4
         with:
           version: 5.12.9
           host: linux
