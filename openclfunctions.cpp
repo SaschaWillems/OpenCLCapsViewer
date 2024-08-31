@@ -99,7 +99,7 @@ bool checkOpenCLAvailability(QString& error)
     else {
         error = "Could not find a OpenCL library";
     }
-#elif defined(__linux__)
+#elif defined(__linux__) || defined(__APPLE__)
     // Try to find the OepenCL library on one of the following paths
     static const char* libraryPaths[] = {
         "libOpenCL.so",
@@ -113,7 +113,9 @@ bool checkOpenCLAvailability(QString& error)
         "/usr/local/lib/libOpenCL.so.1",
         "/usr/local/lib/libpocl.so.1",
         "/usr/lib64/libOpenCL.so.1",
-        "/usr/lib32/libOpenCL.so.1"
+        "/usr/lib32/libOpenCL.so.1",
+        "/System/Library/Frameworks/OpenCL.framework",
+        "/System/Library/Frameworks/OpenCL.framework/Versions/A/OpenCL"
     };
     void* libOpenCL = nullptr;
     for (auto libraryPath : libraryPaths) {
