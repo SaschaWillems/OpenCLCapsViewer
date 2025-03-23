@@ -71,6 +71,7 @@
         </activity>
         <!-- For adding service(s) please check: https://wiki.qt.io/AndroidServices -->
         <uses-native-library android:name="libOpenCL.so" android:required="false"/>
+        <uses-native-library android:name="libOpenCL-pixel.so" android:required="false"/>
     </application>
 
 </manifest>
