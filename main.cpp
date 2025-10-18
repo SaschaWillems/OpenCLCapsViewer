@@ -2,7 +2,7 @@
 *
 * OpenCL hardware capability viewer
 *
-* Copyright (C) 2021-2022 by Sascha Willems (www.saschawillems.de)
+* Copyright (C) 2021-2025 by Sascha Willems (www.saschawillems.de)
 *
 * This code is free software, you can redistribute it and/or
 * modify it under the terms of the GNU Lesser General Public
@@ -60,7 +60,7 @@ void logMessageHandler(QtMsgType type, const QMessageLogContext& context, const 
     QFile logFile("log.txt");
     if (logFile.open(QIODevice::WriteOnly | QIODevice::Append)) {
         QTextStream textStream(&logFile);
-        textStream << logMessage << endl;
+        textStream << logMessage << Qt::endl;
     }
 }
 
@@ -77,6 +77,10 @@ int main(int argc, char *argv[])
 #ifdef GUI_BUILD
 #if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    #ifdef Q_OS_WIN
+        // Disable dark mode on Winodows as it doesn't look very good
+        qputenv("QT_QPA_PLATFORM", "windows::darkmode=0");
+    #endif
 #endif
     QApplication::setApplicationVersion(appVersion);
     QApplication application(argc, argv);

@@ -2,7 +2,7 @@
 *
 * OpenCL hardware capability viewer
 *
-* Copyright (C) 2021-2023 by Sascha Willems (www.saschawillems.de)
+* Copyright (C) 2021-2025 by Sascha Willems (www.saschawillems.de)
 *
 * This code is free software, you can redistribute it and/or
 * modify it under the terms of the GNU Lesser General Public
@@ -20,5 +20,5 @@
 
 #include "appinfo.h"
 
-const QString appVersion = "1.21";
-const QString reportVersion = "1.0";
+const QString appVersion = "1.30";
+const QString reportVersion = "1.1";

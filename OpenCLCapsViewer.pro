@@ -1,8 +1,7 @@
 TEMPLATE = app
 TARGET = OpenCLCapsViewer
-QT       += core network gui
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-CONFIG += c++11
+QT += core network widgets gui
+CONFIG += c++17
 DEFINES += GUI_BUILD
 DEFINES += QT_DLL QT_NETWORK_LIB QT_WIDGETS_LIB
 DEFINES += CL_TARGET_OPENCL_VERSION=300

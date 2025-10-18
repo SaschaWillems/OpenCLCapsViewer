@@ -2,7 +2,7 @@
 *
 * OpenCL hardware capability viewer
 *
-* Copyright (C) 2021-2022 by Sascha Willems (www.saschawillems.de)
+* Copyright (C) 2021-2025 by Sascha Willems (www.saschawillems.de)
 *
 * This code is free software, you can redistribute it and/or
 * modify it under the terms of the GNU Lesser General Public
@@ -430,7 +430,7 @@ void MainWindow::slotAbout()
 {
     std::stringstream aboutText;
     aboutText << "<p>OpenCL Hardware Capability Viewer " << appVersion.toStdString() << "<br/><br/>"
-        "Copyright (c) 2021-2022 by <a href='https://www.saschawillems.de'>Sascha Willems</a><br/><br/>"
+        "Copyright (c) 2021-2025 by <a href='https://www.saschawillems.de'>Sascha Willems</a><br/><br/>"
         "This tool is <b>Free Open Source Software</b><br/><br/>"
         "For usage and distribution details refer to the readme<br/><br/>"
         "<a href='https://www.gpuinfo.org'>https://www.gpuinfo.org</a></p>";
@@ -528,33 +528,33 @@ void MainWindow::slotUploadReport()
 
 void MainWindow::slotFilterDeviceInfo(QString text)
 {
-    QRegExp regExp(text, Qt::CaseInsensitive, QRegExp::RegExp);
-    filterProxies.deviceinfo.setFilterRegExp(regExp);
+    QRegularExpression regExp(text, QRegularExpression::CaseInsensitiveOption);
+    filterProxies.deviceinfo.setFilterRegularExpression(regExp);
 }
 
 void MainWindow::slotFilterDeviceExtensions(QString text)
 {
-    QRegExp regExp(text, Qt::CaseInsensitive, QRegExp::RegExp);
-    filterProxies.deviceExtensions.setFilterRegExp(regExp);
+    QRegularExpression regExp(text, QRegularExpression::CaseInsensitiveOption);
+    filterProxies.deviceExtensions.setFilterRegularExpression(regExp);
 }
 
 void MainWindow::slotFilterDeviceImageFormats(QString text)
 {
-    QRegExp regExp(text, Qt::CaseInsensitive, QRegExp::RegExp);
+    QRegularExpression regExp(text, QRegularExpression::CaseInsensitiveOption);
     filterProxies.deviceImageFormats.setRecursiveFilteringEnabled(true);
-    filterProxies.deviceImageFormats.setFilterRegExp(regExp);
+    filterProxies.deviceImageFormats.setFilterRegularExpression(regExp);
 }
 
 void MainWindow::slotFilterPlatformInfo(QString text)
 {
-    QRegExp regExp(text, Qt::CaseInsensitive, QRegExp::RegExp);
-    filterProxies.platformInfo.setFilterRegExp(regExp);
+    QRegularExpression regExp(text, QRegularExpression::CaseInsensitiveOption);
+    filterProxies.platformInfo.setFilterRegularExpression(regExp);
 }
 
 void MainWindow::slotFilterPlatformExtensions(QString text)
 {
-    QRegExp regExp(text, Qt::CaseInsensitive, QRegExp::RegExp);
-    filterProxies.platformExtensions.setFilterRegExp(regExp);
+    QRegularExpression regExp(text, QRegularExpression::CaseInsensitiveOption);
+    filterProxies.platformExtensions.setFilterRegularExpression(regExp);
 }
 
 void MainWindow::slotComboBoxDeviceChanged(int index)
