@@ -60,7 +60,6 @@ win32 {
 linux:!android {
     contains(DEFINES, X11) {
         message("Building for X11")
-        QT += x11extras
         DEFINES += VK_USE_PLATFORM_XCB_KHR
     }
     contains(DEFINES, WAYLAND) {
