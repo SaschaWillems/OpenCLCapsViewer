@@ -100,3 +100,6 @@ RESOURCES += \
     mainwindow.qrc
 
 win32:RC_FILE = OpenCLCapsViewer.rc
+
+DISTFILES += \
+    android/res/xml/qtprovider_paths.xml
