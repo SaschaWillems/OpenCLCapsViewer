@@ -91,7 +91,8 @@ MainWindow::MainWindow(QWidget *parent)
     }
     // No identation
     for (int i = 0; i < ui->tabWidgetDevice->count(); i++) {
-        ui->tabWidgetDevice->widget(i)->layout()->setMargin(0);
+        // todo: No longer available in Qt6
+        // ui->tabWidgetDevice->widget(i)->layout()->setMargin(0);
     }
 #endif
 }

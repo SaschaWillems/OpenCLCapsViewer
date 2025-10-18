@@ -80,10 +80,8 @@ linux:!android {
 }
 
 android {
-    QT += androidextras
     CONFIG += mobility
     MOBILITY =
-    LIBS += -landroid
 
     ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
 
