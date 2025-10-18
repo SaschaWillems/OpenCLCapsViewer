@@ -76,7 +76,6 @@ int main(int argc, char *argv[])
 
 #ifdef GUI_BUILD
 #if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
-    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     #ifdef Q_OS_WIN
         // Disable dark mode on Winodows as it doesn't look very good
         qputenv("QT_QPA_PLATFORM", "windows::darkmode=0");
