@@ -21,6 +21,10 @@ jobs:
           submodules: "recursive"
 
       - uses: jurplel/install-qt-action@v4
+        with:
+          # todo: Needs to be updated to 6.8.5 once that's released
+          version: 6.8.3
+          target: 'desktop'
 
       - name: Build
         env:
@@ -41,7 +45,7 @@ jobs:
 
   build_ubuntu:
     name: Build Ubuntu (X11)
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
       - uses: actions/checkout@v4
@@ -50,8 +54,9 @@ jobs:
 
       - uses: jurplel/install-qt-action@v4
         with:
-          version: 5.12.9
-          host: linux
+          # todo: Needs to be updated to 6.8.5 once that's released
+          version: 6.8.3
+          target: 'desktop'
 
       - name: Install OpenCL ICD loader
         run: |
@@ -80,7 +85,7 @@ jobs:
 
   build_ubuntu_cli:
     name: Build CLI version on Ubuntu (X11)
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
       - uses: actions/checkout@v4
@@ -89,8 +94,9 @@ jobs:
 
       - uses: jurplel/install-qt-action@v4
         with:
-          version: 5.12.9
-          host: linux
+          # todo: Needs to be updated to 6.8.5 once that's released
+          version: 6.8.3
+          target: 'desktop'
 
       - name: Install OpenCL ICD loader
         run: |
@@ -116,7 +122,7 @@ jobs:
 
       - name: Upload
         if: github.ref == 'refs/heads/master'
-        run: curl -T OpenCL_Caps_Viewer-CLI-x86_64.AppImage ftp://${{ secrets.FTP_USER_NAME }}:${{ secrets.FTP_PASS }}@${{ secrets.FTP_SERVER_NAME }}        
+        run: curl -T OpenCL_Caps_Viewer-CLI-x86_64.AppImage ftp://${{ secrets.FTP_USER_NAME }}:${{ secrets.FTP_PASS }}@${{ secrets.FTP_SERVER_NAME }}
 
   # build_android:
   #   name: Build Android
@@ -131,7 +137,7 @@ jobs:
   #       with:
   #         version: 5.12.9
   #         target: android
-  #         arch: android_arm64_v8a 
+  #         arch: android_arm64_v8a
 
   #     - name: Build
   #       env:
