@@ -30,6 +30,11 @@ MainWindow::MainWindow(QWidget *parent)
     const QString title = "OpenCL Hardware Capability Viewer " + appVersion;
     setWindowTitle(title);
     ui->labelTitle->setText(title);
+    
+    QPalette palette;
+    palette.setColor(QPalette::Highlight, QColor(0, 120, 215));
+    palette.setColor(QPalette::Link, QColor(0, 120, 215));
+    qApp->setPalette(palette);
     qApp->setStyle(QStyleFactory::create("Fusion"));
 
     // Models
