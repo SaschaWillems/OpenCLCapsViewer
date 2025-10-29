@@ -1,8 +1,7 @@
 TEMPLATE = app
 TARGET = OpenCLCapsViewer
-QT       += core network gui
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-CONFIG += c++11
+QT += core network widgets gui
+CONFIG += c++17
 DEFINES += GUI_BUILD
 DEFINES += QT_DLL QT_NETWORK_LIB QT_WIDGETS_LIB
 DEFINES += CL_TARGET_OPENCL_VERSION=300
@@ -61,7 +60,6 @@ win32 {
 linux:!android {
     contains(DEFINES, X11) {
         message("Building for X11")
-        QT += x11extras
         DEFINES += VK_USE_PLATFORM_XCB_KHR
     }
     contains(DEFINES, WAYLAND) {
@@ -81,10 +79,8 @@ linux:!android {
 }
 
 android {
-    QT += androidextras
     CONFIG += mobility
     MOBILITY =
-    LIBS += -landroid
 
     ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
 
@@ -103,3 +99,6 @@ RESOURCES += \
     mainwindow.qrc
 
 win32:RC_FILE = OpenCLCapsViewer.rc
+
+DISTFILES += \
+    android/res/xml/qtprovider_paths.xml

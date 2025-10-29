@@ -2,7 +2,7 @@
 *
 * OpenCL hardware capability viewer
 *
-* Copyright (C) 2021 by Sascha Willems (www.saschawillems.de)
+* Copyright (C) 2021-2025 by Sascha Willems (www.saschawillems.de)
 *
 * This code is free software, you can redistribute it and/or
 * modify it under the terms of the GNU Lesser General Public
@@ -343,7 +343,7 @@ void DeviceInfo::readDeviceInfoValue(DeviceInfoValueDescriptor descriptor, QStri
 			uint32_t index = 0;
 			for (auto& value : values) {
 				QString queueId = "Queue family " + QString::number(index);
-				infoValue.addDetailValue(queueId, "Name", value.name, utils::displayText);
+				infoValue.addDetailValue(queueId, "Name", QString(value.name), utils::displayText);
 				infoValue.addDetailValue(queueId, "Count", value.count);
 				infoValue.addDetailValue(queueId, "Properties", QVariant::fromValue(value.properties), utils::displayCommandQueueProperties);
 				infoValue.addDetailValue(queueId, "Capabilities", QVariant::fromValue(value.capabilities), utils::displayCommandQueueCapabilitiesIntel);
