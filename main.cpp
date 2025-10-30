@@ -62,11 +62,17 @@ void logMessageHandler(QtMsgType type, const QMessageLogContext& context, const 
         QTextStream textStream(&logFile);
         textStream << logMessage << Qt::endl;
     }
+    // Suppress compiler warning
+    (void)context;
 }
 
 #ifndef GUI
 void logMessageHandlerCli(QtMsgType type, const QMessageLogContext& context, const QString& msg)
 {
+    // Suppress compiler warning
+    (void)type;
+    (void)context;
+    (void)msg;
     return;
 }
 #endif

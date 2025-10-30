@@ -33,7 +33,7 @@ For systems without a graphical user interface, the `OpenCLCapsViewerCLI.pro` pr
 Current releases for all platforms will be provided on a regular basis at [this link](https://opencl.gpuinfo.org/download.php).
 
 # Dependencies
-- [Qt 5.12](https://www.qt.io/developers/) - Older versions may not work due to missing functionality
+- [Qt 6.8](https://www.qt.io/developers/) - Older versions may not work due to missing functionality
 
 # Legal
 <a href="https://www.khronos.org/opencl/">OpenCL</a> and the OpenCL logo are trademarks of Apple Inc. used by permission by <a href="https://www.khronos.org">Khronos</a>
