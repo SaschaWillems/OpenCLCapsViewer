@@ -1014,7 +1014,6 @@ QJsonObject DeviceInfo::toJson()
 
 	// Supported image formats
 	QJsonArray jsonImages;
-	int cnt = 0;
 	for (auto& imageType : imageTypes) 
 	{
 		for (auto& channelOrder : imageType.second.channelOrders) 
@@ -1027,7 +1026,6 @@ QJsonObject DeviceInfo::toJson()
 				jsonNode["channeltype"] = QJsonValue(int(channelType.first));
 				jsonNode["flags"] = QJsonValue(int(channelType.second.memFlags));
 				jsonImages.append(jsonNode);
-				cnt++;
 			}
 		}
 	}
