@@ -2,7 +2,7 @@
 *
 * OpenCL hardware capability viewer
 *
-* Copyright (C) 2021 by Sascha Willems (www.saschawillems.de)
+* Copyright (C) 2021-2026 by Sascha Willems (www.saschawillems.de)
 *
 * This code is free software, you can redistribute it and/or
 * modify it under the terms of the GNU Lesser General Public
@@ -75,7 +75,7 @@ namespace utils
 
     QString displayByteSize(QVariant value)
     {
-        return QString("%L1 bytes").arg(value.toUInt());
+        return QString("%L1 bytes").arg(value.toULongLong());
     }
 
     QString displayText(QVariant value)
