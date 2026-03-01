@@ -20,6 +20,10 @@
 
 #include "operatingsystem.h"
 
+#if defined(__APPLE__)
+#include "TargetConditionals.h"
+#endif
+
 OperatingSystem operatingSystem{};
 
 void getOperatingSystem()
@@ -51,7 +55,11 @@ void getOperatingSystem()
     operatingSystem.type = 2;
 #elif defined(__linux__)
     operatingSystem.type = 1;
-#elif __APPLE__
-    // @todo: dinstinguish between macos and ios
+#elif defined(__APPLE__)
+#if TARGET_OS_OSX
+    operatingSystem.type = 3;
+#else
+    operatingSystem.type = 4;
+#endif
 #endif
 }
