@@ -22,6 +22,7 @@
 
 #include "CL/cl.h"
 #include "CL/cl_ext.h"
+#include "CL/cl_gl.h"
 #include <vector>
 #include <sstream>
 #include <QString>

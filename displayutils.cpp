@@ -320,11 +320,6 @@ namespace utils
 #define STR(r) case r: return #r
             // cl_khr_external_memory_dma_buf
             STR(CL_EXTERNAL_MEMORY_HANDLE_DMA_BUF_KHR);
-            // cl_khr_external_memory_dx
-            STR(CL_EXTERNAL_MEMORY_HANDLE_D3D11_TEXTURE_KHR);
-            STR(CL_EXTERNAL_MEMORY_HANDLE_D3D11_TEXTURE_KMT_KHR);
-            STR(CL_EXTERNAL_MEMORY_HANDLE_D3D12_HEAP_KHR);
-            STR(CL_EXTERNAL_MEMORY_HANDLE_D3D12_RESOURCE_KHR);
             // cl_khr_external_memory_opaque_fd
             STR(CL_EXTERNAL_MEMORY_HANDLE_OPAQUE_FD_KHR);
             // cl_khr_external_memory_win32
