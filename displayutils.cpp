@@ -304,6 +304,15 @@ namespace utils
         return QString("[%1]").arg(value.toInt());
     }
 
+    QString displayIntegerDotProductCapabilities(QVariant value)
+    {
+        std::unordered_map<uint32_t, QString> flags = {
+            { CL_DEVICE_INTEGER_DOT_PRODUCT_INPUT_4x8BIT_PACKED, "INTEGER_DOT_PRODUCT_INPUT_4x8BIT_PACKED"},
+            { CL_DEVICE_INTEGER_DOT_PRODUCT_INPUT_4x8BIT, "INTEGER_DOT_PRODUCT_INPUT_4x8BIT" },
+        };
+        return displayFlags(value.toInt(), flags);
+    }
+
     QString displayItegerDotProductCapabilities(QVariant value)
     {
         std::unordered_map<uint32_t, QString> flags = {
