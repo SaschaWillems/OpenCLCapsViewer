@@ -304,6 +304,15 @@ namespace utils
         return QString("[%1]").arg(value.toInt());
     }
 
+    QString displayIntegerDotProductCapabilities(QVariant value)
+    {
+        std::unordered_map<uint32_t, QString> flags = {
+            { CL_DEVICE_INTEGER_DOT_PRODUCT_INPUT_4x8BIT_PACKED, "INTEGER_DOT_PRODUCT_INPUT_4x8BIT_PACKED"},
+            { CL_DEVICE_INTEGER_DOT_PRODUCT_INPUT_4x8BIT, "INTEGER_DOT_PRODUCT_INPUT_4x8BIT" },
+        };
+        return displayFlags(value.toInt(), flags);
+    }
+
     QString displayItegerDotProductCapabilities(QVariant value)
     {
         std::unordered_map<uint32_t, QString> flags = {
@@ -320,11 +329,6 @@ namespace utils
 #define STR(r) case r: return #r
             // cl_khr_external_memory_dma_buf
             STR(CL_EXTERNAL_MEMORY_HANDLE_DMA_BUF_KHR);
-            // cl_khr_external_memory_dx
-            STR(CL_EXTERNAL_MEMORY_HANDLE_D3D11_TEXTURE_KHR);
-            STR(CL_EXTERNAL_MEMORY_HANDLE_D3D11_TEXTURE_KMT_KHR);
-            STR(CL_EXTERNAL_MEMORY_HANDLE_D3D12_HEAP_KHR);
-            STR(CL_EXTERNAL_MEMORY_HANDLE_D3D12_RESOURCE_KHR);
             // cl_khr_external_memory_opaque_fd
             STR(CL_EXTERNAL_MEMORY_HANDLE_OPAQUE_FD_KHR);
             // cl_khr_external_memory_win32
@@ -360,7 +364,7 @@ namespace utils
             { CL_COMMAND_BUFFER_CAPABILITY_KERNEL_PRINTF_KHR, "KERNEL_PRINTF_KHR"},
             { CL_COMMAND_BUFFER_CAPABILITY_DEVICE_SIDE_ENQUEUE_KHR, "DEVICE_SIDE_ENQUEUE_KHR"},
             { CL_COMMAND_BUFFER_CAPABILITY_SIMULTANEOUS_USE_KHR, "SIMULTANEOUS_USE_KHR"},
-            { CL_COMMAND_BUFFER_CAPABILITY_OUT_OF_ORDER_KHR, "OUT_OF_ORDER_KHR"}
+            { CL_COMMAND_BUFFER_CAPABILITY_MULTIPLE_QUEUE_KHR, "MULTIPLE_QUEUE_KHR"}
         };
         return displayFlags(value.toInt(), flags);
     }

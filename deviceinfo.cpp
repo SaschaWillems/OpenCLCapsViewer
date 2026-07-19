@@ -2,7 +2,7 @@
 *
 * OpenCL hardware capability viewer
 *
-* Copyright (C) 2021-2025 by Sascha Willems (www.saschawillems.de)
+* Copyright (C) 2021-2026 by Sascha Willems (www.saschawillems.de)
 *
 * This code is free software, you can redistribute it and/or
 * modify it under the terms of the GNU Lesser General Public
@@ -145,6 +145,20 @@ void DeviceInfo::readDeviceInfoValue(DeviceInfoValueDescriptor descriptor, QStri
 		size_t valueSize;
         _clGetDeviceInfo(this->deviceId, descriptor.name, 0, nullptr, &valueSize);
 		std::vector<cl_uint> values;
+		values.resize(valueSize / sizeof(cl_uint));
+		_clGetDeviceInfo(this->deviceId, descriptor.name, valueSize, &values[0], nullptr);
+		QVariantList variantList;
+		for (auto value : values) {
+			variantList << QVariant::fromValue(value);
+		}
+		deviceInfo.push_back(DeviceInfoValue(descriptor.name, variantList, extension, descriptor.displayFunction));
+		break;
+	}
+	case clValueType::cl_char_array:
+	{
+		size_t valueSize;
+		_clGetDeviceInfo(this->deviceId, descriptor.name, 0, nullptr, &valueSize);
+		std::vector<const char*> values;
 		values.resize(valueSize / sizeof(cl_uint));
 		_clGetDeviceInfo(this->deviceId, descriptor.name, valueSize, &values[0], nullptr);
 		QVariantList variantList;
@@ -611,6 +625,28 @@ void DeviceInfo::readDeviceInfo()
 			{ CL_DEVICE_LATEST_CONFORMANCE_VERSION_PASSED, clValueType::cl_char },
 		};
 		for (auto info : infoListCL30)
+		{
+			readDeviceInfoValue(info);
+		}
+	}
+
+	// OpenCL 3.1
+	if ((clVersionMajor > 3) || ((clVersionMajor == 3) && (clVersionMinor >= 1)))
+	{
+		std::vector<DeviceInfoValueDescriptor> infoListCL31 = {
+			{ CL_DEVICE_UUID, clValueType::special },
+			{ CL_DRIVER_UUID, clValueType::special },
+			{ CL_DEVICE_LUID_VALID, clValueType::cl_bool, utils::displayBool },
+			{ CL_DEVICE_LUID, clValueType::special },
+			{ CL_DEVICE_NODE_MASK, clValueType::cl_uint },
+			{ CL_DEVICE_INTEGER_DOT_PRODUCT_CAPABILITIES, clValueType::cl_device_integer_dot_product_capabilities_khr, utils::displayIntegerDotProductCapabilities },
+			{ CL_DEVICE_INTEGER_DOT_PRODUCT_ACCELERATION_PROPERTIES_8BIT, clValueType::cl_device_integer_dot_product_acceleration_properties_khr },
+			{ CL_DEVICE_INTEGER_DOT_PRODUCT_ACCELERATION_PROPERTIES_4x8BIT_PACKED, clValueType::cl_device_integer_dot_product_acceleration_properties_khr },
+			{ CL_DEVICE_SPIRV_EXTENDED_INSTRUCTION_SETS, clValueType::cl_char_array },
+			{ CL_DEVICE_SPIRV_EXTENSIONS, clValueType::cl_char_array },
+			{ CL_DEVICE_SPIRV_CAPABILITIES, clValueType::cl_uint_array },
+		};
+		for (auto info : infoListCL31)
 		{
 			readDeviceInfoValue(info);
 		}
