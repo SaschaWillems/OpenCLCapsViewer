@@ -30,6 +30,7 @@
 enum class clValueType {
 	cl_bool,
 	cl_char,
+	cl_char_array,
 	cl_command_queue_properties,
 	cl_device_atomic_capabilities,
 	cl_device_device_enqueue_capabilities,
