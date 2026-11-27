@@ -207,6 +207,8 @@ namespace utils
 			STR(CL_DEVICE_HALF_FP_CONFIG);
 			// cl_khr_spir
 			STR(CL_DEVICE_SPIR_VERSIONS);
+			// cl_khr_subgroup_named_barrier
+			STR(CL_DEVICE_MAX_NAMED_BARRIER_COUNT_KHR);
 			// STR(DEVICE_EXTENSIONS_WITH_VERSION_KHR);
 			// STR(DEVICE_BUILT_IN_KERNELS_WITH_VERSION_KHR);
 			// cl_khr_pci_bus_info
